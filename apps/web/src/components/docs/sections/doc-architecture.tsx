@@ -70,16 +70,16 @@ export const DocArchitecture: React.FC<DocArchitectureProps> = ({
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-violet-500/10 border border-violet-500/20 text-[11px] font-mono font-semibold text-violet-400 uppercase tracking-widest w-fit">
             ENGINE ARCHITECTURE
           </div>
-          <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tighter text-white leading-[1.08]">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.1] break-words">
             3-Phase Ticker Pipeline
           </h1>
-          <p className="text-base sm:text-lg text-zinc-400 leading-relaxed max-w-3xl font-normal">
+          <p className="text-sm sm:text-base text-zinc-400 leading-relaxed max-w-3xl font-normal">
             How ScrollCraft completely eliminates layout thrashing, avoids forced synchronous reflows, and locks in 120 FPS frame consistency across refresh cycles.
           </p>
         </header>
 
         <section id="ticker-execution" className="flex flex-col gap-4">
-          <h2 className="text-2xl font-bold tracking-tight text-white">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white break-words">
             The Zero-Allocation Microtask Loop
           </h2>
           <p className="text-sm text-zinc-400 leading-relaxed">
@@ -115,16 +115,16 @@ export const DocArchitecture: React.FC<DocArchitectureProps> = ({
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono font-semibold text-emerald-400 uppercase tracking-widest w-fit">
             ACCESSIBILITY (A11Y)
           </div>
-          <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tighter text-white leading-[1.08]">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.1] break-words">
             Dual-Layer Reduced Motion
           </h1>
-          <p className="text-base sm:text-lg text-zinc-400 leading-relaxed max-w-3xl font-normal">
+          <p className="text-sm sm:text-base text-zinc-400 leading-relaxed max-w-3xl font-normal">
             Built-in OS-level vestibular disorder protection. ScrollCraft automatically honors user accessibility preferences out of the box.
           </p>
         </header>
 
         <section id="a11y-detection" className="flex flex-col gap-4">
-          <h2 className="text-2xl font-bold tracking-tight text-white">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white break-words">
             How Dual-Layer Protection Operates
           </h2>
           <div className="space-y-4 text-sm text-zinc-400 leading-relaxed">
@@ -166,20 +166,23 @@ export const DocArchitecture: React.FC<DocArchitectureProps> = ({
     <div className="flex flex-col gap-12">
       <header className="flex flex-col gap-4">
         <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-violet-500/10 border border-violet-500/20 text-[11px] font-mono font-semibold text-violet-400 uppercase tracking-widest w-fit">
-          ARCHITECTURE & PERF
+          ARCHITECTURE &amp; PERF
         </div>
-        <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tighter text-white leading-[1.08]">
+        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.1] break-words">
           Engine Comparison
         </h1>
-        <p className="text-base sm:text-lg text-zinc-400 leading-relaxed max-w-3xl font-normal">
+        <p className="text-sm sm:text-base text-zinc-400 leading-relaxed max-w-3xl font-normal">
           Direct architectural comparison between ScrollCraft and other web scroll toolkits.
         </p>
       </header>
 
       <section id="fps-comparison" className="flex flex-col gap-4">
-        <h2 className="text-2xl font-bold tracking-tight text-white">
-          Architectural Paradigms Compared
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white break-words">
+            Architectural Paradigms Compared
+          </h2>
+          <span className="text-[10px] font-mono text-zinc-500 sm:hidden">Swipe table &rarr;</span>
+        </div>
         <p className="text-sm text-zinc-400 leading-relaxed">
           How different scroll engineering paradigms handle thread execution, DOM manipulation, and React rendering:
         </p>

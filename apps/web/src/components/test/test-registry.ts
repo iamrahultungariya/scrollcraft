@@ -1767,4 +1767,34 @@ export function EngineMetricsDemo() {
 const scrollY = useScrollState((m) => m.scroll);
 const tier = useScrollCraftTier();`,
   },
+
+  {
+    id: 'robust',
+    slug: 'robust',
+    category: 'components',
+    title: 'Robust Testing Lab',
+    shortDescription: 'Live 8-layer verification suite: adversarial math fuzzing, chaos lifecycle, and zero-leak soak.',
+    fullDescription:
+      '21-card interactive testing lab using all ScrollCraft primitives and hooks. Validates adversarial math fuzzing, chaos unmount bursts, instant coordinate synchronization, clock recovery, memory leak soak, and FrustumShield culling.',
+    tags: ['8-Layer Protocol', 'Fuzzing', 'Chaos Testing', 'Memory Soak', 'Primitives', 'Hooks'],
+    driver: 'Audit Utility',
+    runwayHeight: '180vh',
+    features: [
+      'Layer 1: Adversarial mathematical fuzzing (NaN, Infinity, dt spikes)',
+      'Layer 2: Chaos rapid 50ms unmount burst under StrictMode',
+      'Layer 3: Compositor parity and instant 1,000px coordinate synchronization',
+      'Layer 4: Clock jitter and 5,000ms tab suspension recovery',
+      'Layer 5: Memory soak test with zero residual task leak invariant',
+      'Layer 6: FrustumShield offscreen culling saving 90% GPU composition',
+      'Layer 7: 400-span TextReveal settled-gating workload reduction',
+      'Layer 8: Adaptive quality dynamic blur and layer throttling',
+    ],
+    gotchas: [
+      'For the dedicated full-screen laboratory with live interactive runners, visit /test/robust directly.',
+    ],
+    props: [],
+    code: `// Visit /test/robust for the full interactive 8-layer test laboratory.`,
+    usageCode: `// Run all automated unit and resilience tests via CLI:
+pnpm test`,
+  },
 ];

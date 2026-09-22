@@ -20,6 +20,7 @@ import {
   ticker,
   GlobalResizeManager,
   TransformProperties,
+  frustumShield,
 } from '@scrollcraft/core';
 import { useScrollCraft } from '../context';
 import { ScrollTransformOptions } from '../types';
@@ -110,8 +111,11 @@ export function useScrollTransform<T extends HTMLElement = HTMLDivElement>(
     const measureGeometry = () => {
       if (isMounted) {
         solver.measure();
+        frustumShield.updateBounds(taskId, solver.startY, solver.endY);
         settledFrames = 0;
-        ticker.resumeTask(taskId);
+        if (!frustumShield.isCulled(taskId)) {
+          ticker.resumeTask(taskId);
+        }
       }
     };
     const unobserveElement = GlobalResizeManager.observe(element, measureGeometry);
@@ -130,9 +134,34 @@ export function useScrollTransform<T extends HTMLElement = HTMLDivElement>(
     let currentVelocity = 0;
     let lastScroll = -999999;
 
+    const unregisterFrustum = frustumShield.register({
+      id: taskId,
+      element,
+      startY: solver.startY,
+      endY: solver.endY,
+      margin: 200,
+      onEnter: () => {
+        solver.measure();
+        ticker.resumeTask(taskId);
+      },
+      onExit: (boundary) => {
+        solver.clamp(boundary === 'start' ? 0 : 1);
+        ticker.pauseTask(taskId);
+      },
+      clamp: (p) => solver.clamp(p),
+      update: (scrollY) => {
+        solver.update(scrollY, 0, 0.016, reducedMotion);
+        solver.render();
+      },
+    });
+
     const unsubscribe = subscribe((metrics) => {
       currentScroll = metrics.scroll;
       currentVelocity = metrics.velocity;
+      frustumShield.evaluate(metrics.scroll);
+      if (frustumShield.isCulled(taskId)) {
+        return;
+      }
       if (Math.abs(metrics.velocity) >= 0.001 || Math.abs(metrics.scroll - lastScroll) > 0.1) {
         lastScroll = metrics.scroll;
         settledFrames = 0;
@@ -157,9 +186,11 @@ export function useScrollTransform<T extends HTMLElement = HTMLDivElement>(
     });
 
     solver.measure();
+    frustumShield.updateBounds(taskId, solver.startY, solver.endY);
 
     return () => {
       isMounted = false;
+      unregisterFrustum();
       unsubscribe();
       unbindEngineRemeasure?.();
       unobserveElement();

@@ -7,6 +7,7 @@ import {
   TransformComposer,
   revealObserver,
   ParallaxSolver,
+  tierStore,
 } from '@scrollcraft/core';
 import { useParallax } from '../hooks/useParallax';
 import { useReveal } from '../hooks/useReveal';
@@ -89,6 +90,7 @@ describe('Level 3: Headless React Hooks Hardening & Zero-Jank Suite', () => {
         fonts: { ready: Promise.resolve() },
       },
     });
+    tierStore.setTier('high');
   });
 
   afterEach(() => {
@@ -96,6 +98,7 @@ describe('Level 3: Headless React Hooks Hardening & Zero-Jank Suite', () => {
       window: originalWindow,
       document: originalDocument,
     });
+    tierStore.reset();
     revealObserver.destroy();
     vi.restoreAllMocks();
   });

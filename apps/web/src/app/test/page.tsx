@@ -8,6 +8,8 @@ import {
   CheckCircle2,
   Zap,
   Activity,
+  ShieldCheck,
+  ArrowRight,
 } from 'lucide-react';
 import { ScrollCraftLogo } from '@/components/ui/scrollcraft-logo';
 import { GithubIcon } from '@/components/ui/social-icons';
@@ -48,7 +50,7 @@ export default function TestLabHubPage() {
               <ScrollCraftLogo variant="badge" badgeText="Lab" size="sm" />
             </Link>
 
-            <nav className="flex items-center gap-2 text-xs font-medium">
+            <nav className="hidden md:flex items-center gap-2 text-xs font-medium">
               <Link
                 href="/"
                 className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors"
@@ -106,8 +108,8 @@ export default function TestLabHubPage() {
           <span>Strict Zero-Rerender Engine & Hardware Lab</span>
         </div>
 
-        <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight">
-          Test Lab & Interactive Catalog
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight break-words">
+          Test Lab &amp; Interactive Catalog
         </h1>
 
         <p className="max-w-2xl mx-auto text-sm sm:text-base text-zinc-400 leading-relaxed">
@@ -115,7 +117,7 @@ export default function TestLabHubPage() {
         </p>
 
         {/* Feature Badges */}
-        <div className="flex flex-wrap justify-center gap-4 text-xs font-mono text-zinc-400 pt-2">
+        <div className="flex flex-wrap justify-center gap-3 sm:gap-4 text-xs font-mono text-zinc-400 pt-2">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-zinc-900/80 border border-zinc-800">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
             <span>25 Official Units</span>
@@ -131,11 +133,40 @@ export default function TestLabHubPage() {
         </div>
       </section>
 
+      {/* Featured Banner: Engine Hardening & Robustness Lab */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 mb-8 w-full">
+        <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/40 via-zinc-900/90 to-zinc-900/90 p-5 sm:p-8 backdrop-blur-xl shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-emerald-400">
+                Resilience &amp; Hardening Verification
+              </span>
+            </div>
+            <h3 className="text-lg sm:text-2xl font-black text-white break-words">
+              Engine Robustness &amp; Hardening Laboratory (8 Layers)
+            </h3>
+            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+              Live in-browser test suite verifying mathematical adversarial fuzzing (500+ vectors), 50ms chaos lifecycle resilience, 200-solver memory soak, clock recovery, and FrustumShield culling.
+            </p>
+          </div>
+
+          <Link
+            href="/test/robust"
+            className="w-full sm:w-auto px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all shrink-0 cursor-pointer"
+          >
+            <ShieldCheck className="w-4 h-4 text-emerald-200" />
+            <span>Enter Robustness Lab</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+      </section>
+
       {/* Controls Bar: Category Filter & Search */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 mb-12 w-full">
-        <div className="p-4 rounded-2xl border border-zinc-800 bg-[#09090d] flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
+        <div className="p-3 sm:p-4 rounded-2xl border border-zinc-800 bg-[#09090d] flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
           {/* Category Tabs */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar w-full pb-1 md:pb-0 shrink-0">
             {[
               { id: 'all', label: `All (${TEST_REGISTRY.length})` },
               { id: 'primitives', label: 'Primitives (6)' },
@@ -145,7 +176,7 @@ export default function TestLabHubPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveCategory(tab.id as any)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-mono transition-colors cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-mono whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
                   activeCategory === tab.id
                     ? 'bg-violet-600 text-white font-bold shadow-lg shadow-violet-600/20'
                     : 'bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800 border border-zinc-800'
@@ -154,6 +185,13 @@ export default function TestLabHubPage() {
                 {tab.label}
               </button>
             ))}
+            <Link
+              href="/test/robust"
+              className="px-3.5 py-1.5 rounded-xl text-xs font-mono whitespace-nowrap shrink-0 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 transition-colors flex items-center gap-1.5"
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Robustness (8 Layers)</span>
+            </Link>
           </div>
 
           {/* Search Input */}
@@ -234,8 +272,20 @@ export default function TestLabHubPage() {
       )}
 
       {filteredItems.length === 0 && (
-        <div className="py-24 text-center text-zinc-500 font-mono text-sm">
-          No items found matching your filter criteria.
+        <div className="py-20 text-center space-y-4">
+          <p className="text-zinc-500 font-mono text-sm">
+            No standard unit tests found matching &quot;{searchQuery}&quot;.
+          </p>
+          <div className="inline-block p-6 rounded-2xl border border-emerald-500/30 bg-[#09090d]">
+            <span className="text-xs font-mono text-emerald-400 block mb-2">Looking for resilience, stress, or chaos tests?</span>
+            <Link
+              href="/test/robust"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold transition-colors"
+            >
+              <ShieldCheck className="w-4 h-4" />
+              <span>Explore Engine Robustness &amp; Hardening Lab (8 Layers) →</span>
+            </Link>
+          </div>
         </div>
       )}
     </div>

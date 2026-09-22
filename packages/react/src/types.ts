@@ -337,6 +337,18 @@ export interface ScrollElementProps extends React.HTMLAttributes<HTMLElement> {
   children?: React.ReactNode;
 }
 
+export interface UseTextRevealOptions extends TextRevealOptions {
+  /** Target character/word elements to animate. If omitted, queries within container. */
+  targets?: HTMLElement[] | (() => HTMLElement[]);
+  /** Respect prefers-reduced-motion media query. Default: true */
+  respectReducedMotion?: boolean;
+}
+
+export interface UseTextRevealReturn<T extends HTMLElement = HTMLParagraphElement> {
+  ref: React.RefObject<T | null>;
+  solver: any;
+}
+
 export interface TextRevealProps extends Omit<React.HTMLAttributes<HTMLElement>, 'children'>, TextRevealOptions {
   /** The text content to split and reveal, or child element when asChild is true */
   children: string | React.ReactElement;

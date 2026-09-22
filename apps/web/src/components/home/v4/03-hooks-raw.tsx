@@ -648,11 +648,11 @@ export function HooksRawSection() {
     <section
       ref={sectionRef}
       id="hooks"
-      className="relative w-full bg-[#050507] py-24 sm:py-32 px-4 sm:px-6 lg:px-8 border-t border-zinc-800/80 overflow-hidden"
+      className="relative w-full bg-[#050507] py-16 sm:py-32 px-4 sm:px-6 lg:px-8 border-t border-zinc-800/80 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
           <Reveal direction="down" distance={15}>
             <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
               <span className="text-[11px] sm:text-xs font-mono font-bold tracking-[0.25em] uppercase text-violet-400">
@@ -669,22 +669,22 @@ export function HooksRawSection() {
           </Reveal>
 
           <Reveal direction="up" distance={20} delay={0.1}>
-            <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-4">
+            <h2 className="text-2xl sm:text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-3 sm:mb-4 break-words">
               <span className="text-white block">Prefer to build your own?</span>
               <span className="text-zinc-500 block">Here&apos;s the data.</span>
             </h2>
           </Reveal>
 
           <Reveal direction="up" distance={15} delay={0.2}>
-            <p className="text-sm sm:text-base text-zinc-400 max-w-xl mx-auto leading-relaxed">
+            <p className="text-xs sm:text-base text-zinc-400 max-w-xl mx-auto leading-relaxed">
               Headless hooks exposing high-precision scroll telemetry, mutable ref values, and 3-phase microtask lifecycle events.
             </p>
           </Reveal>
         </div>
 
-        {/* Hook Pill Tabs Selector */}
-        <div className="flex items-center justify-center mb-10">
-          <div className="inline-flex items-center p-1 rounded-full bg-zinc-950 border border-zinc-800/80 gap-1 shadow-inner">
+        {/* Hook Pill Tabs Selector with Mobile Horizontal Scroll */}
+        <div className="w-full flex items-center justify-start sm:justify-center overflow-x-auto no-scrollbar py-1 px-1 mb-8 sm:mb-10">
+          <div className="inline-flex items-center p-1 rounded-full bg-zinc-950 border border-zinc-800/80 gap-1 shadow-inner shrink-0">
             {(['useScrollProgress', 'useParallax', 'useReveal', 'usePin'] as HookTab[]).map((tab) => {
               const isActive = activeTab === tab;
               return (
@@ -692,7 +692,7 @@ export function HooksRawSection() {
                   key={tab}
                   type="button"
                   onClick={() => setActiveTab(tab)}
-                  className={`px-4 sm:px-5 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer flex items-center gap-2 ${
+                  className={`px-3.5 sm:px-5 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 sm:gap-2 shrink-0 ${
                     isActive
                       ? 'bg-zinc-900 border border-zinc-700/90 text-white font-medium shadow-sm'
                       : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
@@ -856,16 +856,16 @@ export function HooksRawSection() {
           </div>
 
           {/* Right: Live Telemetry Card (5 Columns) */}
-          <div className="lg:col-span-5 rounded-2xl border border-zinc-800/80 bg-[#09090b] p-6 flex flex-col justify-between shadow-2xl">
+          <div className="lg:col-span-5 rounded-2xl border border-zinc-800/80 bg-[#09090b] p-4 sm:p-6 flex flex-col justify-between shadow-2xl">
             <div>
               {/* Telemetry Header */}
-              <div className="flex items-center justify-between border-b border-zinc-800/80 pb-4 mb-6">
+              <div className="flex items-center justify-between border-b border-zinc-800/80 pb-4 mb-5 sm:mb-6">
                 <div className="flex items-center gap-2.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse" />
                   <span className="text-sm font-semibold text-white">Live telemetry</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-mono text-xs font-semibold">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <span className="px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-mono text-[11px] sm:text-xs font-semibold">
                     Live
                   </span>
                   <span ref={fpsBadgeRef} className="text-xs font-mono text-zinc-400">60 FPS</span>
@@ -873,68 +873,68 @@ export function HooksRawSection() {
               </div>
 
               {/* 4 Metric Readout Rows */}
-              <div className="space-y-4 mb-6">
+              <div className="space-y-3.5 sm:space-y-4 mb-5 sm:mb-6">
                 {/* 1. Scroll Position */}
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2.5 shrink-0">
+                <div className="flex items-center justify-between gap-2 sm:gap-3">
+                  <div className="flex items-center gap-2 shrink-0">
                     <Ruler className="w-4 h-4 text-violet-400 shrink-0" />
-                    <span className="text-xs text-zinc-400 font-medium">Scroll position</span>
+                    <span className="text-[11px] sm:text-xs text-zinc-400 font-medium">Scroll pos</span>
                   </div>
-                  <div className="w-24 sm:w-28 h-1.5 bg-zinc-800/80 rounded-full overflow-hidden shrink-0">
+                  <div className="w-16 sm:w-28 h-1.5 bg-zinc-800/80 rounded-full overflow-hidden shrink-0">
                     <div
                       ref={scrollPosBarRef}
                       className="h-full bg-violet-500 rounded-full transition-all duration-75"
                       style={{ width: '59%' }}
                     />
                   </div>
-                  <span ref={scrollPosTextRef} className="font-mono text-sm font-bold text-white text-right shrink-0 min-w-[70px]">
+                  <span ref={scrollPosTextRef} className="font-mono text-xs sm:text-sm font-bold text-white text-right shrink-0 min-w-[54px] sm:min-w-[70px]">
                     2367 px
                   </span>
                 </div>
 
                 {/* 2. Scroll Progress */}
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2.5 shrink-0">
+                <div className="flex items-center justify-between gap-2 sm:gap-3">
+                  <div className="flex items-center gap-2 shrink-0">
                     <CircleDot className="w-4 h-4 text-violet-400 shrink-0" />
-                    <span className="text-xs text-zinc-400 font-medium">Scroll progress</span>
+                    <span className="text-[11px] sm:text-xs text-zinc-400 font-medium">Progress</span>
                   </div>
-                  <div className="w-24 sm:w-28 h-1.5 bg-zinc-800/80 rounded-full overflow-hidden shrink-0">
+                  <div className="w-16 sm:w-28 h-1.5 bg-zinc-800/80 rounded-full overflow-hidden shrink-0">
                     <div
                       ref={progressFillRef}
                       className="h-full bg-emerald-400 rounded-full transition-all duration-75"
                       style={{ width: '30.4%' }}
                     />
                   </div>
-                  <span ref={progressTextRef} className="font-mono text-sm font-bold text-emerald-400 text-right shrink-0 min-w-[70px]">
+                  <span ref={progressTextRef} className="font-mono text-xs sm:text-sm font-bold text-emerald-400 text-right shrink-0 min-w-[54px] sm:min-w-[70px]">
                     0.304
                   </span>
                 </div>
 
                 {/* 3. Scroll Velocity */}
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2.5 shrink-0">
+                <div className="flex items-center justify-between gap-2 sm:gap-3">
+                  <div className="flex items-center gap-2 shrink-0">
                     <Activity className="w-4 h-4 text-violet-400 shrink-0" />
-                    <span className="text-xs text-zinc-400 font-medium">Scroll velocity</span>
+                    <span className="text-[11px] sm:text-xs text-zinc-400 font-medium">Velocity</span>
                   </div>
-                  <div className="w-24 sm:w-28 h-1.5 bg-zinc-800/80 rounded-full overflow-hidden shrink-0">
+                  <div className="w-16 sm:w-28 h-1.5 bg-zinc-800/80 rounded-full overflow-hidden shrink-0">
                     <div
                       ref={velocityFillRef}
                       className="h-full bg-violet-500 rounded-full transition-all duration-75"
                       style={{ width: '20%' }}
                     />
                   </div>
-                  <span ref={velocityTextRef} className="font-mono text-sm font-bold text-violet-300 text-right shrink-0 min-w-[70px]">
+                  <span ref={velocityTextRef} className="font-mono text-xs sm:text-sm font-bold text-violet-300 text-right shrink-0 min-w-[54px] sm:min-w-[70px]">
                     0.080 px/f
                   </span>
                 </div>
 
                 {/* 4. Scroll Direction */}
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2.5 shrink-0">
+                <div className="flex items-center justify-between gap-2 sm:gap-3">
+                  <div className="flex items-center gap-2 shrink-0">
                     <ArrowUpDown className="w-4 h-4 text-violet-400 shrink-0" />
-                    <span className="text-xs text-zinc-400 font-medium">Scroll direction</span>
+                    <span className="text-[11px] sm:text-xs text-zinc-400 font-medium">Direction</span>
                   </div>
-                  <span ref={directionTextRef} className="font-medium text-sm text-emerald-400 text-right">
+                  <span ref={directionTextRef} className="font-medium text-xs sm:text-sm text-emerald-400 text-right">
                     Down
                   </span>
                 </div>

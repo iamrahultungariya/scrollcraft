@@ -78,10 +78,32 @@ describe('React Primitives Remediation', () => {
   });
 
   describe('M-06: Dynamic Options Contract', () => {
-    it('exports useScrollTransform and useScrollDraw functions', () => {
+    it('exports useScrollTransform, useScrollDraw, usePin, and useTextReveal functions', () => {
       expect(typeof useScrollTransform).toBe('function');
       expect(typeof useScrollDraw).toBe('function');
       expect(typeof usePin).toBe('function');
+    });
+
+    it('supports useTextReveal headless and ref-forwarding dual API', async () => {
+      const { useTextReveal } = await import('../hooks/useTextReveal');
+      expect(typeof useTextReveal).toBe('function');
+
+      function HeadlessConsumer() {
+        const { ref } = useTextReveal({ range: [0, 1] });
+        return <p ref={ref}><span>Headless</span></p>;
+      }
+
+      function ForwardingConsumer() {
+        const targetRef = React.createRef<HTMLParagraphElement>();
+        useTextReveal(targetRef, { baseOpacity: 0.1 });
+        return <p ref={targetRef}><span>Forwarding</span></p>;
+      }
+
+      const hHtml = renderToString(<HeadlessConsumer />);
+      expect(hHtml).toContain('Headless');
+
+      const fHtml = renderToString(<ForwardingConsumer />);
+      expect(fHtml).toContain('Forwarding');
     });
   });
 });

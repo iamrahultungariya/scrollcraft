@@ -30,3 +30,6 @@ export * from './motion-preference';
 export * from './input-normalizer';
 export * from './history-restore';
 export * from './gsap-bridge';
+export * from './style-registry';
+export * from './trigger-compiler';
+export * from './adaptive-quality';

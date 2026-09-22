@@ -4,47 +4,95 @@
  * Strictly under 650 LOC.
  */
 
-import { ElementTransform } from './types';
-import { tierStore } from './feature-detection';
-import { snapToDevicePixel } from './math';
+import { ElementTransform, NumericTransform } from './types';
+import { formatDevicePixel, snapToDevicePixel } from './math';
+import { styleRegistry } from './style-registry';
+import { adaptiveQualityGovernor } from './adaptive-quality';
+
+export type { NumericTransform };
+
+export function serializeNumericTransform(t: NumericTransform): string {
+  let parts = '';
+  if (t.format === 'parallax') {
+    const x = t.x !== undefined ? `${Number(t.x).toFixed(2)}px` : '0';
+    const y = t.y !== undefined ? `${Number(t.y).toFixed(2)}px` : '0';
+    parts += `translate3d(${x}, ${y}, 0) `;
+  } else if (t.format === 'reveal') {
+    const x = t.x ? `${t.x}px` : '0';
+    const y = t.y ? `${t.y}px` : '0';
+    const z = t.z ? `${t.z}px` : '0';
+    parts += `translate3d(${x}, ${y}, ${z}) `;
+  } else if (t.x !== undefined || t.y !== undefined || t.z !== undefined) {
+    const sx = formatDevicePixel(t.x || 0);
+    const sy = formatDevicePixel(t.y || 0);
+    const sz = formatDevicePixel(t.z || 0);
+    parts += `translate3d(${sx}, ${sy}, ${sz}) `;
+  }
+  if (t.scale !== undefined) parts += `scale(${t.scale}) `;
+  if (t.scaleX !== undefined) parts += `scaleX(${t.scaleX}) `;
+  if (t.scaleY !== undefined) parts += `scaleY(${t.scaleY}) `;
+  if (t.rotate !== undefined) parts += `rotate(${t.rotate}deg) `;
+  if (t.rotateX !== undefined) parts += `rotateX(${t.rotateX}deg) `;
+  if (t.rotateY !== undefined) parts += `rotateY(${t.rotateY}deg) `;
+  if (t.rotateZ !== undefined) parts += `rotateZ(${t.rotateZ}deg) `;
+  if (t.skewX !== undefined) parts += `skewX(${t.skewX}deg) `;
+  if (t.skewY !== undefined) parts += `skewY(${t.skewY}deg) `;
+  return parts.trim();
+}
+
+function numericTransformsEqual(a?: NumericTransform, b?: NumericTransform): boolean {
+  if (!a || !b) return a === b;
+  return (
+    (a.x ?? 0) === (b.x ?? 0) &&
+    (a.y ?? 0) === (b.y ?? 0) &&
+    (a.z ?? 0) === (b.z ?? 0) &&
+    a.scale === b.scale &&
+    a.scaleX === b.scaleX &&
+    a.scaleY === b.scaleY &&
+    a.rotate === b.rotate &&
+    a.rotateX === b.rotateX &&
+    a.rotateY === b.rotateY &&
+    a.rotateZ === b.rotateZ &&
+    a.skewX === b.skewX &&
+    a.skewY === b.skewY &&
+    a.format === b.format
+  );
+}
+
+interface ComposedTransformState {
+  base: string;
+  parts: Map<string, string>;
+  numericParts: Map<string, NumericTransform>;
+  lastComposed: string;
+  writeCount: number;
+}
 
 const transformCache = new WeakMap<HTMLElement, ElementTransform>();
-const composedTransforms = new WeakMap<HTMLElement, { base: string; parts: Map<string, string>; lastComposed: string }>();
+const composedTransforms = new WeakMap<HTMLElement, ComposedTransformState>();
 
 /**
  * Coordinates independent animation primitives without letting their transforms overwrite each other.
  * The first use preserves an existing inline transform as the base layer.
+ * Supports canonical zero-allocation NumericTransform and legacy string transforms.
  */
 export class TransformComposer {
-  public static set(element: HTMLElement, owner: string, transform: string): void {
+  public static setNumeric(element: HTMLElement, owner: string, transform: NumericTransform): void {
     let state = composedTransforms.get(element);
     if (!state) {
-      state = { base: element.style.transform || '', parts: new Map(), lastComposed: '' };
+      state = {
+        base: element.style.transform || '',
+        parts: new Map(),
+        numericParts: new Map(),
+        lastComposed: '',
+        writeCount: 0,
+      };
       composedTransforms.set(element, state);
     }
 
-    // Fast path: if the owner's transform hasn't changed, skip composition entirely
-    if (state.parts.get(owner) === transform) return;
-    state.parts.set(owner, transform);
+    const existing = state.numericParts.get(owner);
+    if (numericTransformsEqual(existing, transform)) return;
 
-    // Direct string composition without intermediate array allocations
-    let composed = state.base || '';
-    for (const part of state.parts.values()) {
-      if (part) {
-        composed = composed ? `${composed} ${part}` : part;
-      }
-    }
-    composed = composed.trim();
-
-    if (composed !== state.lastComposed) {
-      state.lastComposed = composed;
-      element.style.transform = composed;
-    }
-  }
-
-  public static clear(element: HTMLElement, owner: string): void {
-    const state = composedTransforms.get(element);
-    if (!state || !state.parts.has(owner)) return;
+    state.numericParts.set(owner, { ...transform });
     state.parts.delete(owner);
 
     let composed = state.base || '';
@@ -53,19 +101,102 @@ export class TransformComposer {
         composed = composed ? `${composed} ${part}` : part;
       }
     }
+    for (const num of state.numericParts.values()) {
+      const numStr = serializeNumericTransform(num);
+      if (numStr) {
+        composed = composed ? `${composed} ${numStr}` : numStr;
+      }
+    }
     composed = composed.trim();
 
     if (composed !== state.lastComposed) {
       state.lastComposed = composed;
       element.style.transform = composed;
+      state.writeCount++;
     }
-    if (state.parts.size === 0) {
+  }
+
+  public static set(element: HTMLElement, owner: string, transform: string): void {
+    let state = composedTransforms.get(element);
+    if (!state) {
+      state = {
+        base: element.style.transform || '',
+        parts: new Map(),
+        numericParts: new Map(),
+        lastComposed: '',
+        writeCount: 0,
+      };
+      composedTransforms.set(element, state);
+    }
+
+    // Fast path: if the owner's transform hasn't changed, skip composition entirely
+    if (state.parts.get(owner) === transform) return;
+    state.parts.set(owner, transform);
+    state.numericParts.delete(owner);
+
+    // Direct string composition without intermediate array allocations
+    let composed = state.base || '';
+    for (const part of state.parts.values()) {
+      if (part) {
+        composed = composed ? `${composed} ${part}` : part;
+      }
+    }
+    for (const num of state.numericParts.values()) {
+      const numStr = serializeNumericTransform(num);
+      if (numStr) {
+        composed = composed ? `${composed} ${numStr}` : numStr;
+      }
+    }
+    composed = composed.trim();
+
+    if (composed !== state.lastComposed) {
+      state.lastComposed = composed;
+      element.style.transform = composed;
+      state.writeCount++;
+    }
+  }
+
+  public static clear(element: HTMLElement, owner: string): void {
+    const state = composedTransforms.get(element);
+    if (!state || (!state.parts.has(owner) && !state.numericParts.has(owner))) return;
+    state.parts.delete(owner);
+    state.numericParts.delete(owner);
+
+    let composed = state.base || '';
+    for (const part of state.parts.values()) {
+      if (part) {
+        composed = composed ? `${composed} ${part}` : part;
+      }
+    }
+    for (const num of state.numericParts.values()) {
+      const numStr = serializeNumericTransform(num);
+      if (numStr) {
+        composed = composed ? `${composed} ${numStr}` : numStr;
+      }
+    }
+    composed = composed.trim();
+
+    if (composed !== state.lastComposed) {
+      state.lastComposed = composed;
+      element.style.transform = composed;
+      state.writeCount++;
+    }
+    if (state.parts.size === 0 && state.numericParts.size === 0) {
       composedTransforms.delete(element);
     }
   }
 
   public static get(element: HTMLElement): string {
     return composedTransforms.get(element)?.lastComposed ?? element.style.transform ?? '';
+  }
+
+  public static getWriteCount(element: HTMLElement): number {
+    return composedTransforms.get(element)?.writeCount ?? 0;
+  }
+
+  public static resetWriteCount(element: HTMLElement): void {
+    const state = composedTransforms.get(element);
+    if (state) state.writeCount = 0;
   }
 }
 
@@ -186,13 +317,13 @@ export class SmartCompositor {
       this.demoteTimers.delete(element);
     }
 
-    // Global reject-new cap for Tier 1: max 3 concurrent layers
-    const tier = tierStore.getTier();
-    if (tier === 'low' && this.promotedElements.size >= 3 && !this.promotedElements.has(element)) {
+    // Global reject-new cap governed by AdaptiveQualityGovernor
+    const maxLayers = adaptiveQualityGovernor.getMaxLayers();
+    if (this.promotedElements.size >= maxLayers && !this.promotedElements.has(element)) {
       return false;
     }
 
-    element.style.willChange = 'transform';
+    styleRegistry.set(element, 'smart-compositor', 'willChange', 'transform');
     this.promotedElements.add(element);
     this.companionSet.add(element);
     return true;
@@ -213,7 +344,8 @@ export class SmartCompositor {
       this.demoteTimers.delete(element);
       this.promotedElements.delete(element);
       this.companionSet.delete(element);
-      if (element && element.style) {
+      styleRegistry.clear(element, 'smart-compositor', 'willChange');
+      if (element && element.style && !element.style.willChange) {
         element.style.willChange = 'auto';
       }
     }, debounceMs);
@@ -242,7 +374,8 @@ export class SmartCompositor {
     }
     this.promotedElements.delete(element);
     this.companionSet.delete(element);
-    if (element && element.style) {
+    styleRegistry.clear(element, 'smart-compositor', 'willChange');
+    if (element && element.style && !element.style.willChange) {
       element.style.willChange = 'auto';
     }
   }
@@ -257,7 +390,8 @@ export class SmartCompositor {
         clearTimeout(timer);
         this.demoteTimers.delete(element);
       }
-      if (element && element.style) {
+      styleRegistry.clear(element, 'smart-compositor', 'willChange');
+      if (element && element.style && !element.style.willChange) {
         element.style.willChange = 'auto';
       }
     }

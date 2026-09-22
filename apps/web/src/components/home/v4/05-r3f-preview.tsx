@@ -211,7 +211,7 @@ export function R3FPreviewSection() {
     <section
       ref={sectionRef}
       id="r3f"
-      className="relative w-full bg-[#050505] py-24 sm:py-32 px-4 sm:px-6 lg:px-8 border-t border-zinc-800/80 overflow-hidden"
+      className="relative w-full bg-[#050505] py-16 sm:py-32 px-4 sm:px-6 lg:px-8 border-t border-zinc-800/80 overflow-hidden"
     >
       {/* Outer Left Edge Floating Watermark */}
       <div className="hidden xl:flex absolute left-8 top-1/2 -translate-y-1/2 flex-col items-start font-mono text-[10px] tracking-[0.25em] text-zinc-600 uppercase select-none pointer-events-none">
@@ -230,10 +230,10 @@ export function R3FPreviewSection() {
 
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-10">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
           {/* Alpha Preview Pill */}
           <Reveal direction="down" distance={15}>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/30 border border-red-500/20 text-xs font-mono mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/30 border border-red-500/20 text-xs font-mono mb-5 sm:mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.9)]" />
               <span className="text-red-400 font-bold uppercase tracking-wider text-[11px]">
                 ALPHA PREVIEW
@@ -244,7 +244,7 @@ export function R3FPreviewSection() {
 
           {/* Headline */}
           <Reveal direction="up" distance={20} delay={0.1}>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-5">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-3 sm:mb-5 break-words">
               <span className="text-white block">Now leaking into the</span>
               <span className="text-[#ff4d6d] block">third dimension.</span>
             </h2>
@@ -252,7 +252,7 @@ export function R3FPreviewSection() {
 
           {/* Subtitle */}
           <Reveal direction="up" distance={15} delay={0.2}>
-            <p className="text-sm sm:text-base text-zinc-400 max-w-xl mx-auto leading-relaxed mb-8">
+            <p className="text-xs sm:text-base text-zinc-400 max-w-xl mx-auto leading-relaxed mb-6 sm:mb-8">
               Pull-based scroll metrics synchronization for React Three Fiber.
               <br className="hidden sm:inline" /> Synchronize 3D meshes without double-pumping RequestAnimationFrame.
             </p>
@@ -260,7 +260,7 @@ export function R3FPreviewSection() {
 
           {/* CTA Buttons */}
           <Reveal direction="up" distance={15} delay={0.3}>
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
               <Link
                 href="/docs#r3f"
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white hover:bg-zinc-100 text-black font-semibold text-xs transition-all shadow-md active:scale-95 cursor-pointer"
@@ -379,21 +379,21 @@ export function R3FPreviewSection() {
           </div>
 
           {/* Right: Live Interactive 3D Canvas Preview */}
-          <div className="lg:col-span-6 rounded-2xl border border-zinc-800/80 bg-[#070709] relative overflow-hidden shadow-2xl min-h-[460px] flex flex-col justify-between p-5 sm:p-6">
+          <div className="lg:col-span-6 rounded-2xl border border-zinc-800/80 bg-[#070709] relative overflow-hidden shadow-2xl min-h-[380px] sm:min-h-[460px] flex flex-col justify-between p-4 sm:p-6">
             {/* Top Bar Overlay */}
-            <div className="absolute top-5 left-5 right-5 z-10 flex items-center justify-between pointer-events-none">
+            <div className="absolute top-4 sm:top-5 left-4 sm:left-5 right-4 sm:right-5 z-10 flex items-center justify-between pointer-events-none">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900/90 border border-zinc-800/90 backdrop-blur-md pointer-events-auto">
                 <span className="w-2 h-2 rounded-full bg-[#ff4d6d] shadow-[0_0_8px_rgba(255,77,109,0.9)] animate-pulse" />
                 <span className="text-xs font-semibold text-white">Live Preview</span>
               </div>
 
-              <div className="px-3 py-1 rounded-full bg-zinc-900/80 border border-zinc-800 backdrop-blur-md text-[11px] font-mono text-zinc-400 pointer-events-auto select-none">
+              <div className="px-3 py-1 rounded-full bg-zinc-900/80 border border-zinc-800 backdrop-blur-md text-[10px] sm:text-[11px] font-mono text-zinc-400 pointer-events-auto select-none">
                 Scroll to interact
               </div>
             </div>
 
             {/* 3D WebGL Canvas Viewport */}
-            <div className="relative w-full h-[360px] sm:h-[390px] rounded-xl overflow-hidden flex items-center justify-center">
+            <div className="relative w-full h-[290px] sm:h-[390px] rounded-xl overflow-hidden flex items-center justify-center">
               {tier === 'low' ? (
                 <div className="w-full h-full flex flex-col items-center justify-center bg-[#070709] p-6 text-center">
                   <div className="relative w-24 h-24 mb-4 flex items-center justify-center">

@@ -99,8 +99,8 @@ export const DocGettingStarted: React.FC<DocGettingStartedProps> = ({ sectionId 
       {/* 0. Introduction & Mental Model */}
       <section id="introduction-mental-model" className="space-y-4 border-b border-zinc-800 pb-8 scroll-mt-24">
         <div className="flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-violet-400" />
-          <h1 className="text-2xl font-bold text-white font-mono">Introduction &amp; Mental Model</h1>
+          <BookOpen className="w-5 h-5 text-violet-400 shrink-0" />
+          <h1 className="text-xl sm:text-2xl font-bold text-white font-mono break-words">Introduction &amp; Mental Model</h1>
         </div>
         <p className="text-sm text-zinc-300 font-sans leading-relaxed">
           ScrollCraft is a hardware-accelerated declarative scroll engine built specifically for React and Next.js App Router. It decouples continuous scroll gestures from React&apos;s fiber reconciliation tree, writing directly to GPU composite matrices with zero Virtual DOM re-renders.
@@ -143,13 +143,13 @@ export const DocGettingStarted: React.FC<DocGettingStartedProps> = ({ sectionId 
       {/* 1. Installation */}
       <section id="install-package" className="space-y-4 border-b border-zinc-800 pb-8 scroll-mt-24">
         <div className="flex items-center gap-2">
-          <Terminal className="w-4 h-4 text-violet-400" />
-          <h2 className="text-xl font-bold text-white font-mono">Package Installation</h2>
+          <Terminal className="w-4 h-4 text-violet-400 shrink-0" />
+          <h2 className="text-lg sm:text-xl font-bold text-white font-mono break-words">Package Installation</h2>
         </div>
 
         {/* Package Manager Selector & Copy Box */}
-        <div className="rounded-xl border border-zinc-800 bg-[#09090b] p-4 space-y-3 shadow-lg">
-          <div className="flex items-center gap-2 border-b border-zinc-800/80 pb-3">
+        <div className="rounded-xl border border-zinc-800 bg-[#09090b] p-3 sm:p-4 space-y-3 shadow-lg">
+          <div className="flex items-center gap-2 border-b border-zinc-800/80 pb-3 overflow-x-auto no-scrollbar">
             {(['pnpm', 'npm', 'yarn', 'bun'] as const).map((pm) => {
               const isUpcoming = pm === 'yarn' || pm === 'bun';
               return (
@@ -157,7 +157,7 @@ export const DocGettingStarted: React.FC<DocGettingStartedProps> = ({ sectionId 
                   key={pm}
                   type="button"
                   onClick={() => setActivePm(pm)}
-                  className={`px-3 py-1 rounded-md text-xs font-mono font-medium border transition-colors flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1 rounded-md text-xs font-mono font-medium border transition-colors flex items-center gap-1.5 cursor-pointer shrink-0 ${
                     activePm === pm
                       ? 'bg-zinc-800 text-white font-bold border-zinc-700'
                       : 'text-zinc-500 hover:text-zinc-300 border-transparent'
@@ -176,23 +176,23 @@ export const DocGettingStarted: React.FC<DocGettingStartedProps> = ({ sectionId 
 
           {(activePm === 'yarn' || activePm === 'bun') && (
             <div className="rounded-lg bg-amber-950/20 border border-amber-500/30 p-2.5 text-xs text-amber-300/90 font-sans flex items-center gap-2">
-              <span className="font-semibold text-amber-400 uppercase font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/30">
+              <span className="font-semibold text-amber-400 uppercase font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/30 shrink-0">
                 Notice
               </span>
-              <span>
+              <span className="break-words">
                 {activePm === 'yarn' ? 'Yarn' : 'Bun'} package registry integration is in validation. For v0.2.0 Beta, please use <strong>pnpm</strong> or <strong>npm</strong>.
               </span>
             </div>
           )}
 
-          <div className="flex items-center justify-between font-mono text-xs sm:text-sm text-zinc-200">
-            <div className="flex items-center gap-2 overflow-x-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 font-mono text-xs sm:text-sm text-zinc-200">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
               <span className="text-zinc-500 select-none">$</span>
-              <span>{PM_COMMANDS[activePm]}</span>
+              <span className="whitespace-nowrap">{PM_COMMANDS[activePm]}</span>
             </div>
             <button
               onClick={copyInstall}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs transition-colors cursor-pointer ml-3 shrink-0"
+              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs transition-colors cursor-pointer shrink-0 self-end sm:self-auto"
               title="Copy installation command"
             >
               {copied ? (
@@ -210,9 +210,9 @@ export const DocGettingStarted: React.FC<DocGettingStartedProps> = ({ sectionId 
           </div>
         </div>
 
-        <div className="flex items-center gap-4 text-xs font-mono text-zinc-400 pt-1">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-mono text-zinc-400 pt-1">
           <span>Peer Requirements: React 18+ or 19+</span>
-          <span>&bull;</span>
+          <span className="hidden sm:inline">&bull;</span>
           <span>Next.js 14+ or 15+ (App Router)</span>
         </div>
 
@@ -254,7 +254,7 @@ export const DocGettingStarted: React.FC<DocGettingStartedProps> = ({ sectionId 
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-mono border-collapse">
+            <table className="w-full text-left text-xs font-mono border-collapse min-w-[580px]">
               <thead>
                 <tr className="border-b border-zinc-800 text-zinc-400">
                   <th className="py-2.5 px-3 font-semibold text-white">Primitive</th>
@@ -364,11 +364,14 @@ export const DocGettingStarted: React.FC<DocGettingStartedProps> = ({ sectionId 
 
         {/* ScrollProvider Props Table */}
         <div id="provider-props" className="space-y-3 pt-3 scroll-mt-24">
-          <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 block font-semibold">
-            ScrollProvider Configuration Options
-          </span>
-          <div className="rounded-xl border border-zinc-800 overflow-hidden bg-[#0a0a0c]">
-            <table className="w-full text-left text-xs font-mono">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 block font-semibold">
+              ScrollProvider Configuration Options
+            </span>
+            <span className="text-[10px] font-mono text-zinc-500 sm:hidden">Swipe table &rarr;</span>
+          </div>
+          <div className="rounded-xl border border-zinc-800 overflow-x-auto bg-[#0a0a0c]">
+            <table className="w-full text-left text-xs font-mono min-w-[550px]">
               <thead className="bg-zinc-900/80 text-zinc-400 border-b border-zinc-800">
                 <tr>
                   <th className="px-4 py-2.5 font-semibold">Prop</th>

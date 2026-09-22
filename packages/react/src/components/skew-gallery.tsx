@@ -39,7 +39,9 @@ export const SkewGallery: React.FC<SkewGalleryProps> = ({ images, className = ''
         }
         return;
       }
-      TransformComposer.set(container, 'skew-gallery', `skewY(${currentSkew.toFixed(3)}deg)`);
+      TransformComposer.setNumeric(container, 'skew-gallery', {
+        skewY: Number(currentSkew.toFixed(3)),
+      });
     });
 
     return () => {

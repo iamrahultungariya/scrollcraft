@@ -37,7 +37,7 @@ export default function RoadmapPage() {
               <ScrollCraftLogo variant="badge" badgeText="Beta" size="sm" />
             </Link>
 
-            <nav className="flex items-center gap-2 text-xs font-medium">
+            <nav className="hidden md:flex items-center gap-2 text-xs font-medium">
               <Link
                 href="/"
                 className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors"
@@ -111,7 +111,7 @@ export default function RoadmapPage() {
             <span>Architecture &amp; Release Strategy</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight mb-6">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-tight mb-6 break-words">
             ScrollCraft Roadmap
           </h1>
 
@@ -172,9 +172,9 @@ export default function RoadmapPage() {
               </div>
 
               <div className="pt-6 border-t border-emerald-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="font-mono text-xs text-zinc-300 flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-lg border border-emerald-500/30">
+                <div className="font-mono text-xs text-zinc-300 flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-lg border border-emerald-500/30 overflow-x-auto no-scrollbar max-w-full">
                   <span className="text-emerald-500 select-none">$</span>
-                  <code className="text-emerald-300 select-all font-semibold">npm install @scrollcraft/core@beta @scrollcraft/react@beta</code>
+                  <code className="text-emerald-300 select-all font-semibold whitespace-nowrap">npm install @scrollcraft/core@beta @scrollcraft/react@beta</code>
                 </div>
                 <span className="text-[11px] font-mono text-emerald-400 bg-emerald-950/40 px-3 py-1 rounded border border-emerald-500/30 font-semibold">
                   Live on npm • Recommended Release
@@ -617,10 +617,10 @@ export default function RoadmapPage() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full border-t border-zinc-800/80 py-8 text-center text-xs text-zinc-500 bg-[#050505]">
+      <footer className="w-full border-t border-zinc-800/80 pt-8 pb-28 sm:py-8 text-center text-xs text-zinc-500 bg-[#050505]">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p>&copy; {new Date().getFullYear()} ScrollCraft (v0.2.0 Beta). MIT Licensed.</p>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
             <Link href="/" className="hover:text-zinc-300 transition-colors">Home</Link>
             <Link href="/docs" className="hover:text-zinc-300 transition-colors">Docs</Link>
             <Link href="/showcase" className="hover:text-zinc-300 transition-colors">Showcase</Link>

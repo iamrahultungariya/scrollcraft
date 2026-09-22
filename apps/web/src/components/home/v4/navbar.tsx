@@ -24,7 +24,7 @@ export function Navbar() {
   }, [subscribe]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-20 flex items-center">
+    <header className="fixed top-0 left-0 right-0 z-50 h-16 sm:h-20 flex items-center">
       {/* Isolated GPU Composited Background Layer (Zero Repaint & Zero Blur Interpolation Lag) */}
       <div
         ref={bgRef}
@@ -32,7 +32,7 @@ export function Navbar() {
         style={{ opacity: 0, willChange: 'opacity' }}
         className="absolute inset-0 -z-10 glass-surface border-b border-white/10 shadow-2xl transition-opacity duration-200 pointer-events-none"
       />
-      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full flex items-center justify-between relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 w-full flex items-center justify-between relative">
         
         {/* Brand Logo */}
         <div className="flex items-center gap-3">
@@ -55,6 +55,10 @@ export function Navbar() {
           <Link href="/test" className="hover:text-white transition-colors flex items-center gap-1">
             <span>Test Lab</span>
             <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 font-mono font-semibold">25</span>
+          </Link>
+          <Link href="/test/robust" className="hover:text-white transition-colors flex items-center gap-1">
+            <span>Robust</span>
+            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono font-semibold">8L</span>
           </Link>
         </nav>
 

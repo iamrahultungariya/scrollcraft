@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Ticker } from '../ticker';
 import { ParallaxSolver } from '../parallax';
 import { PinSolver } from '../pinning';
+import { TextRevealSolver } from '../text-reveal';
 import { springStep, damp, clamp, mapRange } from '../math';
 import { TransformComposer } from '../dom';
 
@@ -339,5 +340,81 @@ describe('ScrollCraft Engine High-Load Stress Testing', () => {
     // Teardown
     ticker.remove('bg-test-task');
     ticker.stop();
+  });
+
+  // ══════════════════════════════════════════════════════════════════
+  // STRESS TEST 7: 400-Span TextReveal Settled-Gating & Dirty Tracking
+  // ══════════════════════════════════════════════════════════════════
+  it('STRESS: 400-span TextReveal settles at progress >= 1.0, skips DOM writes, resets on scroll reversal', () => {
+    const container = {
+      getBoundingClientRect: () => ({ top: 1000, height: 200 }),
+      setAttribute: vi.fn(),
+      removeAttribute: vi.fn(),
+    } as unknown as HTMLElement;
+
+    const chars: HTMLElement[] = [];
+    for (let i = 0; i < 400; i++) {
+      chars.push({
+        style: { opacity: '0', filter: '', transform: '' },
+      } as unknown as HTMLElement);
+    }
+
+    const solver = new TextRevealSolver(container, chars, {
+      baseOpacity: 0.1,
+      triggerStart: 0.8,
+      triggerEnd: 0.2,
+    });
+
+    solver.measure();
+    expect(solver.getSettled()).toBe(false);
+
+    // Mid-scroll: e.g. viewportTop = 500 (inside reading zone)
+    solver.update(500, 1000);
+    solver.render();
+    expect(solver.getSettled()).toBe(false);
+
+    // Count opacities changed
+    const modifiedCount = chars.filter((c) => c.style.opacity !== '0').length;
+    expect(modifiedCount).toBeGreaterThan(0);
+
+    // Full reveal: scroll past element so progress >= 1.0
+    solver.update(2000, 1000);
+    solver.render();
+    expect(solver.getSettled()).toBe(true);
+
+    // All chars fully revealed
+    for (const c of chars) {
+      expect(c.style.opacity).toBe('1');
+    }
+
+    // Settled gate verification:
+    // With progress >= 1.0 and scrolling down further, no DOM writes must occur
+    let writeCount = 0;
+    const observer = new Proxy(chars[0].style, {
+      set(target, prop, value) {
+        writeCount++;
+        return Reflect.set(target, prop, value);
+      },
+    });
+    chars[0].style = observer;
+
+    // Further downward scroll frame
+    solver.update(2500, 1000, 100);
+    solver.render();
+    expect(solver.getSettled()).toBe(true);
+    expect(writeCount).toBe(0); // ZERO DOM WRITES!
+
+    // Reversal test: scrolling backwards resets settled state
+    solver.update(1500, 1000, -50);
+    expect(solver.getSettled()).toBe(false);
+
+    // Measure test: resize resets settled state
+    solver.update(2500, 1000);
+    solver.render();
+    expect(solver.getSettled()).toBe(true);
+    solver.measure();
+    expect(solver.getSettled()).toBe(false);
+
+    solver.destroy();
   });
 });

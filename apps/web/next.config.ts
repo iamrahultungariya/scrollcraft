@@ -48,6 +48,26 @@ const nextConfig: NextConfig = {
         destination: '/showcase',
         permanent: true,
       },
+      {
+        source: '/robustness',
+        destination: '/test/robust',
+        permanent: false,
+      },
+      {
+        source: '/test/robustness',
+        destination: '/test/robust',
+        permanent: false,
+      },
+      {
+        source: '/robust-testing',
+        destination: '/test/robust',
+        permanent: false,
+      },
+      {
+        source: '/test/hardening',
+        destination: '/test/robust',
+        permanent: false,
+      },
     ];
   },
   webpack: (config) => {

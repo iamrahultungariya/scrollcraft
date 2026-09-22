@@ -4,7 +4,7 @@
  * Strictly under 650 LOC.
  */
 
-import { clamp, formatDevicePixel } from './math';
+import { clamp } from './math';
 import { TransformComposer } from './dom';
 
 export const DEFAULT_PIN_DURATION = 800;
@@ -91,6 +91,24 @@ export class PinSolver {
     return this.state;
   }
 
+  public getBounds(): { startY: number; endY: number } {
+    const pinStart = this.elementTop - this.options.topOffset;
+    return {
+      startY: pinStart,
+      endY: pinStart + Math.max(1, this.options.duration),
+    };
+  }
+
+  public clamp(boundaryProgress: number): void {
+    const bounds = this.getBounds();
+    if (boundaryProgress <= 0) {
+      this.update(bounds.startY - 1);
+    } else {
+      this.update(bounds.endY + 1);
+    }
+    this.render();
+  }
+
   /**
    * Phase 3: Direct GPU transform application
    */
@@ -102,8 +120,11 @@ export class PinSolver {
     this.lastRenderedOffsetY = this.state.pinOffsetY;
 
     if (this.state.pinOffsetY > 0) {
-      const formatted = formatDevicePixel(this.state.pinOffsetY);
-      TransformComposer.set(this.element, 'pin', `translate3d(0px, ${formatted}, 0px)`);
+      TransformComposer.setNumeric(this.element, 'pin', {
+        x: 0,
+        y: this.state.pinOffsetY,
+        z: 0,
+      });
     } else {
       TransformComposer.clear(this.element, 'pin');
     }

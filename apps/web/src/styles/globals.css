@@ -26,6 +26,15 @@
     font-family: var(--font-mono, 'Geist Mono', monospace);
   }
 
+  /* Utility to hide scrollbars on touch / horizontal scrollers */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
   ::selection {
     background: rgba(124, 58, 237, 0.3);
     color: #ede9fe;

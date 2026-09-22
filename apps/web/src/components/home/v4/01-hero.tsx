@@ -113,16 +113,16 @@ export function HeroSection() {
       />
 
       {/* Top Section Layout Container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 w-full flex-1 flex flex-col justify-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-12 w-full flex-1 flex flex-col justify-center">
         
         {/* Main 2-Column Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center pt-4 pb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center pt-4 pb-8">
           
           {/* Left Column (Hero Copy & Controls) - 7 cols on lg */}
           <div className="lg:col-span-7 flex flex-col justify-center">
             
             {/* Overline Badge */}
-            <div className="flex flex-wrap items-center gap-2.5 mb-6 text-xs font-mono select-none">
+            <div className="flex flex-wrap items-center gap-2.5 mb-5 sm:mb-6 text-xs font-mono select-none">
               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold tracking-wide">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse" />
                 <span>v0.2.0 BETA (LIVE)</span>
@@ -138,7 +138,7 @@ export function HeroSection() {
 
             {/* Main Dual-Tone Headline with Reveal */}
             <Reveal direction="up" distance={20}>
-              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[4.4rem] font-bold tracking-tight leading-[1.08] mb-6">
+              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[4.4rem] font-bold tracking-tight leading-[1.08] mb-4 sm:mb-6 break-words">
                 <span className="text-white block font-extrabold">You build the markup.</span>
                 <span className="text-zinc-500 block font-bold mt-1">We handle the physics.</span>
               </h1>
@@ -146,13 +146,13 @@ export function HeroSection() {
 
             {/* Subtitle Description */}
             <Reveal direction="up" distance={15} delay={0.1}>
-              <p className="text-base sm:text-lg text-zinc-400 max-w-xl font-normal leading-relaxed mb-8">
+              <p className="text-sm sm:text-base md:text-lg text-zinc-400 max-w-xl font-normal leading-relaxed mb-6 sm:mb-8">
                 Declarative, slot-based components that mutate hardware transform styles directly on the GPU thread.
               </p>
             </Reveal>
 
             {/* Interactive Primitive Selection Pills */}
-            <div className="flex flex-wrap items-center gap-3 mb-12">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-8 sm:mb-12">
               {primitives.map((prim) => {
                 const isActive = activePrimitive === prim.id;
                 return (
@@ -160,7 +160,7 @@ export function HeroSection() {
                     key={prim.id}
                     onClick={() => setActivePrimitive(prim.id)}
                     type="button"
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer ${
+                    className={`flex items-center gap-1.5 sm:gap-2 px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer ${
                       isActive
                         ? 'bg-violet-600 text-white shadow-[0_0_24px_rgba(124,58,237,0.45)] border border-violet-400/50 scale-[1.02]'
                         : 'bg-[#0d0f14]/90 text-zinc-300 border border-white/[0.08] hover:border-violet-500/40 hover:bg-[#151922] hover:text-white'
@@ -174,7 +174,7 @@ export function HeroSection() {
             </div>
 
             {/* 4 Feature Spec Cards Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-4 border-t border-white/[0.06]">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6 pt-4 border-t border-white/[0.06]">
               
               {/* 1. React Re-Renders */}
               <div className="flex flex-col gap-3">
@@ -280,7 +280,7 @@ export function HeroSection() {
                   />
 
                   {/* Layer 2: Floating Reactive HUD Card connected to Active Primitive Pill */}
-                  <div className="absolute -bottom-4 left-4 right-4 sm:left-6 sm:right-6 bg-[#0c0d12] border border-violet-500/30 rounded-xl p-4 shadow-[0_12px_40px_rgba(0,0,0,0.8)] transition-all duration-300">
+                  <div className="absolute -bottom-2 sm:-bottom-4 left-2 right-2 sm:left-6 sm:right-6 bg-[#0c0d12]/95 backdrop-blur-md border border-violet-500/30 rounded-xl p-3 sm:p-4 shadow-[0_12px_40px_rgba(0,0,0,0.8)] transition-all duration-300">
                     <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/[0.08]">
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.9)]" />
@@ -293,7 +293,7 @@ export function HeroSection() {
                       </span>
                     </div>
 
-                    <div className="text-[11px] font-mono text-zinc-300 bg-[#060709] px-3 py-1.5 rounded-lg border border-white/5 mb-3 overflow-x-auto whitespace-nowrap">
+                    <div className="text-[11px] font-mono text-zinc-300 bg-[#060709] px-2.5 sm:px-3 py-1.5 rounded-lg border border-white/5 mb-2.5 sm:mb-3 overflow-x-auto whitespace-nowrap no-scrollbar">
                       <span className="text-violet-400 font-semibold">{currentPrim.codeSnippet}</span>
                     </div>
 
@@ -313,14 +313,14 @@ export function HeroSection() {
                         </div>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-2 gap-2 text-[10px] font-mono text-zinc-400">
+                      <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-[9.5px] sm:text-[10px] font-mono text-zinc-400">
                         <div className="flex items-center justify-between px-2 py-1 rounded bg-zinc-900/80 border border-white/5">
                           <span>Velocity:</span>
-                          <span ref={velocityTextRef} className="text-emerald-400 font-bold">0.0 px/f</span>
+                          <span ref={velocityTextRef} className="text-emerald-400 font-bold ml-1">0.0 px/f</span>
                         </div>
                         <div className="flex items-center justify-between px-2 py-1 rounded bg-zinc-900/80 border border-white/5">
                           <span>Compositor:</span>
-                          <span className="text-violet-400 font-bold">GPU Active</span>
+                          <span className="text-violet-400 font-bold ml-1">GPU Active</span>
                         </div>
                       </div>
                     )}

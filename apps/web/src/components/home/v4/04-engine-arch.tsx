@@ -26,7 +26,7 @@ export function EngineArchitectureSection() {
   return (
     <section
       id="architecture"
-      className="relative w-full bg-[#050505] py-24 sm:py-32 px-4 sm:px-6 lg:px-8 border-t border-zinc-800/80 overflow-hidden"
+      className="relative w-full bg-[#050505] py-16 sm:py-32 px-4 sm:px-6 lg:px-8 border-t border-zinc-800/80 overflow-hidden"
     >
       {/* Background Ambience Lines */}
       <svg
@@ -67,7 +67,7 @@ export function EngineArchitectureSection() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
           <Reveal direction="down" distance={15}>
             <div className="flex items-center justify-center gap-2 mb-3">
               <span className="text-[11px] sm:text-xs font-mono font-bold tracking-[0.25em] uppercase text-violet-400">
@@ -81,14 +81,14 @@ export function EngineArchitectureSection() {
           </Reveal>
 
           <Reveal direction="up" distance={20} delay={0.1}>
-            <h2 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.08] mb-4">
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.08] mb-3 sm:mb-4 break-words">
               <span className="text-white block">Not a wrapper.</span>
               <span className="text-zinc-500 block">An engine.</span>
             </h2>
           </Reveal>
 
           <Reveal direction="up" distance={15} delay={0.2}>
-            <p className="text-sm sm:text-base text-zinc-400 max-w-xl mx-auto leading-relaxed">
+            <p className="text-xs sm:text-base text-zinc-400 max-w-xl mx-auto leading-relaxed">
               A 3-phase deterministic microtask pipeline executing between hardware vSync ticks and React component reconciliation.
             </p>
           </Reveal>
@@ -96,7 +96,7 @@ export function EngineArchitectureSection() {
 
         {/* Main Architecture Diagram Container */}
         <Reveal direction="up" distance={25} delay={0.25}>
-          <div className="w-full max-w-5xl mx-auto rounded-2xl border border-zinc-800/90 bg-[#09090b] p-6 sm:p-8 shadow-2xl relative overflow-hidden mb-14">
+          <div className="w-full max-w-5xl mx-auto rounded-2xl border border-zinc-800/90 bg-[#09090b] p-4 sm:p-8 shadow-2xl relative overflow-hidden mb-10 sm:mb-14">
             {/* Top Bar inside card */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-zinc-800/80 mb-6">
               <div className="flex items-center gap-3">
@@ -201,8 +201,8 @@ export function EngineArchitectureSection() {
             </div>
 
             {/* Bottom Bridge Line inside card */}
-            <div className="relative mt-8 pt-4 border-t border-zinc-800/80 flex items-center justify-center">
-              <span className="text-[10px] sm:text-[11px] font-mono tracking-[0.2em] text-zinc-500 uppercase bg-[#09090b] px-3">
+            <div className="relative mt-6 sm:mt-8 pt-4 border-t border-zinc-800/80 flex items-center justify-center">
+              <span className="text-[9px] sm:text-[11px] font-mono tracking-[0.1em] sm:tracking-[0.2em] text-zinc-500 uppercase bg-[#09090b] px-2.5 sm:px-3 text-center break-words">
                 REACTIVE CONTEXT &amp; HEADLESS BINDINGS BRIDGE
               </span>
             </div>
@@ -210,10 +210,10 @@ export function EngineArchitectureSection() {
         </Reveal>
 
         {/* 3 Spec Pillars */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto mb-12 sm:mb-16">
           {/* Spec 1 */}
-          <div className="flex items-center gap-3.5 justify-center sm:justify-start">
-            <div className="text-violet-400">
+          <div className="flex items-center gap-3.5 justify-start">
+            <div className="text-violet-400 shrink-0">
               <Zap className="w-5 h-5" />
             </div>
             <div>
@@ -223,8 +223,8 @@ export function EngineArchitectureSection() {
           </div>
 
           {/* Spec 2 */}
-          <div className="flex items-center gap-3.5 justify-center sm:justify-start">
-            <div className="text-violet-400">
+          <div className="flex items-center gap-3.5 justify-start">
+            <div className="text-violet-400 shrink-0">
               <Box className="w-5 h-5" />
             </div>
             <div>
@@ -234,8 +234,8 @@ export function EngineArchitectureSection() {
           </div>
 
           {/* Spec 3 */}
-          <div className="flex items-center gap-3.5 justify-center sm:justify-start">
-            <div className="text-violet-400">
+          <div className="flex items-center gap-3.5 justify-start">
+            <div className="text-violet-400 shrink-0">
               <Leaf className="w-5 h-5" />
             </div>
             <div>

@@ -101,9 +101,11 @@ export const TextReveal = React.memo(
       const unobserve = GlobalResizeManager.observe(container, measure);
 
       ticker.add(`${taskId}-update`, 'update', () => {
-        const scrollY = engine?.getMetrics().scroll ?? (window.scrollY || window.pageYOffset);
+        const metrics = engine?.getMetrics();
+        const scrollY = metrics?.scroll ?? (typeof window !== 'undefined' ? (window.scrollY || window.pageYOffset) : 0);
         const wh = window.innerHeight;
-        solver.update(scrollY, wh);
+        const velocity = metrics?.velocity;
+        solver.update(scrollY, wh, velocity);
       });
 
       ticker.add(`${taskId}-render`, 'render', () => {
@@ -135,8 +137,6 @@ export const TextReveal = React.memo(
                     opacity: baseOpacity,
                     display: 'inline-block',
                     transformOrigin: '50% 100%',
-                    transformStyle: 'preserve-3d',
-                    backfaceVisibility: 'hidden',
                   }}
                 >
                   {word}
@@ -151,7 +151,6 @@ export const TextReveal = React.memo(
                   style={{
                     display: 'inline-block',
                     whiteSpace: 'nowrap',
-                    transformStyle: 'preserve-3d',
                   }}
                 >
                   {chars.map(({ char, index }) => (
@@ -166,8 +165,6 @@ export const TextReveal = React.memo(
                         display: 'inline-block',
                         whiteSpace: char === ' ' ? 'pre' : 'normal',
                         transformOrigin: '50% 100%',
-                        transformStyle: 'preserve-3d',
-                        backfaceVisibility: 'hidden',
                       }}
                     >
                       {char}
@@ -179,6 +176,8 @@ export const TextReveal = React.memo(
             ))}
       </span>
     );
+
+    const has3D = Boolean(rotateX || rotateY);
 
     if (asChild && React.isValidElement(children)) {
       const child = children as React.ReactElement<any>;
@@ -192,8 +191,7 @@ export const TextReveal = React.memo(
         ref: combinedRef,
         className: ['m-0 p-0 flex flex-wrap', className, child.props.className].filter(Boolean).join(' '),
         style: {
-          perspective: '1000px',
-          transformStyle: 'preserve-3d',
+          ...(has3D ? { perspective: '1000px' } : undefined),
           ...style,
           ...child.props.style,
         },
@@ -208,8 +206,7 @@ export const TextReveal = React.memo(
         aria-label={rawText}
         className={['m-0 p-0 flex flex-wrap', className].filter(Boolean).join(' ')}
         style={{
-          perspective: '1000px',
-          transformStyle: 'preserve-3d',
+          ...(has3D ? { perspective: '1000px' } : undefined),
           ...style,
         }}
         {...domProps}

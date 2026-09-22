@@ -386,7 +386,7 @@ export function DocsView() {
             overflow-y-auto overscroll-contain sidebar-scroll
             ${
               mobileMenuOpen
-                ? 'fixed inset-y-0 left-0 z-50 w-72 bg-[#050505] p-6 shadow-2xl block border-r border-zinc-800'
+                ? 'fixed inset-y-0 left-0 z-50 w-72 bg-[#050505] p-6 pb-28 shadow-2xl block border-r border-zinc-800'
                 : desktopSidebarOpen
                 ? 'hidden md:block'
                 : 'hidden'
@@ -428,7 +428,7 @@ export function DocsView() {
         </aside>
 
         {/* Center Main Article */}
-        <main className="flex-1 min-w-0 px-4 sm:px-8 lg:px-12 py-8 lg:py-12">
+        <main className="flex-1 min-w-0 px-3 sm:px-8 lg:px-12 pt-6 sm:pt-8 lg:pt-12 pb-28 sm:pb-16">
           <article className="prose prose-invert prose-zinc max-w-none">
             {renderSection()}
           </article>

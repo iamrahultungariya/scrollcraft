@@ -89,7 +89,7 @@ const ARCHITECTURE_INVARIANTS = [
 
 export function ComparisonSection() {
   return (
-    <section id="architecture" className="relative w-full bg-[#050505] py-24 sm:py-32 px-4 sm:px-6 lg:px-8 border-t border-zinc-800/80 overflow-hidden font-sans">
+    <section id="architecture" className="relative w-full bg-[#050505] py-16 sm:py-32 px-4 sm:px-6 lg:px-8 border-t border-zinc-800/80 overflow-hidden font-sans">
       {/* Background ambient lighting - Zero-cost hardware radial gradient */}
       <div
         aria-hidden="true"
@@ -104,7 +104,7 @@ export function ComparisonSection() {
         {/* ========================================== */}
         {/* 1. BUILT FOR PURE PERFORMANCE & ZERO-JANK DX */}
         {/* ========================================== */}
-        <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-20">
           <Reveal direction="down" distance={15}>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/30 text-violet-400 text-xs font-mono font-medium mb-4">
               <Cpu className="w-3.5 h-3.5" />
@@ -113,25 +113,25 @@ export function ComparisonSection() {
           </Reveal>
 
           <Reveal direction="up" distance={20} delay={0.1}>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight mb-4">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight mb-4 break-words">
               Built for Pure Performance &amp; Zero-Jank DX
             </h2>
           </Reveal>
 
           <Reveal direction="up" distance={15} delay={0.2}>
-            <p className="text-sm sm:text-base text-zinc-400 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xs sm:text-base text-zinc-400 max-w-2xl mx-auto leading-relaxed">
               ScrollCraft delivers a GPU-composited hardware pipeline built strictly for modern React. Every primitive is engineered against 6 unbreakable runtime invariants.
             </p>
           </Reveal>
         </div>
 
         {/* 6 Clean Invariant Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-6xl mx-auto mb-16 sm:mb-24">
           {ARCHITECTURE_INVARIANTS.map((item, idx) => (
             <Reveal key={item.title} direction="up" distance={20} index={idx} stagger={0.05}>
-              <div className="p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-200 flex flex-col justify-between h-full group">
+              <div className="p-5 sm:p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-200 flex flex-col justify-between h-full group">
                 <div>
-                  <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center justify-between mb-4 sm:mb-5">
                     <div className="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300">
                       {item.icon}
                     </div>
@@ -164,7 +164,7 @@ export function ComparisonSection() {
         {/* ========================================== */}
         {/* 2. VERIFIED PRODUCTION FOOTPRINT (CLEAN & MODERN) */}
         {/* ========================================== */}
-        <div className="max-w-6xl mx-auto rounded-3xl border border-zinc-800/90 bg-[#090a0f] p-6 sm:p-10 mb-20 shadow-2xl relative overflow-hidden">
+        <div className="max-w-6xl mx-auto rounded-3xl border border-zinc-800/90 bg-[#090a0f] p-4 sm:p-8 lg:p-10 mb-14 sm:mb-20 shadow-2xl relative overflow-hidden">
           {/* Ambient accent */}
           <div
             aria-hidden="true"
@@ -316,12 +316,12 @@ export function ComparisonSection() {
             </div>
 
             {/* Diagnostic readout */}
-            <div className="mt-8 pt-5 border-t border-zinc-800/80 flex flex-wrap items-center justify-between gap-3 text-xs font-mono bg-black/60 px-5 py-3 rounded-xl border border-zinc-800 text-zinc-400">
-              <span className="text-zinc-300 flex items-center gap-2">
-                <Terminal className="w-3.5 h-3.5 text-violet-400" />
-                <span className="text-emerald-400">$</span> scrollcraft audit --production --strict-mode
+            <div className="mt-6 sm:mt-8 pt-4 sm:pt-5 border-t border-zinc-800/80 flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 text-[11px] sm:text-xs font-mono bg-black/60 px-3.5 sm:px-5 py-3 rounded-xl border border-zinc-800 text-zinc-400">
+              <span className="text-zinc-300 flex items-center gap-2 break-all sm:break-normal">
+                <Terminal className="w-3.5 h-3.5 text-violet-400 shrink-0" />
+                <span><span className="text-emerald-400">$</span> scrollcraft audit --production --strict-mode</span>
               </span>
-              <span className="text-zinc-400 text-[11px]">
+              <span className="text-zinc-400 text-[10px] sm:text-[11px] break-words">
                 [PASS] @scrollcraft/core (2.9kb) &bull; [PASS] @scrollcraft/react (1.9kb) &bull; [PASS] zero-deps
               </span>
             </div>
@@ -330,19 +330,19 @@ export function ComparisonSection() {
         {/* ========================================== */}
         {/* 3. ARCHITECTURE & ATTRIBUTIONS */}
         {/* ========================================== */}
-        <div className="max-w-6xl mx-auto rounded-3xl border border-zinc-800/90 bg-[#090a0f] p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+        <div className="max-w-6xl mx-auto rounded-3xl border border-zinc-800/90 bg-[#090a0f] p-4 sm:p-8 lg:p-10 shadow-2xl relative overflow-hidden">
             {/* Header */}
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-8 border-b border-zinc-800/80 mb-8">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 sm:pb-8 border-b border-zinc-800/80 mb-6 sm:mb-8">
               <div>
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-xs font-mono font-semibold uppercase tracking-widest text-violet-400">
+                  <span className="text-[11px] sm:text-xs font-mono font-semibold uppercase tracking-widest text-violet-400">
                     ENGINEERING ARCHITECTURE &amp; PRIOR ART
                   </span>
                   <span className="text-[10px] px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-300 border border-zinc-700 font-mono font-medium">
                     Open Source Attributions
                   </span>
                 </div>
-                <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight break-words">
                   Custom React Motion Core &bull; Inertia Normalization Prior Art
                 </h3>
               </div>

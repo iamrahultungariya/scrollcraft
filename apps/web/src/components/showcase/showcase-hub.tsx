@@ -62,7 +62,7 @@ export function ShowcaseHub() {
 
         <Reveal direction="up" distance={25} delay={0.1}>
           {/* Professional Dual-Tone Headline */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white mb-6 leading-[1.08]">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-6 leading-[1.08] break-words">
             You Build. <span className="text-violet-400">We Showcase.</span>
           </h1>
         </Reveal>
@@ -190,8 +190,8 @@ export function ShowcaseHub() {
       </section>
 
       {/* Community Submission Banner */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
-        <div className="rounded-3xl border border-zinc-800 bg-[#070709] p-8 sm:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-8 relative overflow-hidden">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32 sm:pb-24">
+        <div className="rounded-3xl border border-zinc-800 bg-[#070709] p-6 sm:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-8 relative overflow-hidden">
           <div className="max-w-xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-950/40 border border-violet-500/20 text-xs font-mono text-violet-300 mb-4">
               <Send className="w-3.5 h-3.5" />

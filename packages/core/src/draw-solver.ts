@@ -1,5 +1,6 @@
 import { clamp, damp } from './math';
 import { triggerRegistry } from './markers';
+import { compileTrigger, CompiledTrigger } from './trigger-compiler';
 
 export interface DrawSolverOptions {
   id?: string;
@@ -15,8 +16,14 @@ export class DrawSolver {
   private options: DrawSolverOptions;
   public readonly id: string;
   
-  private startY: number = 0;
-  private endY: number = 0;
+  public startY: number = 0;
+  public endY: number = 0;
+
+  public getBounds(): { startY: number; endY: number } {
+    return { startY: this.startY, endY: this.endY };
+  }
+  private startTriggerCompiled: CompiledTrigger;
+  private endTriggerCompiled: CompiledTrigger;
   
   private progress: number = 0;
   private targetProgress: number = 0;
@@ -38,35 +45,10 @@ export class DrawSolver {
       start: options.start ?? 'top bottom',
       end: options.end ?? 'bottom top',
     };
+    this.startTriggerCompiled = compileTrigger(this.options.start);
+    this.endTriggerCompiled = compileTrigger(this.options.end);
     this.initialStrokeDasharray = element.style.strokeDasharray || '';
     this.initialStrokeDashoffset = element.style.strokeDashoffset || '';
-  }
-
-  private parseTrigger(trigger: string | undefined, rect: DOMRect, windowHeight: number): number {
-    const safeTrigger = trigger && typeof trigger === 'string' && trigger.trim() ? trigger.trim() : 'top bottom';
-    const parts = safeTrigger.split(/\s+/);
-    const elAlign = parts[0] || 'top';
-    const vpAlign = parts[1] || 'bottom';
-    
-    const scrollTop = window.scrollY ?? window.pageYOffset ?? 0;
-    const elementTopAbs = rect.top + scrollTop;
-    
-    let elOffset = 0;
-    if (elAlign === 'center') elOffset = rect.height / 2;
-    else if (elAlign === 'bottom') elOffset = rect.height;
-    else if (elAlign.endsWith('%')) elOffset = rect.height * (parseFloat(elAlign) / 100);
-    else if (elAlign.endsWith('px')) elOffset = parseFloat(elAlign);
-    
-    let vpOffset = 0;
-    if (vpAlign === 'center') vpOffset = windowHeight / 2;
-    else if (vpAlign === 'bottom') vpOffset = windowHeight;
-    else if (vpAlign.endsWith('%')) vpOffset = windowHeight * (parseFloat(vpAlign) / 100);
-    else if (vpAlign.endsWith('px')) vpOffset = parseFloat(vpAlign);
-    else if (vpAlign.startsWith('+=') || vpAlign.startsWith('-=')) {
-      return elementTopAbs + elOffset + parseFloat(vpAlign.replace('=', ''));
-    }
-    
-    return elementTopAbs + elOffset - vpOffset;
   }
 
   public measure(): void {
@@ -74,9 +56,10 @@ export class DrawSolver {
     
     const rect = this.element.getBoundingClientRect();
     const wh = window.innerHeight;
+    const scrollTop = window.scrollY ?? window.pageYOffset ?? 0;
     
-    this.startY = this.parseTrigger(this.options.start!, rect, wh);
-    this.endY = this.parseTrigger(this.options.end!, rect, wh);
+    this.startY = this.startTriggerCompiled.evaluate(rect, wh, scrollTop);
+    this.endY = this.endTriggerCompiled.evaluate(rect, wh, scrollTop);
     
     if (this.options.end?.startsWith('+=')) {
         this.endY = this.startY + parseFloat(this.options.end.replace('+=', ''));
@@ -147,6 +130,15 @@ export class DrawSolver {
 
   public isSettled(): boolean {
     return Math.abs(this.progress - this.targetProgress) < 0.0005;
+  }
+
+  public clamp(boundaryProgress: number): void {
+    const clamped = clamp(boundaryProgress, 0, 1);
+    this.targetProgress = clamped;
+    this.progress = clamped;
+    this.isVisible = this.progress > 0 && this.progress < 1;
+    triggerRegistry.updateProgress(this.id, this.progress);
+    this.render();
   }
 
   public render(): void {

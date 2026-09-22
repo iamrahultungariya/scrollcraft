@@ -140,16 +140,16 @@ export const DocRecipes: React.FC<DocRecipesProps> = ({ recipeId }) => {
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-violet-500/10 border border-violet-500/20 text-[11px] font-mono font-semibold text-violet-300 uppercase tracking-widest w-fit">
             PRODUCTION RECIPES
           </div>
-          <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tighter text-white leading-[1.08]">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.1] break-words">
             Sticky Narrative Cards
           </h1>
-          <p className="text-base sm:text-lg text-zinc-400 leading-relaxed max-w-3xl">
+          <p className="text-sm sm:text-base text-zinc-400 leading-relaxed max-w-3xl font-normal">
             A full-page pinned narrative pattern where sticky headlines remain locked in place while content cards sequence into view.
           </p>
         </header>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-bold tracking-tight text-white">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white break-words">
             Implementation Pattern
           </h2>
           <CodeViewer
@@ -174,16 +174,16 @@ export const DocRecipes: React.FC<DocRecipesProps> = ({ recipeId }) => {
         <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-violet-500/10 border border-violet-500/20 text-[11px] font-mono font-semibold text-violet-300 uppercase tracking-widest w-fit">
           PRODUCTION RECIPES
         </div>
-        <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tighter text-white leading-[1.08]">
+        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.1] break-words">
           Horizontal Gallery Scrub
         </h1>
-        <p className="text-base sm:text-lg text-zinc-400 leading-relaxed max-w-3xl">
+        <p className="text-sm sm:text-base text-zinc-400 leading-relaxed max-w-3xl font-normal">
           Convert vertical page scroll distance into seamless horizontal slide translation with zero layout shift.
         </p>
       </header>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-2xl font-bold tracking-tight text-white">
+        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white break-words">
           Implementation Pattern
         </h2>
         <CodeViewer

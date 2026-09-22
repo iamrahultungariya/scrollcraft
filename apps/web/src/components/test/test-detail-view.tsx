@@ -62,14 +62,14 @@ export const TestDetailView: React.FC<TestDetailViewProps> = ({ item }) => {
 
       {/* Breadcrumb & Navigation Subnav */}
       <div className="w-full border-b border-zinc-800/80 bg-zinc-950/40 px-4 sm:px-6 py-3">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <Link
               href="/test"
               className="flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-white transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Test Lab Hub</span>
+              <span className="hidden sm:inline">Back to </span><span>Test Lab</span>
             </Link>
             <span className="text-zinc-700">/</span>
             <span className={`text-[10px] font-mono font-bold uppercase px-2.5 py-0.5 rounded-full border ${categoryBadge}`}>
@@ -77,23 +77,23 @@ export const TestDetailView: React.FC<TestDetailViewProps> = ({ item }) => {
             </span>
           </div>
 
-          <div className="flex items-center gap-3 text-xs font-mono">
+          <div className="flex items-center gap-2 text-xs font-mono">
             {prevItem && (
               <Link
                 href={`/test/${prevItem.slug}`}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition-colors"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition-colors text-[11px]"
               >
-                <ArrowLeft className="w-3 h-3" />
-                <span>{prevItem.title}</span>
+                <ArrowLeft className="w-3 h-3 shrink-0" />
+                <span className="truncate max-w-[80px] sm:max-w-[150px]">{prevItem.title}</span>
               </Link>
             )}
             {nextItem && (
               <Link
                 href={`/test/${nextItem.slug}`}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition-colors"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition-colors text-[11px]"
               >
-                <span>{nextItem.title}</span>
-                <ArrowRight className="w-3 h-3" />
+                <span className="truncate max-w-[80px] sm:max-w-[150px]">{nextItem.title}</span>
+                <ArrowRight className="w-3 h-3 shrink-0" />
               </Link>
             )}
           </div>
@@ -115,7 +115,7 @@ export const TestDetailView: React.FC<TestDetailViewProps> = ({ item }) => {
                 Zero Re-renders Verified
               </span>
             </div>
-            <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight font-mono">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight font-mono break-all sm:break-normal">
               {item.title}
             </h1>
             <p className="text-sm sm:text-base text-zinc-400 leading-relaxed">
@@ -230,13 +230,16 @@ export const TestDetailView: React.FC<TestDetailViewProps> = ({ item }) => {
 
         {/* API Props & Options Specification Table */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2 font-mono text-sm text-sky-400 font-bold">
-            <BookOpen className="w-5 h-5" />
-            <span className="uppercase tracking-wider">Props & Configuration Reference</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 font-mono text-sm text-sky-400 font-bold">
+              <BookOpen className="w-5 h-5" />
+              <span className="uppercase tracking-wider">Props & Configuration Reference</span>
+            </div>
+            <span className="text-[10px] font-mono text-zinc-500 sm:hidden">Swipe table &rarr;</span>
           </div>
 
           <div className="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950/60">
-            <table className="w-full text-left font-mono text-xs border-collapse">
+            <table className="w-full text-left font-mono text-xs border-collapse min-w-[560px]">
               <thead>
                 <tr className="border-b border-zinc-800 bg-zinc-900/60 text-zinc-400">
                   <th className="p-4">Prop / Option</th>

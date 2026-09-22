@@ -6,7 +6,7 @@
  */
 
 import { ScrollDriver, DriverState } from './driver';
-import { clamp, snapToDevicePixel } from './math';
+import { clamp } from './math';
 import { Capabilities } from './feature-detection';
 import { injectNativeStyles } from './native-styles';
 import { TransformComposer } from './dom';
@@ -75,12 +75,14 @@ class JSHorizontalDriver implements ScrollDriver {
 
   public render(): void {
     if (motionStore.isReduced()) {
-      TransformComposer.set(this.innerContainer, 'horizontal', 'translate3d(0, 0, 0)');
+      TransformComposer.setNumeric(this.innerContainer, 'horizontal', { x: 0, y: 0, z: 0 });
       return;
     }
-    const dpr = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1;
-    const snappedOffset = snapToDevicePixel(this.state.offset, dpr);
-    TransformComposer.set(this.innerContainer, 'horizontal', `translate3d(${snappedOffset.toFixed(2)}px, 0, 0)`);
+    TransformComposer.setNumeric(this.innerContainer, 'horizontal', {
+      x: this.state.offset,
+      y: 0,
+      z: 0,
+    });
   }
 
   public getState(): HorizontalState {

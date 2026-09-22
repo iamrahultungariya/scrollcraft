@@ -121,16 +121,23 @@ export interface LenisScrollEvent {
   [key: string]: any;
 }
 
-export interface ElementTransform {
+export interface NumericTransform {
   x?: number;
   y?: number;
   z?: number;
   scale?: number;
   scaleX?: number;
   scaleY?: number;
+  rotate?: number;
   rotateX?: number;
   rotateY?: number;
   rotateZ?: number;
+  skewX?: number;
+  skewY?: number;
+  format?: 'standard' | 'parallax' | 'compact' | 'reveal';
+}
+
+export interface ElementTransform extends NumericTransform {
   opacity?: number;
 }
 

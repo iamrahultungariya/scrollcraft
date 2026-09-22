@@ -111,10 +111,10 @@ export const CodeViewer: React.FC<CodeViewerProps> = React.memo(({
       className={`rounded-xl bg-[#09090b] border border-zinc-800/80 shadow-2xl overflow-hidden text-xs font-mono select-text transition-all ${className}`}
     >
       {/* Titlebar with Tabs & Actions */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 bg-[#0d0d10] border-b border-zinc-800/80">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between gap-2 px-3 py-2 sm:px-3.5 sm:py-2.5 bg-[#0d0d10] border-b border-zinc-800/80">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 overflow-hidden">
           {/* Mac Traffic Lights */}
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="hidden sm:flex items-center gap-1.5 shrink-0">
             <div className="w-2.5 h-2.5 rounded-full bg-zinc-700/60" />
             <div className="w-2.5 h-2.5 rounded-full bg-zinc-700/60" />
             <div className="w-2.5 h-2.5 rounded-full bg-zinc-700/60" />
@@ -122,7 +122,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = React.memo(({
 
           {/* Tabs or Filename */}
           {tabs && tabs.length > 0 ? (
-            <div className="flex items-center gap-1 bg-zinc-900/90 p-0.5 rounded-lg border border-zinc-800/80">
+            <div className="flex items-center gap-1 bg-zinc-900/90 p-0.5 rounded-lg border border-zinc-800/80 overflow-x-auto no-scrollbar">
               {tabs.map((tab, idx) => (
                 <button
                   key={tab.label}
@@ -130,7 +130,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = React.memo(({
                     setActiveTabIdx(idx);
                     setCopied(false);
                   }}
-                  className={`px-3 py-1 rounded-md text-xs font-medium font-sans transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium font-sans whitespace-nowrap transition-all cursor-pointer ${
                     activeTabIdx === idx
                       ? 'bg-zinc-800 text-white shadow-xs font-semibold'
                       : 'text-zinc-400 hover:text-zinc-200'
@@ -141,7 +141,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = React.memo(({
               ))}
             </div>
           ) : currentFileName ? (
-            <span className="text-[11px] text-zinc-400 font-semibold font-mono tracking-tight">
+            <span className="text-[11px] text-zinc-400 font-semibold font-mono tracking-tight truncate">
               {currentFileName}
             </span>
           ) : (
@@ -151,7 +151,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = React.memo(({
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Word Wrap Toggle */}
           <button
             onClick={() => setWordWrap((prev) => !prev)}
@@ -169,7 +169,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = React.memo(({
           {/* Copy Button with Green Tick Feedback */}
           <button
             onClick={onCopy}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-md border text-[11px] transition-all cursor-pointer shadow-xs active:scale-95 ${
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-md border text-[11px] transition-all cursor-pointer shadow-xs active:scale-95 ${
               copied
                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 font-medium'
                 : 'bg-zinc-900/80 hover:bg-zinc-800 border-zinc-800 text-zinc-300 hover:text-white'
@@ -179,12 +179,12 @@ export const CodeViewer: React.FC<CodeViewerProps> = React.memo(({
             {copied ? (
               <>
                 <Check className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-400 font-medium">Copied!</span>
+                <span className="text-emerald-400 font-medium text-[11px]">Copied!</span>
               </>
             ) : (
               <>
                 <Copy className="w-3.5 h-3.5 text-zinc-400" />
-                <span>Copy</span>
+                <span className="hidden sm:inline">Copy</span>
               </>
             )}
           </button>
@@ -192,16 +192,16 @@ export const CodeViewer: React.FC<CodeViewerProps> = React.memo(({
       </div>
 
       {/* Code Area */}
-      <div className={`p-4 leading-relaxed bg-[#060608] ${wordWrap ? 'overflow-x-hidden' : 'overflow-x-auto'}`}>
+      <div className={`p-3 sm:p-4 leading-relaxed bg-[#060608] ${wordWrap ? 'overflow-x-hidden' : 'overflow-x-auto'}`}>
         <table className="w-full border-collapse">
           <tbody>
             {tokenizedLines.map((tokens, idx) => (
               <tr key={idx} className="hover:bg-zinc-900/40 transition-colors">
-                <td className="pr-4 text-right text-zinc-600 select-none w-8 align-top font-mono text-[11px] shrink-0">
+                <td className="pr-2 sm:pr-4 text-right text-zinc-600 select-none w-6 sm:w-8 align-top font-mono text-[10px] sm:text-[11px] shrink-0">
                   {idx + 1}
                 </td>
                 <td
-                  className={`text-zinc-200 font-mono text-[12.5px] leading-6 w-full ${
+                  className={`text-zinc-200 font-mono text-[11px] sm:text-[12.5px] leading-5 sm:leading-6 w-full ${
                     wordWrap ? 'whitespace-pre-wrap break-words' : 'whitespace-pre'
                   }`}
                 >

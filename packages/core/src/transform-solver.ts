@@ -1,7 +1,11 @@
-import { clamp, damp, calculateVelocitySnapTarget, snapToDevicePixel } from './math';
+import { clamp, damp, calculateVelocitySnapTarget } from './math';
 import { TimelineSolver, PropertyTimeline, KeyframeSegment } from './timeline';
 import { TransformComposer } from './dom';
 import { triggerRegistry } from './markers';
+import { styleRegistry } from './style-registry';
+import { compileTrigger, CompiledTrigger } from './trigger-compiler';
+import { adaptiveQualityGovernor } from './adaptive-quality';
+import { PerformanceTier } from './types';
 
 export interface TransformProperties {
   x?: [number, number] | number[];
@@ -37,8 +41,12 @@ export class TransformSolver {
   private options: TransformSolverOptions;
   public readonly id: string;
   
-  private startY: number = 0;
-  private endY: number = 0;
+  public startY: number = 0;
+  public endY: number = 0;
+
+  public getBounds(): { startY: number; endY: number } {
+    return { startY: this.startY, endY: this.endY };
+  }
   
   private progress: number = 0;
   private targetProgress: number = 0;
@@ -51,13 +59,8 @@ export class TransformSolver {
   private wasVisible: boolean = false;
 
   private snapTimeout: number | null = null;
-  private initialStyles: {
-    opacity: string;
-    filter: string;
-    borderRadius: string;
-    willChange: string;
-  };
-  private mutatedProperties: Set<string> = new Set();
+  private startTriggerCompiled: CompiledTrigger;
+  private endTriggerCompiled: CompiledTrigger;
 
   constructor(element: HTMLElement, options: TransformSolverOptions) {
     this.element = element;
@@ -68,13 +71,8 @@ export class TransformSolver {
       end: options.end ?? 'bottom top',
     };
     
-    this.initialStyles = {
-      opacity: element.style.opacity || '',
-      filter: element.style.filter || '',
-      borderRadius: element.style.borderRadius || '',
-      willChange: element.style.willChange || '',
-    };
-
+    this.startTriggerCompiled = compileTrigger(this.options.start);
+    this.endTriggerCompiled = compileTrigger(this.options.end);
     this.buildTimeline();
   }
 
@@ -99,33 +97,6 @@ export class TransformSolver {
     }
   }
 
-  private parseTrigger(trigger: string | undefined, rect: DOMRect, windowHeight: number): number {
-    const safeTrigger = trigger && typeof trigger === 'string' && trigger.trim() ? trigger.trim() : 'top bottom';
-    const parts = safeTrigger.split(/\s+/);
-    const elAlign = parts[0] || 'top';
-    const vpAlign = parts[1] || 'bottom';
-    
-    const scrollTop = window.scrollY ?? window.pageYOffset ?? 0;
-    const elementTopAbs = rect.top + scrollTop;
-    
-    let elOffset = 0;
-    if (elAlign === 'center') elOffset = rect.height / 2;
-    else if (elAlign === 'bottom') elOffset = rect.height;
-    else if (elAlign.endsWith('%')) elOffset = rect.height * (parseFloat(elAlign) / 100);
-    else if (elAlign.endsWith('px')) elOffset = parseFloat(elAlign);
-    
-    let vpOffset = 0;
-    if (vpAlign === 'center') vpOffset = windowHeight / 2;
-    else if (vpAlign === 'bottom') vpOffset = windowHeight;
-    else if (vpAlign.endsWith('%')) vpOffset = windowHeight * (parseFloat(vpAlign) / 100);
-    else if (vpAlign.endsWith('px')) vpOffset = parseFloat(vpAlign);
-    else if (vpAlign.startsWith('+=') || vpAlign.startsWith('-=')) {
-      return elementTopAbs + elOffset + parseFloat(vpAlign.replace('=', ''));
-    }
-    
-    return elementTopAbs + elOffset - vpOffset;
-  }
-
   public measure(): void {
     if (typeof window === 'undefined') return;
     
@@ -135,9 +106,10 @@ export class TransformSolver {
     
     const rect = this.element.getBoundingClientRect();
     const wh = window.innerHeight;
+    const scrollTop = window.scrollY ?? window.pageYOffset ?? 0;
     
-    this.startY = this.parseTrigger(this.options.start!, rect, wh);
-    this.endY = this.parseTrigger(this.options.end!, rect, wh);
+    this.startY = this.startTriggerCompiled.evaluate(rect, wh, scrollTop);
+    this.endY = this.endTriggerCompiled.evaluate(rect, wh, scrollTop);
     
     if (this.options.end?.startsWith('+=')) {
         this.endY = this.startY + parseFloat(this.options.end.replace('+=', ''));
@@ -219,11 +191,24 @@ export class TransformSolver {
     return Math.abs(this.progress - this.targetProgress) < 0.0005;
   }
 
+  public clamp(boundaryProgress: number): void {
+    const clampedProgress = clamp(boundaryProgress, 0, 1);
+    this.targetProgress = clampedProgress;
+    this.progress = clampedProgress;
+    this.targetValues = TimelineSolver.evaluateTimeline(this.timeline, this.progress, this.targetValues);
+    Object.assign(this.currentValues, this.targetValues);
+    this.isVisible = this.progress > 0 && this.progress < 1;
+    triggerRegistry.updateProgress(this.id, this.progress);
+    this.render();
+  }
+
   private lastRenderedProgress: number | null = null;
   private lastRenderedValues: Record<string, number> = {};
+  private lastRenderedTier: PerformanceTier | null = null;
 
   public render(): void {
-    let hasChanges = false;
+    const currentTier = adaptiveQualityGovernor.getTier();
+    let hasChanges = currentTier !== this.lastRenderedTier;
     for (const key in this.currentValues) {
       if (this.currentValues[key] !== this.lastRenderedValues[key]) {
         hasChanges = true;
@@ -232,6 +217,7 @@ export class TransformSolver {
     }
     if (!hasChanges && this.lastRenderedProgress === this.progress) return;
     
+    this.lastRenderedTier = currentTier;
     this.lastRenderedProgress = this.progress;
     Object.assign(this.lastRenderedValues, this.currentValues);
 
@@ -239,47 +225,57 @@ export class TransformSolver {
     if (!this.isVisible && !this.wasVisible && this.progress === 0) return;
     
     const v = this.currentValues;
-    let transformStr = '';
-    
-    if (v.x !== undefined || v.y !== undefined || v.z !== undefined) {
-      const sx = snapToDevicePixel(v.x || 0);
-      const sy = snapToDevicePixel(v.y || 0);
-      const sz = snapToDevicePixel(v.z || 0);
-      transformStr += `translate3d(${sx}px, ${sy}px, ${sz}px) `;
-    }
-    if (v.scale !== undefined) transformStr += `scale(${v.scale}) `;
-    if (v.scaleX !== undefined) transformStr += `scaleX(${v.scaleX}) `;
-    if (v.scaleY !== undefined) transformStr += `scaleY(${v.scaleY}) `;
-    if (v.rotate !== undefined) transformStr += `rotate(${v.rotate}deg) `;
-    if (v.rotateX !== undefined) transformStr += `rotateX(${v.rotateX}deg) `;
-    if (v.rotateY !== undefined) transformStr += `rotateY(${v.rotateY}deg) `;
-    if (v.rotateZ !== undefined) transformStr += `rotateZ(${v.rotateZ}deg) `;
-    if (v.skewX !== undefined) transformStr += `skewX(${v.skewX}deg) `;
-    if (v.skewY !== undefined) transformStr += `skewY(${v.skewY}deg) `;
-    
-    if (transformStr) {
-      TransformComposer.set(this.element, 'scroll-transform', transformStr.trim());
+    const hasTransformProps =
+      v.x !== undefined ||
+      v.y !== undefined ||
+      v.z !== undefined ||
+      v.scale !== undefined ||
+      v.scaleX !== undefined ||
+      v.scaleY !== undefined ||
+      v.rotate !== undefined ||
+      v.rotateX !== undefined ||
+      v.rotateY !== undefined ||
+      v.rotateZ !== undefined ||
+      v.skewX !== undefined ||
+      v.skewY !== undefined;
+
+    if (hasTransformProps) {
+      TransformComposer.setNumeric(this.element, 'scroll-transform', {
+        x: v.x,
+        y: v.y,
+        z: v.z,
+        scale: v.scale,
+        scaleX: v.scaleX,
+        scaleY: v.scaleY,
+        rotate: v.rotate,
+        rotateX: v.rotateX,
+        rotateY: v.rotateY,
+        rotateZ: v.rotateZ,
+        skewX: v.skewX,
+        skewY: v.skewY,
+      });
     }
     
     if (v.opacity !== undefined) {
-      this.element.style.opacity = v.opacity.toString();
-      this.mutatedProperties.add('opacity');
+      styleRegistry.set(this.element, 'scroll-transform', 'opacity', v.opacity.toString());
     }
     if (v.blur !== undefined) {
-      this.element.style.filter = `blur(${v.blur}px)`;
-      this.mutatedProperties.add('filter');
+      const effectiveBlur = adaptiveQualityGovernor.clampBlur(v.blur);
+      if (effectiveBlur > 0) {
+        styleRegistry.set(this.element, 'scroll-transform', 'filter', `blur(${effectiveBlur}px)`);
+      } else {
+        styleRegistry.clear(this.element, 'scroll-transform', 'filter');
+      }
     }
     if (v.borderRadius !== undefined) {
-      this.element.style.borderRadius = `${v.borderRadius}px`;
-      this.mutatedProperties.add('borderRadius');
+      styleRegistry.set(this.element, 'scroll-transform', 'borderRadius', `${v.borderRadius}px`);
     }
     
-    // Manage will-change
+    // Manage will-change via styleRegistry
     if (this.isVisible && !this.wasVisible) {
-      this.element.style.willChange = 'transform, opacity, filter';
-      this.mutatedProperties.add('willChange');
+      styleRegistry.set(this.element, 'scroll-transform', 'willChange', 'transform, opacity, filter');
     } else if (!this.isVisible && this.wasVisible) {
-      this.element.style.willChange = this.initialStyles.willChange || '';
+      styleRegistry.clear(this.element, 'scroll-transform', 'willChange');
     }
     
     this.wasVisible = this.isVisible;
@@ -302,18 +298,6 @@ export class TransformSolver {
     }
     TransformComposer.clear(this.element, 'scroll-transform');
     triggerRegistry.unregister(this.id);
-    
-    if (this.mutatedProperties.has('willChange')) {
-      this.element.style.willChange = this.initialStyles.willChange || '';
-    }
-    if (this.mutatedProperties.has('opacity')) {
-      this.element.style.opacity = this.initialStyles.opacity || '';
-    }
-    if (this.mutatedProperties.has('filter')) {
-      this.element.style.filter = this.initialStyles.filter || '';
-    }
-    if (this.mutatedProperties.has('borderRadius')) {
-      this.element.style.borderRadius = this.initialStyles.borderRadius || '';
-    }
+    styleRegistry.clear(this.element, 'scroll-transform');
   }
 }

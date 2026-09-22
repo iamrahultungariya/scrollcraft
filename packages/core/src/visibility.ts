@@ -5,6 +5,7 @@
  */
 
 import { VisibilityCallback, VisibilityOptions } from './types';
+import { ticker } from './ticker';
 
 export class GlobalVisibilityManager {
   private static instance: GlobalVisibilityManager | null = null;
@@ -157,3 +158,182 @@ export class GlobalVisibilityManager {
 }
 
 export const globalVisibilityManager = GlobalVisibilityManager.get();
+ 
+export interface FrustumItem {
+  id: string;
+  element?: Element;
+  startY: number;
+  endY: number;
+  margin?: number; // default: 200px
+  onEnter?: () => void;
+  onExit?: (boundary: 'start' | 'end') => void;
+  clamp?: (progress: number) => void;
+  update?: (scrollY: number) => void;
+}
+
+interface FrustumItemInternal {
+  item: FrustumItem;
+  isActive: boolean;
+  lastBoundary: 'start' | 'end' | null;
+}
+
+export class FrustumShield {
+  private static instance: FrustumShield | null = null;
+  private items = new Map<string, FrustumItemInternal>();
+  private originalScrollTo: typeof window.scrollTo | null = null;
+  private isListening = false;
+
+  public static get(): FrustumShield {
+    if (!FrustumShield.instance) {
+      FrustumShield.instance = new FrustumShield();
+    }
+    return FrustumShield.instance;
+  }
+
+  private constructor() {
+    this.init();
+  }
+
+  private init(): void {
+    if (typeof window === 'undefined') return;
+    if (!this.isListening) {
+      this.isListening = true;
+      window.addEventListener('scroll', this.onScroll, { passive: true });
+      this.bindScrollTo();
+    }
+  }
+
+  private onScroll = (): void => {
+    const scrollY = typeof window !== 'undefined' ? (window.scrollY || window.pageYOffset) : 0;
+    this.evaluate(scrollY);
+  };
+
+  private bindScrollTo(): void {
+    if (typeof window === 'undefined' || this.originalScrollTo) return;
+    this.originalScrollTo = window.scrollTo;
+    const self = this;
+    window.scrollTo = function (...args: any[]) {
+      self.originalScrollTo!.apply(this, args as any);
+      let targetY: number | undefined;
+      if (typeof args[0] === 'object' && args[0] !== null) {
+        targetY = args[0].top;
+      } else if (typeof args[1] === 'number') {
+        targetY = args[1];
+      } else if (typeof args[0] === 'number') {
+        targetY = args[0];
+      }
+      if (typeof targetY === 'number' && !isNaN(targetY)) {
+        self.evaluate(targetY);
+      }
+    };
+  }
+
+  public register(item: FrustumItem): () => void {
+    if (!this.isListening) {
+      this.init();
+    }
+    const currentScrollY = typeof window !== 'undefined' ? (window.scrollY || window.pageYOffset) : 0;
+    const internal: FrustumItemInternal = {
+      item,
+      isActive: false,
+      lastBoundary: null,
+    };
+    this.items.set(item.id, internal);
+    this.evaluateItem(internal, currentScrollY, true);
+
+    return () => {
+      this.unregister(item.id);
+    };
+  }
+
+  public unregister(id: string): void {
+    this.items.delete(id);
+  }
+
+  public updateBounds(id: string, startY: number, endY: number): void {
+    const record = this.items.get(id);
+    if (!record) return;
+    record.item.startY = startY;
+    record.item.endY = endY;
+    const currentScrollY = typeof window !== 'undefined' ? (window.scrollY || window.pageYOffset) : 0;
+    this.evaluateItem(record, currentScrollY);
+  }
+
+  public evaluate(scrollY: number): void {
+    for (const record of this.items.values()) {
+      this.evaluateItem(record, scrollY);
+    }
+  }
+
+  private evaluateItem(record: FrustumItemInternal, scrollY: number, isInitial = false): void {
+    const margin = record.item.margin ?? 200;
+    const minBound = Math.min(record.item.startY, record.item.endY);
+    const maxBound = Math.max(record.item.startY, record.item.endY);
+    const rangeStart = minBound - margin;
+    const rangeEnd = maxBound + margin;
+    const id = record.item.id;
+
+    if (scrollY < rangeStart) {
+      if (record.isActive || record.lastBoundary !== 'start' || isInitial) {
+        record.item.clamp?.(0);
+        record.item.onExit?.('start');
+        record.lastBoundary = 'start';
+      }
+      if (record.isActive || isInitial) {
+        record.isActive = false;
+        ticker.pauseTask(id);
+      }
+    } else if (scrollY > rangeEnd) {
+      if (record.isActive || record.lastBoundary !== 'end' || isInitial) {
+        record.item.clamp?.(1);
+        record.item.onExit?.('end');
+        record.lastBoundary = 'end';
+      }
+      if (record.isActive || isInitial) {
+        record.isActive = false;
+        ticker.pauseTask(id);
+      }
+    } else {
+      if (!record.isActive || isInitial) {
+        record.isActive = true;
+        record.lastBoundary = null;
+        ticker.resumeTask(id);
+        record.item.onEnter?.();
+        record.item.update?.(scrollY);
+      }
+    }
+  }
+
+  public isCulled(id: string): boolean {
+    const record = this.items.get(id);
+    if (!record) return false;
+    return !record.isActive;
+  }
+
+  public getActiveCount(): number {
+    let count = 0;
+    for (const record of this.items.values()) {
+      if (record.isActive) count++;
+    }
+    return count;
+  }
+
+  public getTotalCount(): number {
+    return this.items.size;
+  }
+
+  public destroy(): void {
+    if (this.isListening && typeof window !== 'undefined') {
+      window.removeEventListener('scroll', this.onScroll);
+      this.isListening = false;
+    }
+    if (this.originalScrollTo && typeof window !== 'undefined') {
+      window.scrollTo = this.originalScrollTo;
+      this.originalScrollTo = null;
+    }
+    this.items.clear();
+  }
+}
+
+export const frustumShield = /* @__PURE__ */ FrustumShield.get();
+

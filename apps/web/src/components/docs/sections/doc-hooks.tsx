@@ -355,8 +355,8 @@ export const DocHooks: React.FC<DocHooksProps> = ({ hookId }) => {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-zinc-800 pb-6">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-extrabold text-white tracking-tight font-mono">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-mono break-all sm:break-normal">
               {hook.name}()
             </h1>
             <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
@@ -367,7 +367,7 @@ export const DocHooks: React.FC<DocHooksProps> = ({ hookId }) => {
               {hook.status}
             </span>
           </div>
-          <p className="text-sm text-zinc-300 font-sans">
+          <p className="text-sm text-zinc-300 font-sans leading-relaxed">
             <strong className="text-white">What it does:</strong> {hook.whatItDoes}
           </p>
         </div>
@@ -383,13 +383,16 @@ export const DocHooks: React.FC<DocHooksProps> = ({ hookId }) => {
 
       {/* Capabilities / Return Values */}
       <div id="capabilities" className="space-y-4 pt-4 scroll-mt-24">
-        <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-400 font-semibold">
-          <Activity className="w-3.5 h-3.5 text-violet-400" />
-          <span>Capabilities &amp; Return Values</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-400 font-semibold">
+            <Activity className="w-3.5 h-3.5 text-violet-400" />
+            <span>Capabilities &amp; Return Values</span>
+          </div>
+          <span className="text-[10px] font-mono text-zinc-500 sm:hidden">Swipe table &rarr;</span>
         </div>
 
-        <div className="rounded-xl border border-zinc-800 overflow-hidden bg-[#0a0a0c]">
-          <table className="w-full text-left text-xs font-mono">
+        <div className="rounded-xl border border-zinc-800 overflow-x-auto bg-[#0a0a0c]">
+          <table className="w-full text-left text-xs font-mono min-w-[500px]">
             <thead className="bg-zinc-900/80 text-zinc-400 border-b border-zinc-800">
               <tr>
                 <th className="px-4 py-2.5 font-semibold">Parameter / Return</th>
@@ -411,7 +414,7 @@ export const DocHooks: React.FC<DocHooksProps> = ({ hookId }) => {
       </div>
 
       {/* Status Signal */}
-      <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 text-xs font-mono text-zinc-400 flex items-center justify-between">
+      <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 text-xs font-mono text-zinc-400 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <span>Status: <strong className={isComingSoon ? "text-cyan-400 uppercase" : "text-amber-400 uppercase"}>{hook.status}</strong></span>
         <span className="text-[11px] text-zinc-500 font-sans">
           {isComingSoon

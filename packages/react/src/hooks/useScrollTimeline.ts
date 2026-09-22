@@ -21,6 +21,7 @@ import {
   TimelineSolver,
   ticker,
   TransformComposer,
+  styleRegistry,
 } from '@scrollcraft/core';
 import { useScrollCraft } from '../context';
 import { ScrollTimelineOptions } from '../types';
@@ -145,29 +146,31 @@ export function useScrollTimeline<T extends HTMLElement = HTMLDivElement>(
     const applyProgress = (p: number) => {
       TimelineSolver.evaluateTimeline(timeline, p, evaluatedValues);
 
-      const parts: string[] = [];
-      if (evaluatedValues.x !== undefined || evaluatedValues.y !== undefined || evaluatedValues.z !== undefined) {
-        parts.push(`translate3d(${evaluatedValues.x ?? 0}px, ${evaluatedValues.y ?? 0}px, ${evaluatedValues.z ?? 0}px)`);
-      }
-      if (evaluatedValues.scale !== undefined) {
-        parts.push(`scale(${evaluatedValues.scale})`);
-      }
-      if (evaluatedValues.rotate !== undefined) {
-        parts.push(`rotate(${evaluatedValues.rotate}deg)`);
-      }
-      if (evaluatedValues.rotateX !== undefined) {
-        parts.push(`rotateX(${evaluatedValues.rotateX}deg)`);
-      }
-      if (evaluatedValues.rotateY !== undefined) {
-        parts.push(`rotateY(${evaluatedValues.rotateY}deg)`);
-      }
+      const hasTransform =
+        evaluatedValues.x !== undefined ||
+        evaluatedValues.y !== undefined ||
+        evaluatedValues.z !== undefined ||
+        evaluatedValues.scale !== undefined ||
+        evaluatedValues.rotate !== undefined ||
+        evaluatedValues.rotateX !== undefined ||
+        evaluatedValues.rotateY !== undefined;
 
-      if (parts.length > 0) {
-        TransformComposer.set(node, 'timeline', parts.join(' '));
+      if (hasTransform) {
+        TransformComposer.setNumeric(node, 'timeline', {
+          x: evaluatedValues.x,
+          y: evaluatedValues.y,
+          z: evaluatedValues.z,
+          scale: evaluatedValues.scale,
+          rotate: evaluatedValues.rotate,
+          rotateX: evaluatedValues.rotateX,
+          rotateY: evaluatedValues.rotateY,
+        });
+      } else {
+        TransformComposer.clear(node, 'timeline');
       }
 
       if (evaluatedValues.opacity !== undefined) {
-        node.style.opacity = String(evaluatedValues.opacity);
+        styleRegistry.lease(node, 'timeline', 'opacity', String(evaluatedValues.opacity));
       }
 
       onUpdateRef.current?.(evaluatedValues);
@@ -186,6 +189,7 @@ export function useScrollTimeline<T extends HTMLElement = HTMLDivElement>(
     return () => {
       unsub?.();
       ticker.remove(taskId);
+      styleRegistry.release(node, 'timeline', 'opacity');
       TransformComposer.clear(node, 'timeline');
     };
   }, [

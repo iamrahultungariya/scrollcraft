@@ -184,7 +184,11 @@ export class MagneticSolver {
   };
 
   private render = () => {
-    const scale = this.options.scale !== 1 ? ` scale(${this.stateScale.position.toFixed(3)})` : '';
-    TransformComposer.set(this.element, 'magnetic', `translate3d(${this.stateX.position.toFixed(2)}px, ${this.stateY.position.toFixed(2)}px, 0)${scale}`);
+    TransformComposer.setNumeric(this.element, 'magnetic', {
+      x: this.stateX.position,
+      y: this.stateY.position,
+      z: 0,
+      scale: this.options.scale !== 1 ? Number(this.stateScale.position.toFixed(3)) : undefined,
+    });
   };
 }

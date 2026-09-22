@@ -7,6 +7,7 @@
  */
 
 import React, { forwardRef, useEffect, useRef } from 'react';
+import { TransformComposer, styleRegistry } from '@scrollcraft/core';
 import { Slot, composeRefs } from '../slot';
 import { useScrollProgress } from '../hooks/useScrollProgress';
 import { ScrollProgressProps } from '../types';
@@ -39,22 +40,28 @@ export const ScrollProgress = React.memo(
       const node = internalRef.current;
       if (!node) return;
 
-      node.style.transformOrigin = '0% 50%';
-      node.style.willChange = 'transform';
+      const origin = orientation === 'vertical' ? '50% 0%' : '0% 50%';
+      styleRegistry.lease(node, 'scroll-progress', 'transformOrigin', origin);
+      styleRegistry.lease(node, 'scroll-progress', 'willChange', 'transform');
 
       const unsubscribe = progressValue.subscribe((progress) => {
         if (internalRef.current) {
-          internalRef.current.style.transform = `scaleX(${progress})`;
+          TransformComposer.setNumeric(
+            internalRef.current,
+            'scroll-progress',
+            orientation === 'vertical' ? { scaleY: progress } : { scaleX: progress }
+          );
         }
       });
 
       return () => {
         unsubscribe();
         if (node) {
-          node.style.willChange = '';
+          styleRegistry.release(node, 'scroll-progress');
+          TransformComposer.clear(node, 'scroll-progress');
         }
       };
-    }, [progressValue]);
+    }, [progressValue, orientation]);
 
     const mergedRef = composeRefs(forwardedRef, internalRef);
 
@@ -66,12 +73,17 @@ export const ScrollProgress = React.memo(
       );
     }
 
+    const defaultOrigin = orientation === 'vertical' ? '50% 0%' : '0% 50%';
+    const initialTransform = orientation === 'vertical'
+      ? `scaleY(${progressValue.get()})`
+      : `scaleX(${progressValue.get()})`;
+
     return (
       <div
         ref={mergedRef}
         style={{
-          transform: `scaleX(${progressValue.get()})`,
-          transformOrigin: '0% 50%',
+          transform: initialTransform,
+          transformOrigin: defaultOrigin,
           ...style,
         }}
         {...domProps}

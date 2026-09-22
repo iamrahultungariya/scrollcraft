@@ -259,12 +259,12 @@ export function PrimitivesShowcase() {
   // Device width mapping
   const deviceWidthClass = {
     desktop: 'w-full',
-    tablet: 'w-[85%] mx-auto',
-    mobile: 'w-[360px] mx-auto',
+    tablet: 'w-full max-w-[540px] mx-auto',
+    mobile: 'w-full max-w-[360px] mx-auto',
   }[activeDevice];
 
   return (
-    <section id="primitives" className="relative w-full bg-[#060709] text-zinc-100 py-20 sm:py-28 px-6 md:px-12 border-t border-white/[0.06] overflow-hidden">
+    <section id="primitives" className="relative w-full bg-[#060709] text-zinc-100 py-16 sm:py-28 px-4 sm:px-6 md:px-12 border-t border-white/[0.06] overflow-hidden">
       
       {/* Background Architectural Grid Lines */}
       <div
@@ -275,7 +275,7 @@ export function PrimitivesShowcase() {
       <div className="relative z-10 max-w-7xl mx-auto flex flex-col items-center">
         
         {/* Header with Left and Right Architectural Tags */}
-        <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-6 items-start mb-12 select-none">
+        <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-6 items-start mb-8 sm:mb-12 select-none">
           
           {/* Left Tag */}
           <div className="hidden md:flex md:col-span-3 flex-col items-start pt-2">
@@ -290,13 +290,13 @@ export function PrimitivesShowcase() {
           {/* Center Title & Subtitle */}
           <div className="md:col-span-6 flex flex-col items-center text-center">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0d0f14] border border-zinc-800 text-[11px] font-mono tracking-[0.25em] text-zinc-400 uppercase mb-4 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0d0f14] border border-zinc-800 text-[10px] sm:text-[11px] font-mono tracking-[0.25em] text-zinc-400 uppercase mb-3 sm:mb-4 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse" />
               <span>CORE PRIMITIVES &bull; BETA v0.2.0 (LIVE)</span>
             </div>
 
             {/* Dual-Tone Headline */}
-            <h2 className="text-3xl sm:text-5xl md:text-5xl lg:text-[3.5rem] font-bold tracking-tight leading-[1.08] mb-4">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold tracking-tight leading-[1.08] mb-3 sm:mb-4 break-words">
               <span className="text-white block font-extrabold">You build the markup.</span>
               <span className="bg-gradient-to-r from-violet-400 via-purple-300 to-indigo-300 bg-clip-text text-transparent block font-extrabold mt-1">
                 We handle the physics.
@@ -304,7 +304,7 @@ export function PrimitivesShowcase() {
             </h2>
 
             {/* Subtitle */}
-            <p className="text-sm sm:text-base text-zinc-400 max-w-xl mx-auto font-sans leading-relaxed">
+            <p className="text-xs sm:text-base text-zinc-400 max-w-xl mx-auto font-sans leading-relaxed">
               Copy, paste, and customize. Each primitive is a composable building block with live preview and production-ready code.
             </p>
           </div>
@@ -322,10 +322,10 @@ export function PrimitivesShowcase() {
         </div>
 
         {/* Tabs & Search Bar Row */}
-        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
           
           {/* 4 Primitive Selector Pills */}
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
             {(Object.keys(PRIMITIVES_DATA) as PrimitiveKey[]).map((key) => {
               const item = PRIMITIVES_DATA[key];
               const Icon = item.icon;
@@ -335,7 +335,7 @@ export function PrimitivesShowcase() {
                   key={key}
                   type="button"
                   onClick={() => setActivePrimitive(key)}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer ${
                     isActive
                       ? 'bg-violet-600 text-white shadow-[0_0_20px_rgba(124,58,237,0.4)] border border-violet-400/50 scale-[1.02]'
                       : 'bg-[#0d0f14]/90 text-zinc-400 border border-white/[0.08] hover:border-violet-500/30 hover:bg-[#151922] hover:text-white'
@@ -349,14 +349,14 @@ export function PrimitivesShowcase() {
           </div>
 
           {/* Search primitives input */}
-          <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-[#0d0f14] border border-white/[0.08] text-xs text-zinc-400 hover:border-zinc-700 transition-colors cursor-text shadow-sm w-full sm:w-auto">
+          <div className="flex items-center gap-2.5 sm:gap-3 px-3.5 sm:px-4 py-2 rounded-full bg-[#0d0f14] border border-white/[0.08] text-xs text-zinc-400 hover:border-zinc-700 transition-colors cursor-text shadow-sm w-full sm:w-auto">
             <Search className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
             <input
               type="text"
               placeholder="Search primitives..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-transparent border-none outline-none text-xs text-zinc-200 placeholder:text-zinc-500 w-36 sm:w-44 font-sans"
+              className="bg-transparent border-none outline-none text-xs text-zinc-200 placeholder:text-zinc-500 w-full sm:w-44 font-sans"
             />
             <kbd className="hidden sm:inline-flex items-center text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700">
               Ctrl K
@@ -383,7 +383,7 @@ export function PrimitivesShowcase() {
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
           
           {/* ================= LEFT CARD: CODE VIEWER ================= */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0a0b0e] p-6 shadow-2xl flex flex-col justify-between">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#0a0b0e] p-4 sm:p-6 shadow-2xl flex flex-col justify-between">
             
             <div>
               {/* Clean Top Header of Code Card (No Source link, No CTAs) */}
@@ -482,7 +482,7 @@ export function PrimitivesShowcase() {
           </div>
 
           {/* ================= RIGHT CARD: LIVE PREVIEW ================= */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0a0b0e] p-6 shadow-2xl flex flex-col justify-between">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#0a0b0e] p-4 sm:p-6 shadow-2xl flex flex-col justify-between">
             
             <div>
               {/* Top Bar: Preview Badge + Device Viewport Toggles (Live Controls removed) */}
@@ -721,7 +721,7 @@ export function PrimitivesShowcase() {
             </div>
 
             {/* Bottom 3 Feature Specs Row Matching Screenshot */}
-            <div className="grid grid-cols-3 gap-4 pt-4 mt-4 border-t border-white/[0.06]">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-4 mt-4 border-t border-white/[0.06]">
               
               {/* 1. 60 FPS */}
               <div className="flex items-center gap-3">

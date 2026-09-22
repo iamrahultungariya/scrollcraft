@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono, Caveat } from 'next/font/google';
 import { ScrollProvider, ScrollInspector } from '@scrollcraft/react';
 import { RouteScrollSync } from '@/components/layout/route-scroll-sync';
+import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import '../styles/globals.css';
 
 const geistSans = Geist({
@@ -85,9 +86,10 @@ export default function RootLayout({
           autoResetOnRouteChange={true}
         >
           <RouteScrollSync />
-          <div className="relative flex-1 flex flex-col min-h-0">
+          <div className="relative flex-1 flex flex-col min-h-0 pb-16 md:pb-0">
             {children}
           </div>
+          <MobileBottomNav />
           <ScrollInspector defaultCollapsed position="bottom-right" />
         </ScrollProvider>
       </body>

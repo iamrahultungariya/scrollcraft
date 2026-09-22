@@ -127,9 +127,9 @@ export const TestHeaderHUD: React.FC<TestHeaderHUDProps> = ({
         </div>
 
         {/* Center: Live Real-Time Telemetry Gauges (Direct DOM Writes) */}
-        <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-zinc-300">
+        <div className="flex items-center gap-3 sm:gap-6 text-zinc-300 overflow-x-auto no-scrollbar max-w-full py-0.5">
           {/* FPS Gauge */}
-          <div className="flex items-center gap-1.5" title="Hardware frame rate via ScrollCraft ticker">
+          <div className="flex items-center gap-1.5 shrink-0" title="Hardware frame rate via ScrollCraft ticker">
             <Activity className="w-3.5 h-3.5 text-zinc-500" />
             <span className="text-zinc-500">FPS:</span>
             <span ref={fpsRef} className="font-bold text-emerald-400">
@@ -139,11 +139,11 @@ export const TestHeaderHUD: React.FC<TestHeaderHUDProps> = ({
 
           {/* Re-render Audit Counter */}
           <div
-            className="flex items-center gap-1.5"
+            className="flex items-center gap-1.5 shrink-0"
             title="Proof of zero virtual DOM re-renders during active scrolling"
           >
             <Zap className="w-3.5 h-3.5 text-violet-400" />
-            <span className="text-zinc-500">SCROLL RE-RENDERS:</span>
+            <span className="text-zinc-500"><span className="hidden sm:inline">SCROLL </span>RE-RENDERS:</span>
             <span
               ref={auditRef}
               className="font-bold px-1.5 py-0.2 rounded text-emerald-400 bg-emerald-500/10 border border-emerald-500/30"
@@ -153,7 +153,7 @@ export const TestHeaderHUD: React.FC<TestHeaderHUDProps> = ({
           </div>
 
           {/* Scroll Y & Progress */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 shrink-0">
             <Compass className="w-3.5 h-3.5 text-zinc-500" />
             <span className="text-zinc-500">Y:</span>
             <span ref={scrollRef} className="text-white font-bold">
@@ -165,7 +165,7 @@ export const TestHeaderHUD: React.FC<TestHeaderHUDProps> = ({
           </div>
 
           {/* Velocity & Direction */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 shrink-0">
             <span className="text-zinc-500">VEL:</span>
             <span ref={velocityRef} className="text-sky-400 font-bold">
               0.00

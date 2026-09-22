@@ -136,6 +136,25 @@ export class StackedCardsSolver {
     const maxPinY = this.containerTop + Math.max(0, this.containerHeight - maxStackHeight);
     const effectiveScroll = Math.min(scrollY, maxPinY);
 
+    // Pre-calculate the pinning and approach state across cards in O(n)
+    let fullPinnedCount = 0;
+    while (fullPinnedCount < totalCards && scrollY >= this.cards[fullPinnedCount].pinStartY) {
+      fullPinnedCount++;
+    }
+
+    let approachFraction = 0;
+    if (fullPinnedCount < totalCards) {
+      const approachingCard = this.cards[fullPinnedCount];
+      const approachDist = Math.max(100, this.options.cardDistance);
+      if (scrollY > approachingCard.pinStartY - approachDist) {
+        approachFraction = clamp(
+          (scrollY - (approachingCard.pinStartY - approachDist)) / approachDist,
+          0,
+          1
+        );
+      }
+    }
+
     for (let i = 0; i < totalCards; i++) {
       const card = this.cards[i];
 
@@ -150,21 +169,8 @@ export class StackedCardsSolver {
         const pinnedY = effectiveScroll - card.pinStartY;
         card.currentY = Math.max(0, pinnedY);
 
-        // Continuous smooth scale degradation:
-        // As subsequent cards approach and stack on top, smoothly scale this card down!
-        let buriedDepth = 0;
-        for (let j = i + 1; j < totalCards; j++) {
-          const nextCard = this.cards[j];
-          if (scrollY >= nextCard.pinStartY) {
-            buriedDepth += 1;
-          } else {
-            const approachDist = Math.max(100, this.options.cardDistance);
-            if (scrollY > nextCard.pinStartY - approachDist) {
-              const fraction = (scrollY - (nextCard.pinStartY - approachDist)) / approachDist;
-              buriedDepth += clamp(fraction, 0, 1);
-            }
-          }
-        }
+        // O(1) depth calculation: cards strictly above i that are pinned + approaching card fraction
+        const buriedDepth = Math.max(0, fullPinnedCount - 1 - i) + approachFraction;
 
         card.isBuried = buriedDepth >= 1;
 
@@ -178,6 +184,24 @@ export class StackedCardsSolver {
     }
   }
 
+  public getBounds(): { startY: number; endY: number } {
+    const wh = typeof window !== 'undefined' ? window.innerHeight : 800;
+    return {
+      startY: Math.max(0, this.containerTop - wh),
+      endY: this.containerTop + this.containerHeight,
+    };
+  }
+
+  public clamp(boundaryProgress: number): void {
+    const bounds = this.getBounds();
+    if (boundaryProgress <= 0) {
+      this.update(bounds.startY - 1);
+    } else {
+      this.update(bounds.endY + 1);
+    }
+    this.render();
+  }
+
   /**
    * Phase 3: Render
    * Batched GPU compositor style writes and dynamic pointer-events gating.
@@ -188,7 +212,6 @@ export class StackedCardsSolver {
     const total = this.cards.length;
     for (let i = 0; i < total; i++) {
       const card = this.cards[i];
-      const formattedScale = card.currentScale.toFixed(4);
 
       // 1. Direct GPU Transform composition
       const isSticky =
@@ -199,18 +222,14 @@ export class StackedCardsSolver {
             window.getComputedStyle(card.element)?.position === 'sticky'));
 
       if (isSticky) {
-        TransformComposer.set(
-          card.element,
-          'stacked-cards',
-          `scale(${formattedScale})`
-        );
+        TransformComposer.setNumeric(card.element, 'stacked-cards', {
+          scale: card.currentScale,
+        });
       } else {
-        const formattedY = card.currentY.toFixed(2);
-        TransformComposer.set(
-          card.element,
-          'stacked-cards',
-          `translate3d(0, ${formattedY}px, 0) scale(${formattedScale})`
-        );
+        TransformComposer.setNumeric(card.element, 'stacked-cards', {
+          y: card.currentY,
+          scale: card.currentScale,
+        });
       }
 
       // 2. Dynamic pointer-events gating:

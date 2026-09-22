@@ -196,6 +196,18 @@ export class Ticker {
     return false;
   }
 
+  /**
+   * Returns total registered tasks across all 4 phases.
+   */
+  public getTaskCount(): number {
+    return (
+      this.measureTasks.size +
+      this.driverTasks.size +
+      this.updateTasks.size +
+      this.renderTasks.size
+    );
+  }
+
   public setErrorHandler(handler: TickerErrorHandler | null): void {
     this.errorHandler = handler;
   }

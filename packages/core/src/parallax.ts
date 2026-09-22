@@ -155,21 +155,15 @@ class JSParallaxDriver implements ScrollDriver {
     // Subpixel grid snapping prevents font glyph raster shimmering and jitter
     const dpr = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1;
     const snappedOffset = Math.round(this.state.offset * dpr) / dpr;
-    const formattedOffset = snappedOffset.toFixed(2);
-
-    let transform = this.options.direction === 'vertical'
-      ? `translate3d(0, ${formattedOffset}px, 0)`
-      : `translate3d(${formattedOffset}px, 0, 0)`;
-
     const finalScale = (this.options.scale || 1) * this.bleedScale;
-    if (finalScale !== 1) {
-      transform += ` scale(${finalScale.toFixed(4)})`;
-    }
-    if (this.options.rotate) {
-      transform += ` rotate(${this.options.rotate}deg)`;
-    }
 
-    TransformComposer.set(this.element, 'parallax', transform);
+    TransformComposer.setNumeric(this.element, 'parallax', {
+      x: this.options.direction === 'horizontal' ? snappedOffset : undefined,
+      y: this.options.direction === 'vertical' ? snappedOffset : undefined,
+      scale: finalScale !== 1 ? parseFloat(finalScale.toFixed(4)) : undefined,
+      rotate: this.options.rotate || undefined,
+      format: 'parallax',
+    });
   }
 
   public getState(): ParallaxState {

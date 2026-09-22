@@ -4,8 +4,10 @@
  * Strictly under 650 LOC.
  */
 
-import { TransformComposer } from './dom';
+import { TransformComposer, NumericTransform } from './dom';
 import { motionStore } from './motion-preference';
+import { styleRegistry } from './style-registry';
+import { adaptiveQualityGovernor } from './adaptive-quality';
 
 export interface RevealOptions {
   direction?: 'up' | 'down' | 'left' | 'right' | 'none';
@@ -33,6 +35,7 @@ interface RevealEntry {
     filter: string;
   };
   isObserved: boolean;
+  cleanupTimer?: ReturnType<typeof setTimeout>;
 }
 
 export class GlobalRevealObserver {
@@ -94,40 +97,50 @@ export class GlobalRevealObserver {
     return this.observers.get(threshold) ?? null;
   }
 
-  private getHiddenTransform(options: RevealOptions): string {
+  private getHiddenNumericTransform(options: RevealOptions): NumericTransform {
     const direction = options.direction ?? 'up';
     const distance = options.distance ?? 32;
-    const parts: string[] = [];
+    let x: number | undefined;
+    let y: number | undefined;
+    let z: number | undefined;
 
     switch (direction) {
-      case 'up': parts.push(`translate3d(0, ${distance}px, 0)`); break;
-      case 'down': parts.push(`translate3d(0, -${distance}px, 0)`); break;
-      case 'left': parts.push(`translate3d(${distance}px, 0, 0)`); break;
-      case 'right': parts.push(`translate3d(-${distance}px, 0, 0)`); break;
+      case 'up': x = 0; y = distance; z = 0; break;
+      case 'down': x = 0; y = -distance; z = 0; break;
+      case 'left': x = distance; y = 0; z = 0; break;
+      case 'right': x = -distance; y = 0; z = 0; break;
       default: break;
     }
 
-    if (options.scale !== undefined && options.scale !== 1) {
-      parts.push(`scale(${options.scale})`);
-    }
-    if (options.rotateX) {
-      parts.push(`rotateX(${options.rotateX}deg)`);
-    }
-    if (options.rotateY) {
-      parts.push(`rotateY(${options.rotateY}deg)`);
-    }
-
-    return parts.join(' ') || 'none';
+    return {
+      x,
+      y,
+      z,
+      format: 'reveal',
+      scale: options.scale !== undefined && options.scale !== 1 ? options.scale : undefined,
+      rotateX: options.rotateX,
+      rotateY: options.rotateY,
+    };
   }
 
   private applyInitialHiddenState(element: HTMLElement, options: RevealOptions): void {
-    element.style.transition = 'none';
-    element.style.opacity = '0';
+    styleRegistry.lease(element, 'reveal', 'transition', 'none');
+    styleRegistry.lease(element, 'reveal', 'opacity', '0');
     if (options.blur) {
       const blurPx = typeof options.blur === 'number' ? options.blur : 8;
-      element.style.filter = `blur(${blurPx}px)`;
+      const effectiveBlur = adaptiveQualityGovernor.clampBlur(blurPx);
+      if (effectiveBlur > 0) {
+        styleRegistry.lease(element, 'reveal', 'filter', `blur(${effectiveBlur}px)`);
+      } else {
+        styleRegistry.release(element, 'reveal', 'filter');
+      }
     }
-    TransformComposer.set(element, 'reveal', this.getHiddenTransform(options));
+    const hidden = this.getHiddenNumericTransform(options);
+    if (hidden.x !== undefined || hidden.scale !== undefined || hidden.rotateX !== undefined || hidden.rotateY !== undefined) {
+      TransformComposer.setNumeric(element, 'reveal', hidden);
+    } else {
+      TransformComposer.clear(element, 'reveal');
+    }
     void element.offsetHeight;
   }
 
@@ -137,42 +150,58 @@ export class GlobalRevealObserver {
     let transition = `opacity ${duration}s cubic-bezier(0.16, 1, 0.3, 1), transform ${duration}s cubic-bezier(0.16, 1, 0.3, 1)`;
     if (options.blur) {
       const blurPx = typeof options.blur === 'number' ? options.blur : 8;
-      element.style.filter = `blur(${blurPx}px)`;
+      styleRegistry.lease(element, 'reveal', 'filter', `blur(${blurPx}px)`);
       transition += `, filter ${duration}s cubic-bezier(0.16, 1, 0.3, 1)`;
     }
-    element.style.willChange = 'opacity, transform';
-    element.style.transition = transition;
-    element.style.opacity = '0';
-    TransformComposer.set(element, 'reveal', this.getHiddenTransform(options));
+    styleRegistry.lease(element, 'reveal', 'willChange', 'opacity, transform');
+    styleRegistry.lease(element, 'reveal', 'transition', transition);
+    styleRegistry.lease(element, 'reveal', 'opacity', '0');
+    const hidden = this.getHiddenNumericTransform(options);
+    if (hidden.x !== undefined || hidden.scale !== undefined || hidden.rotateX !== undefined || hidden.rotateY !== undefined) {
+      TransformComposer.setNumeric(element, 'reveal', hidden);
+    } else {
+      TransformComposer.clear(element, 'reveal');
+    }
   }
 
   private applyRevealedState(element: HTMLElement, options: RevealOptions): void {
+    const data = this.entries.get(element);
+    if (data?.cleanupTimer) {
+      clearTimeout(data.cleanupTimer);
+      data.cleanupTimer = undefined;
+    }
+
     const duration = options.duration ?? 0.6;
     const delay = options.delay ?? 0;
     const delayStr = delay > 0 ? ` ${delay}s` : '';
     let transition = `opacity ${duration}s cubic-bezier(0.16, 1, 0.3, 1)${delayStr}, transform ${duration}s cubic-bezier(0.16, 1, 0.3, 1)${delayStr}`;
     if (options.blur) {
-      element.style.filter = 'blur(0px)';
+      styleRegistry.lease(element, 'reveal', 'filter', 'blur(0px)');
       transition += `, filter ${duration}s cubic-bezier(0.16, 1, 0.3, 1)${delayStr}`;
     }
-    element.style.transition = transition;
-    element.style.opacity = '1';
-    TransformComposer.set(element, 'reveal', 'translate3d(0, 0, 0)');
+    styleRegistry.lease(element, 'reveal', 'transition', transition);
+    styleRegistry.lease(element, 'reveal', 'opacity', '1');
+    TransformComposer.setNumeric(element, 'reveal', { x: 0, y: 0, z: 0, format: 'reveal' });
 
     (element as any).__sc_revealed = true;
 
     // Release GPU compositing layer once animation finishes to eliminate texture exhaustion and ghosting
     const cleanupMs = Math.max(50, Math.round((duration + delay) * 1000) + 60);
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       if ((element as any).__sc_revealed) {
-        element.style.willChange = '';
-        element.style.transition = '';
+        styleRegistry.release(element, 'reveal', 'willChange');
+        styleRegistry.release(element, 'reveal', 'transition');
         if (options.blur) {
-          element.style.filter = '';
+          styleRegistry.release(element, 'reveal', 'filter');
         }
         TransformComposer.clear(element, 'reveal');
       }
+      if (data) data.cleanupTimer = undefined;
     }, cleanupMs);
+
+    if (data) {
+      data.cleanupTimer = timer;
+    }
   }
 
   public observe(element: HTMLElement, options: RevealOptions): void {
@@ -180,10 +209,10 @@ export class GlobalRevealObserver {
 
     if (motionStore.isReduced()) {
       (element as any).__sc_revealed = true;
-      element.style.opacity = '1';
-      element.style.transition = 'none';
-      element.style.filter = '';
-      TransformComposer.set(element, 'reveal', 'none');
+      styleRegistry.lease(element, 'reveal', 'opacity', '1');
+      styleRegistry.lease(element, 'reveal', 'transition', 'none');
+      if (options.blur) styleRegistry.release(element, 'reveal', 'filter');
+      TransformComposer.clear(element, 'reveal');
       options.onReveal?.();
       return;
     }
@@ -205,10 +234,10 @@ export class GlobalRevealObserver {
 
     // If element has already completed its one-time reveal, guarantee it stays visible
     if (fullOptions.once && (element as any).__sc_revealed) {
-      element.style.opacity = '1';
-      element.style.willChange = '';
-      element.style.transition = '';
-      if (fullOptions.blur) element.style.filter = '';
+      styleRegistry.lease(element, 'reveal', 'opacity', '1');
+      styleRegistry.release(element, 'reveal', 'willChange');
+      styleRegistry.release(element, 'reveal', 'transition');
+      if (fullOptions.blur) styleRegistry.release(element, 'reveal', 'filter');
       TransformComposer.clear(element, 'reveal');
       return;
     }
@@ -242,9 +271,9 @@ export class GlobalRevealObserver {
     if (rect.bottom < 0) {
       entry.hasRevealed = true;
       (element as any).__sc_revealed = true;
-      element.style.opacity = '1';
-      if (fullOptions.blur) element.style.filter = 'none';
-      TransformComposer.set(element, 'reveal', 'translate3d(0, 0, 0)');
+      styleRegistry.lease(element, 'reveal', 'opacity', '1');
+      if (fullOptions.blur) styleRegistry.lease(element, 'reveal', 'filter', 'none');
+      TransformComposer.setNumeric(element, 'reveal', { x: 0, y: 0, z: 0, format: 'reveal' });
       fullOptions.onReveal?.();
       
       if (fullOptions.once) {
@@ -252,7 +281,7 @@ export class GlobalRevealObserver {
         return;
       }
     } else {
-      element.style.willChange = 'opacity, transform';
+      styleRegistry.lease(element, 'reveal', 'willChange', 'opacity, transform');
       this.applyInitialHiddenState(element, fullOptions);
     }
 
@@ -260,9 +289,9 @@ export class GlobalRevealObserver {
     if (!observer) {
       entry.hasRevealed = true;
       (element as any).__sc_revealed = true;
-      element.style.opacity = '1';
-      if (fullOptions.blur) element.style.filter = 'none';
-      TransformComposer.set(element, 'reveal', 'translate3d(0, 0, 0)');
+      styleRegistry.lease(element, 'reveal', 'opacity', '1');
+      if (fullOptions.blur) styleRegistry.lease(element, 'reveal', 'filter', 'none');
+      TransformComposer.setNumeric(element, 'reveal', { x: 0, y: 0, z: 0, format: 'reveal' });
       fullOptions.onReveal?.();
       return;
     }
@@ -275,6 +304,11 @@ export class GlobalRevealObserver {
     const data = this.entries.get(element);
     if (!data) return;
 
+    if (data.cleanupTimer) {
+      clearTimeout(data.cleanupTimer);
+      data.cleanupTimer = undefined;
+    }
+
     if (data.isObserved) {
       for (const observer of this.observers.values()) {
         observer.unobserve(element);
@@ -283,10 +317,16 @@ export class GlobalRevealObserver {
     
     this.entries.delete(element);
     delete (element as any).__sc_revealed;
-    element.style.willChange = data.initialStyles.willChange;
-    element.style.transition = data.initialStyles.transition;
-    element.style.opacity = data.initialStyles.opacity;
-    element.style.filter = data.initialStyles.filter;
+    styleRegistry.release(element, 'reveal', 'opacity');
+    styleRegistry.release(element, 'reveal', 'willChange');
+    styleRegistry.release(element, 'reveal', 'transition');
+    styleRegistry.release(element, 'reveal', 'filter');
+    if (element.style) {
+      if (element.style.opacity === '') element.style.opacity = data.initialStyles.opacity;
+      if (element.style.transition === '') element.style.transition = data.initialStyles.transition;
+      if (element.style.willChange === '') element.style.willChange = data.initialStyles.willChange;
+      if (element.style.filter === '') element.style.filter = data.initialStyles.filter;
+    }
     TransformComposer.clear(element, 'reveal');
   }
 
@@ -295,11 +335,21 @@ export class GlobalRevealObserver {
     for (const observer of this.observers.values()) observer.disconnect();
     this.observers.clear();
     for (const entry of this.entries.values()) {
+      if (entry.cleanupTimer) {
+        clearTimeout(entry.cleanupTimer);
+        entry.cleanupTimer = undefined;
+      }
       delete (entry.element as any).__sc_revealed;
-      entry.element.style.willChange = entry.initialStyles.willChange;
-      entry.element.style.transition = entry.initialStyles.transition;
-      entry.element.style.opacity = entry.initialStyles.opacity;
-      entry.element.style.filter = entry.initialStyles.filter;
+      styleRegistry.release(entry.element, 'reveal', 'opacity');
+      styleRegistry.release(entry.element, 'reveal', 'willChange');
+      styleRegistry.release(entry.element, 'reveal', 'transition');
+      styleRegistry.release(entry.element, 'reveal', 'filter');
+      if (entry.element.style) {
+        if (entry.element.style.opacity === '') entry.element.style.opacity = entry.initialStyles.opacity;
+        if (entry.element.style.transition === '') entry.element.style.transition = entry.initialStyles.transition;
+        if (entry.element.style.willChange === '') entry.element.style.willChange = entry.initialStyles.willChange;
+        if (entry.element.style.filter === '') entry.element.style.filter = entry.initialStyles.filter;
+      }
       TransformComposer.clear(entry.element, 'reveal');
     }
     this.entries.clear();
