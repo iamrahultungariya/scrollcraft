@@ -11,8 +11,7 @@ import {
   ShieldCheck,
   ArrowRight,
 } from 'lucide-react';
-import { ScrollCraftLogo } from '@/components/ui/scrollcraft-logo';
-import { GithubIcon } from '@/components/ui/social-icons';
+import { SiteNav } from '@/components/layout/site-nav';
 import { TEST_REGISTRY, TestCategory } from '@/components/test/test-registry';
 import { TestHeaderHUD } from '@/components/test/test-header-hud';
 import { TestItemCard } from '@/components/test/test-item-card';
@@ -42,61 +41,8 @@ export default function TestLabHubPage() {
 
   return (
     <div className="w-full min-h-screen bg-[#050505] text-zinc-100 flex flex-col font-sans selection:bg-violet-600/30 selection:text-white pb-32">
-      {/* Top Navbar */}
-      <header className="w-full border-b border-zinc-800/80 bg-[#050505]/90 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6 sm:gap-8">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <ScrollCraftLogo variant="badge" badgeText="Lab" size="sm" />
-            </Link>
-
-            <nav className="hidden md:flex items-center gap-2 text-xs font-medium">
-              <Link
-                href="/"
-                className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors"
-              >
-                Home
-              </Link>
-              <Link
-                href="/docs"
-                className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors"
-              >
-                Docs
-              </Link>
-              <Link
-                href="/showcase"
-                className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors"
-              >
-                Showcase
-              </Link>
-              <Link
-                href="/roadmap"
-                className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors"
-              >
-                Roadmap
-              </Link>
-              <Link
-                href="/test"
-                className="px-3 py-1.5 rounded-lg bg-violet-600/20 text-violet-300 font-semibold border border-violet-500/30 shadow-xs"
-              >
-                Test Lab
-              </Link>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <a
-              href="https://github.com/ScrollCraft/scrollcraft"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-full border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 text-zinc-400 hover:text-white transition-colors"
-              aria-label="GitHub Repository"
-            >
-              <GithubIcon className="w-4 h-4" />
-            </a>
-          </div>
-        </div>
-      </header>
+      {/* Top Unified Navigation */}
+      <SiteNav />
 
       {/* Sticky Telemetry HUD */}
       <TestHeaderHUD title="ScrollCraft Test Lab" badge="25 Verified Units" />
@@ -130,6 +76,19 @@ export default function TestLabHubPage() {
             <Activity className="w-3.5 h-3.5 text-sky-400" />
             <span>120 FPS Direct GPU Writes</span>
           </div>
+        </div>
+
+        {/* Robust Testing Benchmark Banner */}
+        <div className="pt-4">
+          <Link
+            href="/robust-testing"
+            className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-gradient-to-r from-violet-600/20 via-sky-600/20 to-emerald-600/20 border border-violet-500/30 hover:border-violet-400 text-xs sm:text-sm font-mono text-zinc-200 hover:text-white transition-all shadow-xl group cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4 text-violet-400 group-hover:scale-110 transition-transform" />
+            <span>
+              <strong className="text-white">Robust Testing Benchmark:</strong> 21 Heavy Glass Cards, 4 Primitives &amp; GPU Blur Mode Isolation &rarr;
+            </span>
+          </Link>
         </div>
       </section>
 

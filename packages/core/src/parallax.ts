@@ -59,9 +59,7 @@ class JSParallaxDriver implements ScrollDriver {
     private element: HTMLElement,
     private options: Required<ParallaxOptions>
   ) {
-    smartCompositor.promote(element);
-
-    if (this.options.bleed) {
+if (this.options.bleed) {
       if (this.element.parentElement) {
         this.prevParentOverflow = this.element.parentElement.style.overflow;
         this.element.parentElement.style.overflow = 'hidden';
@@ -77,8 +75,7 @@ class JSParallaxDriver implements ScrollDriver {
     this.isVisible = visible;
 
     if (visible) {
-      smartCompositor.promote(this.element);
-    } else {
+} else {
       smartCompositor.demote(this.element, 300);
     }
   }
@@ -201,9 +198,7 @@ class NativeParallaxDriver implements ScrollDriver {
     this.element.style.animationName = this.options.direction === 'vertical' ? 'sc-parallax-y' : 'sc-parallax-x';
     this.element.style.animationFillMode = 'both';
     this.element.style.animationTimingFunction = 'linear';
-    smartCompositor.promote(element);
-
-    // Auto-remeasure upon late font readiness, image loads, and window resizing
+// Auto-remeasure upon late font readiness, image loads, and window resizing
     if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
       window.addEventListener('load', this.onLayoutShift, { passive: true });
       window.addEventListener('resize', this.onLayoutShift, { passive: true });
@@ -348,3 +343,4 @@ export class ParallaxSolver {
     this.driver.destroy();
   }
 }
+

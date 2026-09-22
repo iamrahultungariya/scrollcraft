@@ -35,6 +35,7 @@ interface CardRuntimeState {
   currentY: number;
   currentScale: number;
   isBuried: boolean;
+  isSticky: boolean;
 }
 
 export class StackedCardsSolver {
@@ -60,8 +61,7 @@ export class StackedCardsSolver {
     };
 
     this.cards = cardElements.map((el, index) => {
-      smartCompositor.promote(el);
-      el.style.zIndex = String(index + 1);
+el.style.zIndex = String(index + 1);
       return {
         element: el,
         initialPointerEvents: el.style.pointerEvents || '',
@@ -71,6 +71,7 @@ export class StackedCardsSolver {
         currentY: 0,
         currentScale: 1,
         isBuried: false,
+        isSticky: false,
       };
     });
 
@@ -101,6 +102,14 @@ export class StackedCardsSolver {
       const card = this.cards[i];
       const cardRect = card.element.getBoundingClientRect();
       card.measuredHeight = card.element.offsetHeight || cardRect.height || 300;
+
+      // Cache sticky state during measure phase to eliminate window.getComputedStyle from render loop
+      card.isSticky =
+        card.element &&
+        (card.element.style?.position === 'sticky' ||
+          (typeof window !== 'undefined' &&
+            typeof window.getComputedStyle === 'function' &&
+            window.getComputedStyle(card.element)?.position === 'sticky'));
 
       const offsetTop = card.element.offsetTop;
       const targetStickyTop = this.options.top + i * this.options.offset;
@@ -213,13 +222,8 @@ export class StackedCardsSolver {
     for (let i = 0; i < total; i++) {
       const card = this.cards[i];
 
-      // 1. Direct GPU Transform composition
-      const isSticky =
-        card.element &&
-        (card.element.style?.position === 'sticky' ||
-          (typeof window !== 'undefined' &&
-            typeof window.getComputedStyle === 'function' &&
-            window.getComputedStyle(card.element)?.position === 'sticky'));
+      // 1. Direct GPU Transform composition (using cached isSticky from measure phase)
+      const isSticky = card.isSticky;
 
       if (isSticky) {
         TransformComposer.setNumeric(card.element, 'stacked-cards', {
@@ -260,3 +264,4 @@ export class StackedCardsSolver {
     this.cards = [];
   }
 }
+

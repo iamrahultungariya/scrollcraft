@@ -11,6 +11,7 @@
 
 import { TickerCallback, TickerErrorHandler, TickerPhase } from './types';
 import { tierStore } from './feature-detection';
+import { fastTransform } from './fast-transform';
 
 export const MIN_DELTA_TIME = 0.001;
 export const MAX_DELTA_TIME = 0.033;
@@ -45,6 +46,7 @@ export class Ticker {
   private lastStepTime: number = 0;
   private justWokeUp: boolean = true;
   private emaDelta: number = 0;
+  private consecutiveSlowFrames: number = 0;
 
   /**
    * Benchmark Contamination Guard:
@@ -311,10 +313,14 @@ export class Ticker {
     }
   };
 
-  private resetFrameHistory(): void {
+  private resetTierSampler(): void {
     this.frameHistory.fill(this.detectedTargetInterval);
     this.frameHistoryIndex = 0;
     this.sampledFrameCount = 0;
+  }
+
+  private resetFrameHistory(): void {
+    this.resetTierSampler();
     this.droppedFramesHistory.fill(0);
     this.droppedFramesIndex = 0;
     this.calibrationSamples.length = 0;
@@ -372,6 +378,37 @@ export class Ticker {
     this.droppedFramesIndex = (this.droppedFramesIndex + 1) % 60;
     if (isDrop) this.droppedFrames += missedFrames;
 
+    // Fast-Acting Hitch Shield:
+    // If consecutive frames exceed 28ms (approx < 35 FPS), do not wait 3+ seconds for 60 samples.
+    // Immediately downgrade tier to protect scroll responsiveness and prevent 20 FPS lockup.
+    if (effectiveDelta > 0.028) {
+      this.consecutiveSlowFrames++;
+    } else if (effectiveDelta <= 0.020) {
+      this.consecutiveSlowFrames = 0;
+    }
+
+    const currentTier = tierStore.getTier();
+
+    // Urgent hitch response:
+    // - 2 severe slow frames (>45ms, i.e. <= 22 FPS) => drop directly to low tier
+    // - 3 consecutive slow frames (>28ms) => drop one tier
+    if (currentTier !== 'low') {
+      if (effectiveDelta > 0.045 && this.consecutiveSlowFrames >= 2) {
+        tierStore.setTier('low');
+        this.lastStepTime = currentTime;
+        this.consecutiveSlowFrames = 0;
+        this.resetTierSampler();
+        return;
+      } else if (this.consecutiveSlowFrames >= 3) {
+        const nextTier = currentTier === 'high' ? 'balanced' : 'low';
+        tierStore.setTier(nextTier);
+        this.lastStepTime = currentTime;
+        this.consecutiveSlowFrames = 0;
+        this.resetTierSampler();
+        return;
+      }
+    }
+
     if (this.sampledFrameCount >= 60) {
       let slowFrames = 0;
       let fastFrames = 0;
@@ -382,24 +419,25 @@ export class Ticker {
         if (d < 0.0180) fastFrames++;
       }
 
-      const currentTier = tierStore.getTier();
+      // Step-Down: Sustained delta > 33.3ms for >= 20 of 60 frames (33% frame drop rate)
+      const isMobile = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '');
+      const dropThreshold = isMobile ? 15 : 20; // More aggressive on mobile to rescue GPU
 
-      // Step-Down: Sustained delta > 33.3ms for >= 45 of 60 frames
-      if (slowFrames >= 45 && currentTier !== 'low') {
-        const nextTier = currentTier === 'high' ? 'balanced' : 'low';
+      if (slowFrames >= dropThreshold && currentTier !== 'low') {
+        const nextTier = (currentTier === 'high' && !isMobile) ? 'balanced' : 'low'; // Mobile drops straight to low
         tierStore.setTier(nextTier);
         this.lastStepTime = currentTime;
-        this.resetFrameHistory();
+        this.resetTierSampler();
       } else if (
-        fastFrames >= 50 &&
+        fastFrames >= 52 &&
         currentTier !== 'high' &&
         currentTime - this.lastStepTime >= COOLDOWN_STEP_UP_MS
       ) {
-        // Step-Up: Sustained delta < 18ms for >= 50 of 60 frames AND 3.0s cooldown passed
+        // Step-Up: Sustained delta < 18ms for >= 52 of 60 frames AND 3.0s cooldown passed
         const nextTier = currentTier === 'low' ? 'balanced' : 'high';
         tierStore.setTier(nextTier);
         this.lastStepTime = currentTime;
-        this.resetFrameHistory();
+        this.resetTierSampler();
       }
     }
   }
@@ -484,6 +522,7 @@ export class Ticker {
     // Phase 4: Direct DOM GPU Compositor writes
     if (this.taskArraysDirty) this.syncTaskArrays();
     this.runPhase('render', this.renderTasks, this.renderTasksArray, dt, currentTime);
+    fastTransform.flush();
 
     // Check if tasks settled/went dormant
     if (this.isRunning && this.hasActiveTasks()) {

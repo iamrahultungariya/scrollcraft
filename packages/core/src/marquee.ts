@@ -38,8 +38,7 @@ export class VelocityMarqueeSolver implements ScrollDriver {
       maxSpeed: options?.maxSpeed ?? 50,
     };
 
-    smartCompositor.promote(element);
-    this.measure();
+this.measure();
   }
 
   public setVisible(visible: boolean): void {
@@ -47,8 +46,7 @@ export class VelocityMarqueeSolver implements ScrollDriver {
     this.isVisible = visible;
 
     if (visible) {
-      smartCompositor.promote(this.element);
-    } else {
+} else {
       smartCompositor.demote(this.element, 300);
     }
   }
@@ -104,3 +102,4 @@ export class VelocityMarqueeSolver implements ScrollDriver {
     TransformComposer.clear(this.element, 'marquee');
   }
 }
+

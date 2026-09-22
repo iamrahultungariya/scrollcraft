@@ -47,9 +47,12 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/icon.svg',
-    shortcut: '/icon.svg',
-    apple: '/icon.svg',
+    icon: [
+      { url: '/icon.webp', type: 'image/webp' },
+      { url: '/images/scrollcraft-logo.webp', type: 'image/webp' },
+    ],
+    shortcut: '/images/scrollcraft-logo.webp',
+    apple: '/images/scrollcraft-logo.webp',
   },
   openGraph: {
     title: 'ScrollCraft — The Scroll Engine React Never Had',

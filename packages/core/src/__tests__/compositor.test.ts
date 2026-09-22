@@ -105,3 +105,4 @@ describe('SmartCompositor', () => {
     expect(el2.style.willChange).toBe('auto');
   });
 });
+

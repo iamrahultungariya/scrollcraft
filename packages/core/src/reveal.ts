@@ -8,6 +8,8 @@ import { TransformComposer, NumericTransform } from './dom';
 import { motionStore } from './motion-preference';
 import { styleRegistry } from './style-registry';
 import { adaptiveQualityGovernor } from './adaptive-quality';
+import { tierStore } from './feature-detection';
+
 
 export interface RevealOptions {
   direction?: 'up' | 'down' | 'left' | 'right' | 'none';
@@ -127,8 +129,9 @@ export class GlobalRevealObserver {
     styleRegistry.lease(element, 'reveal', 'transition', 'none');
     styleRegistry.lease(element, 'reveal', 'opacity', '0');
     if (options.blur) {
+      const tier = tierStore.getTier();
       const blurPx = typeof options.blur === 'number' ? options.blur : 8;
-      const effectiveBlur = adaptiveQualityGovernor.clampBlur(blurPx);
+      const effectiveBlur = tier === 'low' ? 0 : adaptiveQualityGovernor.clampBlur(blurPx);
       if (effectiveBlur > 0) {
         styleRegistry.lease(element, 'reveal', 'filter', `blur(${effectiveBlur}px)`);
       } else {
@@ -148,10 +151,14 @@ export class GlobalRevealObserver {
     (element as any).__sc_revealed = false;
     const duration = options.duration ?? 0.6;
     let transition = `opacity ${duration}s cubic-bezier(0.16, 1, 0.3, 1), transform ${duration}s cubic-bezier(0.16, 1, 0.3, 1)`;
-    if (options.blur) {
+    const tier = tierStore.getTier();
+    const shouldBlur = options.blur && tier !== 'low';
+    if (shouldBlur) {
       const blurPx = typeof options.blur === 'number' ? options.blur : 8;
       styleRegistry.lease(element, 'reveal', 'filter', `blur(${blurPx}px)`);
       transition += `, filter ${duration}s cubic-bezier(0.16, 1, 0.3, 1)`;
+    } else if (options.blur) {
+      element.style.filter = 'none';
     }
     styleRegistry.lease(element, 'reveal', 'willChange', 'opacity, transform');
     styleRegistry.lease(element, 'reveal', 'transition', transition);
@@ -175,9 +182,13 @@ export class GlobalRevealObserver {
     const delay = options.delay ?? 0;
     const delayStr = delay > 0 ? ` ${delay}s` : '';
     let transition = `opacity ${duration}s cubic-bezier(0.16, 1, 0.3, 1)${delayStr}, transform ${duration}s cubic-bezier(0.16, 1, 0.3, 1)${delayStr}`;
-    if (options.blur) {
+    const tier = tierStore.getTier();
+    const shouldBlur = options.blur && tier !== 'low';
+    if (shouldBlur) {
       styleRegistry.lease(element, 'reveal', 'filter', 'blur(0px)');
       transition += `, filter ${duration}s cubic-bezier(0.16, 1, 0.3, 1)${delayStr}`;
+    } else if (options.blur) {
+      styleRegistry.release(element, 'reveal', 'filter');
     }
     styleRegistry.lease(element, 'reveal', 'transition', transition);
     styleRegistry.lease(element, 'reveal', 'opacity', '1');

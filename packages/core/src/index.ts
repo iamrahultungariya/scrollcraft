@@ -33,3 +33,6 @@ export * from './gsap-bridge';
 export * from './style-registry';
 export * from './trigger-compiler';
 export * from './adaptive-quality';
+export { FastTransformBuffer, SC_STATE_KEY, type ElementTransformRecord } from './fast-transform';
+export * from './spatial-registry';
+

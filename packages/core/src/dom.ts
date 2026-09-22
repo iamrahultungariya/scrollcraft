@@ -67,6 +67,7 @@ interface ComposedTransformState {
   writeCount: number;
 }
 
+
 const transformCache = new WeakMap<HTMLElement, ElementTransform>();
 const composedTransforms = new WeakMap<HTMLElement, ComposedTransformState>();
 
@@ -116,7 +117,11 @@ export class TransformComposer {
     }
   }
 
-  public static set(element: HTMLElement, owner: string, transform: string): void {
+  public static set(element: HTMLElement, owner: string, transform: string | NumericTransform): void {
+    if (typeof transform !== 'string') {
+      return this.setNumeric(element, owner, transform);
+    }
+
     let state = composedTransforms.get(element);
     if (!state) {
       state = {
@@ -229,6 +234,7 @@ export class TransformWriter {
       const transformString = `translate3d(${x}px, ${y}px, ${z}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg) scale(${scaleX}, ${scaleY})`;
       element.style.transform = transformString;
       transformCache.set(element, { x, y, z, scaleX, scaleY, rotateX, rotateY, rotateZ });
+      SmartCompositor.get().promote(element);
     }
 
     if (transform.opacity !== undefined && element.style.opacity !== String(transform.opacity)) {
@@ -543,4 +549,11 @@ export class GlobalResizeManager {
     this.windowListeners.clear();
   }
 }
+
+
+
+
+
+
+
 

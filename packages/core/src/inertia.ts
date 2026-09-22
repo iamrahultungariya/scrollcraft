@@ -121,6 +121,8 @@ export class InertiaEngine {
     // Passive listeners for hardware input classification & autonomous wake
     window.addEventListener('wheel', this.onWheel, { passive: true });
     window.addEventListener('touchstart', this.onWake, { passive: true });
+    window.addEventListener('touchmove', this.onWake, { passive: true });
+    window.addEventListener('scroll', this.onWake, { passive: true });
     window.addEventListener('keydown', this.onWake, { passive: true });
 
     // Populate initial metrics from DOM
@@ -237,6 +239,8 @@ export class InertiaEngine {
 
     window.removeEventListener('wheel', this.onWheel);
     window.removeEventListener('touchstart', this.onWake);
+    window.removeEventListener('touchmove', this.onWake);
+    window.removeEventListener('scroll', this.onWake);
     window.removeEventListener('keydown', this.onWake);
 
     if (this.nativeScrollBound) {

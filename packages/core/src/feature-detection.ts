@@ -72,6 +72,31 @@ export class ScrollCraftTierStore {
   }
 }
 
+function detectLowEndGpu(): boolean {
+  if (typeof document === 'undefined') return false;
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) return true; // No WebGL support at all => low tier
+    const debugInfo = (gl as WebGLRenderingContext).getExtension('WEBGL_debug_renderer_info');
+    if (debugInfo) {
+      const renderer = (gl as WebGLRenderingContext).getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || '';
+      const rendererLower = String(renderer).toLowerCase();
+      // Software renderers
+      if (/swiftshader|llvmpipe|softpipe|mesa|software|virtualbox|vmware|basic render/i.test(rendererLower)) {
+        return true;
+      }
+      // Low-end mobile / legacy GPUs
+      if (/mali-4|mali-t6|mali-t7|mali-t8|mali-g31|mali-g51|mali-g52|adreno\s*(2|3|4|504|505|506|508|509|610|612)|powervr\s*(sgx|ge8)|intel\s*(hd\s*graphics\s*(2000|3000|4000|2500|4400|515|520|500|505)|gma)/i.test(rendererLower)) {
+        return true;
+      }
+    }
+  } catch {
+    // Canvas or WebGL context creation failed or blocked
+  }
+  return false;
+}
+
 export function detectPerformanceTier(): PerformanceTier {
   if (typeof window === 'undefined') {
     return 'balanced';
@@ -82,29 +107,51 @@ export function detectPerformanceTier(): PerformanceTier {
   }
 
   try {
-    const cores = typeof navigator !== 'undefined' ? (navigator.hardwareConcurrency || 4) : 4;
-    const memory = typeof navigator !== 'undefined' && 'deviceMemory' in navigator ? (navigator as any).deviceMemory : 8;
     const isMobile = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '');
     const isSafari = typeof navigator !== 'undefined' && /^((?!chrome|android).)*safari/i.test(navigator.userAgent || '');
+    const cores = typeof navigator !== 'undefined' ? (navigator.hardwareConcurrency || (isMobile ? 4 : 4)) : 4;
+    // On mobile, default memory assumption should be conservative (4GB) since deviceMemory is undefined on Safari/iOS
+    const memory = typeof navigator !== 'undefined' && 'deviceMemory' in navigator
+      ? (navigator as any).deviceMemory
+      : (isMobile ? 4 : 8);
 
-    // Low Tier:
-    // 1. 2 or fewer cores (budget / legacy devices)
-    // 2. 4GB or less system memory (legacy or entry devices)
-    // 3. 4 or fewer threads on desktop (e.g. 2015-era dual-core 4-thread laptops)
-    if (cores <= 2 || memory <= 4 || (cores <= 4 && !isMobile)) {
+    // 0. User Preferences / Network Constraints
+    const prefersReducedMotion = typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    const isSaveData = typeof navigator !== 'undefined' &&
+      (navigator as any).connection?.saveData === true;
+
+    if (prefersReducedMotion || isSaveData) {
       cachedTier = 'low';
       return cachedTier;
     }
 
-    // High Tier: 8 or more cores on desktop non-Safari
-    // Safari and mobile devices default conservatively to 'balanced' to prevent GPU layer memory exhaustion
-    if (cores >= 8 && !isMobile && !isSafari) {
+    // 1. GPU Check: software renderers or weak integrated mobile GPUs
+    if (detectLowEndGpu()) {
+      cachedTier = 'low';
+      return cachedTier;
+    }
+
+    // 2. Low Tier:
+    // - 4 or fewer cores on mobile (budget entry mobile devices)
+    // - 4 or fewer cores on desktop
+    // - 4GB or less system memory
+    // - 6 or fewer cores on mobile (entry/mid big.LITTLE Cortex-A53/A55)
+    if (cores <= 4 || memory <= 4 || (isMobile && cores <= 6)) {
+      cachedTier = 'low';
+      return cachedTier;
+    }
+
+    // 3. High Tier:
+    // Strictly powerful desktop non-Safari machines with 8+ high-performance cores and >4GB RAM
+    // Mobile and Safari are capped at 'balanced' to prevent GPU layer memory exhaustion and thermal throttling
+    if (cores >= 8 && memory > 4 && !isMobile && !isSafari) {
       cachedTier = 'high';
       return cachedTier;
     }
 
-    // Default to 'balanced'. The Ticker's rolling 60-frame sampler will autonomously
-    // self-heal and step down to 'low' if sustained frame drops (<45 FPS) occur.
+    // Default to 'balanced'. The Ticker's rolling sampler will autonomously
+    // self-heal and step down to 'low' if sustained frame drops occur.
     cachedTier = 'balanced';
     return cachedTier;
   } catch {

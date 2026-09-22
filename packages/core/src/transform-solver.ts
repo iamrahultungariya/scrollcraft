@@ -1,6 +1,6 @@
 import { clamp, damp, calculateVelocitySnapTarget } from './math';
 import { TimelineSolver, PropertyTimeline, KeyframeSegment } from './timeline';
-import { TransformComposer } from './dom';
+import { TransformComposer, SmartCompositor } from './dom';
 import { triggerRegistry } from './markers';
 import { styleRegistry } from './style-registry';
 import { compileTrigger, CompiledTrigger } from './trigger-compiler';
@@ -297,7 +297,10 @@ export class TransformSolver {
       window.clearTimeout(this.snapTimeout);
     }
     TransformComposer.clear(this.element, 'scroll-transform');
+    SmartCompositor.get().destroy(this.element);
     triggerRegistry.unregister(this.id);
     styleRegistry.clear(this.element, 'scroll-transform');
   }
 }
+
+

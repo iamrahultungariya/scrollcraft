@@ -125,32 +125,19 @@
   pointer-events: none;
 }
 
-/* Autonomous degradation on Tier 1 (Low-End / Software Mode): Zero blur, clean high-contrast opaque background */
+/* Tier-aware GPU Optimization: Preserves modern glassmorphism while gently capping excessive convolution kernels */
 [data-scrollcraft-tier="low"] .glass-surface,
 [data-scrollcraft-tier="low"] .glass-card,
-[data-scrollcraft-tier="low"] .glass-card-subtle,
-[data-scrollcraft-tier="low"] [class*="backdrop-blur"] {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  background-color: rgba(14, 14, 20, 0.96) !important;
+[data-scrollcraft-tier="low"] .glass-card-subtle {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-/* On software-rendered hardware, bypass massive Gaussian blur convolution kernels that bottleneck CPU rasterizer */
-[data-scrollcraft-tier="low"] .ambient-glow,
-[data-scrollcraft-tier="low"] [class*="blur-[1"],
-[data-scrollcraft-tier="low"] [class*="blur-3xl"],
-[data-scrollcraft-tier="low"] [class*="blur-2xl"],
-[data-scrollcraft-tier="low"] [class*="blur-xl"] {
-  filter: none !important;
-  opacity: 0.12 !important;
-}
-
-/* Balanced tier: clamp heavy 24px and 40px blurs to lightweight 8px to guarantee 60 FPS on mid-range and integrated GPUs */
 [data-scrollcraft-tier="balanced"] [class*="backdrop-blur-2xl"],
 [data-scrollcraft-tier="balanced"] [class*="backdrop-blur-xl"],
 [data-scrollcraft-tier="balanced"] .glass-card {
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 
