@@ -1,8 +1,7 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Reveal, useScrollCraft } from '@scrollcraft/react';
 import { Terminal, Copy, Check, ArrowRight, Activity, Cpu, Zap, ShieldCheck } from 'lucide-react';
 
 export function HeroSection() {
