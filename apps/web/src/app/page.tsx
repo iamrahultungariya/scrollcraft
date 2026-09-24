@@ -19,16 +19,13 @@ const EngineArchitectureSection = dynamic(
 const R3FPreviewSection = dynamic(
   () => import('@/components/home/v4/05-r3f-preview').then((m) => m.R3FPreviewSection)
 );
-const ComparisonSection = dynamic(
-  () => import('@/components/home/v4/06-comparison').then((m) => m.ComparisonSection)
-);
 const FinalCTASection = dynamic(
   () => import('@/components/home/v4/07-final-cta').then((m) => m.FinalCTASection)
 );
 
 export const metadata: Metadata = {
-  title: 'ScrollCraft — The Scroll Engine React Never Had',
-  description: 'Composable primitives and hooks for parallax, reveals, pins, and scroll-progress — powered by Lenis, safe in RSC, zero React re-renders.',
+  title: 'ScrollCraft — The Zero-VDOM Scroll Engine for React',
+  description: 'Composable primitives and low-level reactive hooks for parallax, reveals, pins, and scroll timelines with zero React re-renders.',
 };
 
 export default function HomePage() {
@@ -37,7 +34,7 @@ export default function HomePage() {
       {/* Keyboard Accessibility Skip Link */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-violet-600 focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-400 font-medium text-xs shadow-lg transition-all"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-zinc-800 focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-400 font-medium text-xs shadow-lg transition-all"
       >
         Skip to main content
       </a>
@@ -51,20 +48,17 @@ export default function HomePage() {
         {/* Section 2: Primitives Showcase */}
         <PrimitivesShowcase />
 
-        {/* Section 3: Hooks — Raw Access */}
+        {/* Section 3: Raw Hooks */}
         <HooksRawSection />
 
-        {/* Section 4: R3F Preview (Alpha) */}
-        <R3FPreviewSection />
-
-        {/* Section 5: Engine & Architecture */}
+        {/* Section 4: Engine & 4-Phase Architecture */}
         <EngineArchitectureSection />
 
-        {/* Section 6: Ready When You Are (CTA) */}
-        <FinalCTASection />
+        {/* Section 5: R3F Canvas Stage */}
+        <R3FPreviewSection />
 
-        {/* Section 7: Comparison (Where ScrollCraft Fits) */}
-        <ComparisonSection />
+        {/* Section 6: Final CTA & Install */}
+        <FinalCTASection />
       </main>
 
       <Footer />
