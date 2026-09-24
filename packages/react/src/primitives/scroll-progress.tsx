@@ -43,13 +43,14 @@ export const ScrollProgress = React.memo(
       const origin = orientation === 'vertical' ? '50% 0%' : '0% 50%';
       styleRegistry.lease(node, 'scroll-progress', 'transformOrigin', origin);
       styleRegistry.lease(node, 'scroll-progress', 'willChange', 'transform');
+      styleRegistry.lease(node, 'scroll-progress', 'backfaceVisibility', 'hidden');
 
       const unsubscribe = progressValue.subscribe((progress) => {
         if (internalRef.current) {
           TransformComposer.setNumeric(
             internalRef.current,
             'scroll-progress',
-            orientation === 'vertical' ? { scaleY: progress } : { scaleX: progress }
+            orientation === 'vertical' ? { z: 0, scaleY: progress } : { z: 0, scaleX: progress }
           );
         }
       });
@@ -67,7 +68,7 @@ export const ScrollProgress = React.memo(
 
     if (asChild) {
       return (
-        <Slot ref={mergedRef} style={style} {...domProps}>
+        <Slot ref={mergedRef} style={{ willChange: 'transform', backfaceVisibility: 'hidden', ...style }} {...domProps}>
           {children}
         </Slot>
       );
@@ -75,8 +76,8 @@ export const ScrollProgress = React.memo(
 
     const defaultOrigin = orientation === 'vertical' ? '50% 0%' : '0% 50%';
     const initialTransform = orientation === 'vertical'
-      ? `scaleY(${progressValue.get()})`
-      : `scaleX(${progressValue.get()})`;
+      ? `translate3d(0, 0, 0) scaleY(${progressValue.get()})`
+      : `translate3d(0, 0, 0) scaleX(${progressValue.get()})`;
 
     return (
       <div
@@ -84,6 +85,9 @@ export const ScrollProgress = React.memo(
         style={{
           transform: initialTransform,
           transformOrigin: defaultOrigin,
+          willChange: 'transform',
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
           ...style,
         }}
         {...domProps}

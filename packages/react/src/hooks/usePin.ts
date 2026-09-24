@@ -14,11 +14,13 @@
  * Strictly under 650 LOC.
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ticker, PinSolver, GlobalResizeManager, createScrollValue, ScrollValue } from '@scrollcraft/core';
 import { useScrollCraft } from '../context';
 import { PinOptions } from '../types';
 import { useDualRef, captureNode } from '../utils/ref';
+
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 export interface UsePinReturn<T extends HTMLElement> {
   ref: React.RefObject<T | null>;
@@ -78,7 +80,7 @@ export function usePin<T extends HTMLElement = HTMLDivElement>(
   const onLeaveBackRef = useRef(onLeaveBack);
   onLeaveBackRef.current = onLeaveBack;
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const node = captureNode(ref);
     if (!node || typeof window === 'undefined') return;
 
@@ -114,6 +116,9 @@ export function usePin<T extends HTMLElement = HTMLDivElement>(
     // Auto-spacing placeholder track generation when pinSpacing is enabled
     let spacerElement: HTMLDivElement | null = null;
     if (pinSpacing) {
+      if (node.nextElementSibling?.getAttribute('data-sc-pin-spacer') === 'true') {
+        node.nextElementSibling.remove();
+      }
       spacerElement = document.createElement('div');
       spacerElement.setAttribute('data-sc-pin-spacer', 'true');
       spacerElement.style.display = 'block';
@@ -227,8 +232,11 @@ export function usePin<T extends HTMLElement = HTMLDivElement>(
       unobserve();
       ticker.remove(taskId);
       solver.destroy();
-      if (spacerElement) {
+      if (spacerElement && spacerElement.parentNode) {
         spacerElement.remove();
+      }
+      if (node.nextElementSibling?.getAttribute('data-sc-pin-spacer') === 'true') {
+        node.nextElementSibling.remove();
       }
       node.style.position = '';
       node.style.top = '';

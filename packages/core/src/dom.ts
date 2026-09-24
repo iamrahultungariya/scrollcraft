@@ -27,6 +27,9 @@ export function serializeNumericTransform(t: NumericTransform): string {
     const sy = formatDevicePixel(t.y || 0);
     const sz = formatDevicePixel(t.z || 0);
     parts += `translate3d(${sx}, ${sy}, ${sz}) `;
+  } else {
+    // Hardware Compositing Anchor: Always anchor transforms to 3D space to guarantee Blink compositor layer allocation
+    parts += 'translate3d(0px, 0px, 0px) ';
   }
   if (t.scale !== undefined) parts += `scale(${t.scale}) `;
   if (t.scaleX !== undefined) parts += `scaleX(${t.scaleX}) `;
@@ -76,12 +79,27 @@ const composedTransforms = new WeakMap<HTMLElement, ComposedTransformState>();
  * The first use preserves an existing inline transform as the base layer.
  * Supports canonical zero-allocation NumericTransform and legacy string transforms.
  */
+function cleanInitialBaseTransform(base: string): string {
+  if (!base) return '';
+  const trimmed = base.trim();
+  if (
+    trimmed === 'translateZ(0)' ||
+    trimmed === 'translateZ(0px)' ||
+    trimmed === 'translate3d(0, 0, 0)' ||
+    trimmed === 'translate3d(0px, 0px, 0px)' ||
+    (trimmed.startsWith('translate3d(0') && (trimmed.includes('scaleX(') || trimmed.includes('scaleY(')))
+  ) {
+    return '';
+  }
+  return trimmed;
+}
+
 export class TransformComposer {
   public static setNumeric(element: HTMLElement, owner: string, transform: NumericTransform): void {
     let state = composedTransforms.get(element);
     if (!state) {
       state = {
-        base: element.style.transform || '',
+        base: cleanInitialBaseTransform(element.style.transform || ''),
         parts: new Map(),
         numericParts: new Map(),
         lastComposed: '',
@@ -114,6 +132,9 @@ export class TransformComposer {
       state.lastComposed = composed;
       element.style.transform = composed;
       state.writeCount++;
+      if (owner !== 'reveal' && !SmartCompositor.get().isPromoted(element)) {
+        SmartCompositor.get().promote(element);
+      }
     }
   }
 
@@ -125,7 +146,7 @@ export class TransformComposer {
     let state = composedTransforms.get(element);
     if (!state) {
       state = {
-        base: element.style.transform || '',
+        base: cleanInitialBaseTransform(element.style.transform || ''),
         parts: new Map(),
         numericParts: new Map(),
         lastComposed: '',
@@ -158,6 +179,9 @@ export class TransformComposer {
       state.lastComposed = composed;
       element.style.transform = composed;
       state.writeCount++;
+      if (owner !== 'reveal' && !SmartCompositor.get().isPromoted(element)) {
+        SmartCompositor.get().promote(element);
+      }
     }
   }
 
@@ -188,6 +212,9 @@ export class TransformComposer {
     }
     if (state.parts.size === 0 && state.numericParts.size === 0) {
       composedTransforms.delete(element);
+      if (SmartCompositor.get().isPromoted(element)) {
+        SmartCompositor.get().destroy(element);
+      }
     }
   }
 
@@ -326,10 +353,38 @@ export class SmartCompositor {
     // Global reject-new cap governed by AdaptiveQualityGovernor
     const maxLayers = adaptiveQualityGovernor.getMaxLayers();
     if (this.promotedElements.size >= maxLayers && !this.promotedElements.has(element)) {
-      return false;
+      // If any currently promoted element is off-screen, demote it to yield layer budget to incoming visible element
+      if (typeof window !== 'undefined' && window.innerHeight > 0) {
+        const vh = window.innerHeight;
+        for (const el of this.promotedElements) {
+          if (typeof el.getBoundingClientRect === 'function') {
+            const rect = el.getBoundingClientRect();
+            // True off-screen check: element is completely outside viewport with margin
+            if ((rect.bottom < -150 || rect.top > vh + 150) && rect.width > 0 && rect.height > 0) {
+              const timer = this.demoteTimers.get(el);
+              if (timer) {
+                clearTimeout(timer);
+                this.demoteTimers.delete(el);
+              }
+              this.promotedElements.delete(el);
+              this.companionSet.delete(el);
+              styleRegistry.clear(el, 'smart-compositor', 'willChange');
+              styleRegistry.clear(el, 'smart-compositor', 'backfaceVisibility');
+              if (el && el.style && !el.style.willChange) {
+                el.style.willChange = 'auto';
+              }
+              break;
+            }
+          }
+        }
+      }
+      if (this.promotedElements.size >= maxLayers && !this.promotedElements.has(element)) {
+        return false;
+      }
     }
 
     styleRegistry.set(element, 'smart-compositor', 'willChange', 'transform');
+    styleRegistry.set(element, 'smart-compositor', 'backfaceVisibility', 'hidden');
     this.promotedElements.add(element);
     this.companionSet.add(element);
     return true;
@@ -351,6 +406,7 @@ export class SmartCompositor {
       this.promotedElements.delete(element);
       this.companionSet.delete(element);
       styleRegistry.clear(element, 'smart-compositor', 'willChange');
+      styleRegistry.clear(element, 'smart-compositor', 'backfaceVisibility');
       if (element && element.style && !element.style.willChange) {
         element.style.willChange = 'auto';
       }
@@ -381,6 +437,7 @@ export class SmartCompositor {
     this.promotedElements.delete(element);
     this.companionSet.delete(element);
     styleRegistry.clear(element, 'smart-compositor', 'willChange');
+    styleRegistry.clear(element, 'smart-compositor', 'backfaceVisibility');
     if (element && element.style && !element.style.willChange) {
       element.style.willChange = 'auto';
     }
@@ -397,6 +454,7 @@ export class SmartCompositor {
         this.demoteTimers.delete(element);
       }
       styleRegistry.clear(element, 'smart-compositor', 'willChange');
+      styleRegistry.clear(element, 'smart-compositor', 'backfaceVisibility');
       if (element && element.style && !element.style.willChange) {
         element.style.willChange = 'auto';
       }

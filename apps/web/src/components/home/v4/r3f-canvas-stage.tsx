@@ -11,111 +11,161 @@ interface SceneProps {
 }
 
 function SceneMeshes({ scrollRef, autoRotate }: SceneProps) {
+  const groupRef = useRef<THREE.Group>(null!);
   const centerMeshRef = useRef<THREE.Mesh>(null!);
-  const cube1Ref = useRef<THREE.Mesh>(null!);
-  const cube2Ref = useRef<THREE.Mesh>(null!);
-  
-  // Interpolated smooth values to guarantee zero-jitter physics
+  const innerCoreRef = useRef<THREE.Mesh>(null!);
+  const ring1Ref = useRef<THREE.Mesh>(null!);
+  const ring2Ref = useRef<THREE.Mesh>(null!);
+  const orbiter1Ref = useRef<THREE.Mesh>(null!);
+  const orbiter2Ref = useRef<THREE.Mesh>(null!);
+
+  // Interpolated smooth values for 120 FPS silky physics
   const baseAngle = useRef(0);
   const smoothedProgress = useRef(0);
 
   useFrame((_, delta) => {
-    // 1. Gentle continuous idle spin when autoRotate is on
     if (autoRotate) {
-      baseAngle.current += delta * 0.35;
+      baseAngle.current += delta * 0.45;
     }
 
-    // 2. Smooth exponential lerp toward target scroll progress (dampens any abrupt scroll step)
     const targetProgress = scrollRef.current?.progress ?? 0;
     smoothedProgress.current += (targetProgress - smoothedProgress.current) * 0.08;
 
-    // 3. Combined angle for the central cube
-    const currentAngle = baseAngle.current + smoothedProgress.current * Math.PI * 2;
+    const angle = baseAngle.current + smoothedProgress.current * Math.PI * 2;
 
-    // 4. Central Glowing Coral Cube: smooth rotation with gentle breathing float
+    // 1. Central Spatial Monolith: Multi-axis rotation with breathing float
     if (centerMeshRef.current) {
-      centerMeshRef.current.rotation.y = currentAngle;
-      centerMeshRef.current.rotation.x = 0.38 + Math.sin(currentAngle * 0.5) * 0.04;
-      centerMeshRef.current.rotation.z = Math.cos(currentAngle * 0.5) * 0.03;
-      // Ultra-gentle breathing float along Y (0.05 max, perfectly stable)
-      centerMeshRef.current.position.y = Math.sin(baseAngle.current * 0.8) * 0.06;
+      centerMeshRef.current.rotation.y = angle * 0.8;
+      centerMeshRef.current.rotation.x = 0.35 + Math.sin(angle * 0.5) * 0.08;
+      centerMeshRef.current.rotation.z = Math.cos(angle * 0.4) * 0.05;
+      centerMeshRef.current.position.y = Math.sin(baseAngle.current * 0.8) * 0.08;
     }
 
-    // 5. Metallic Cube 1 (Upper Left): stable position with graceful slow drift
-    if (cube1Ref.current) {
-      cube1Ref.current.rotation.x = 0.4 + baseAngle.current * 0.15;
-      cube1Ref.current.rotation.y = 0.6 + baseAngle.current * 0.2;
-      cube1Ref.current.position.y = 1.3 + Math.sin(baseAngle.current * 0.7) * 0.05;
+    // 2. Inner Luminescent Core (spins counter to outer shell)
+    if (innerCoreRef.current) {
+      innerCoreRef.current.rotation.y = -angle * 1.2;
+      innerCoreRef.current.rotation.z = angle * 0.6;
+      const pulse = 1 + Math.sin(baseAngle.current * 2) * 0.06;
+      innerCoreRef.current.scale.set(pulse, pulse, pulse);
     }
 
-    // 6. Metallic Cube 2 (Lower Right): stable position with graceful slow drift
-    if (cube2Ref.current) {
-      cube2Ref.current.rotation.x = 0.2 + baseAngle.current * 0.18;
-      cube2Ref.current.rotation.z = -0.3 + baseAngle.current * 0.12;
-      cube2Ref.current.position.y = -1.2 + Math.cos(baseAngle.current * 0.6) * 0.05;
+    // 3. Precision Orbital Rings
+    if (ring1Ref.current) {
+      ring1Ref.current.rotation.x = Math.PI / 3 + Math.sin(angle * 0.3) * 0.1;
+      ring1Ref.current.rotation.y = angle * 0.3;
+    }
+    if (ring2Ref.current) {
+      ring2Ref.current.rotation.x = -Math.PI / 4 + Math.cos(angle * 0.25) * 0.1;
+      ring2Ref.current.rotation.y = -angle * 0.4;
+    }
+
+    // 4. Satellite Prism 1 (Upper Left Orbit)
+    if (orbiter1Ref.current) {
+      const radius = 2.4;
+      orbiter1Ref.current.position.x = Math.cos(angle * 0.7) * radius;
+      orbiter1Ref.current.position.z = Math.sin(angle * 0.7) * radius * 0.8;
+      orbiter1Ref.current.position.y = 1.1 + Math.sin(angle * 0.5) * 0.2;
+      orbiter1Ref.current.rotation.x = angle * 1.1;
+      orbiter1Ref.current.rotation.y = angle * 0.9;
+    }
+
+    // 5. Satellite Prism 2 (Lower Right Orbit)
+    if (orbiter2Ref.current) {
+      const radius = 2.6;
+      orbiter2Ref.current.position.x = Math.cos(angle * 0.7 + Math.PI) * radius;
+      orbiter2Ref.current.position.z = Math.sin(angle * 0.7 + Math.PI) * radius * 0.8;
+      orbiter2Ref.current.position.y = -1.0 + Math.cos(angle * 0.5) * 0.2;
+      orbiter2Ref.current.rotation.x = -angle * 0.8;
+      orbiter2Ref.current.rotation.z = angle * 1.2;
     }
   });
 
   return (
-    <>
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[5, 8, 5]} intensity={1.5} color="#ffffff" />
-      <directionalLight position={[-5, -4, -3]} intensity={0.5} color="#60a5fa" />
+    <group ref={groupRef}>
+      {/* Studio Lighting Hierarchy */}
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[6, 8, 5]} intensity={1.8} color="#ffffff" />
+      <directionalLight position={[-6, -4, -4]} intensity={0.8} color="#38bdf8" />
+      <pointLight position={[0, 0, 1.8]} intensity={4.5} distance={10} color="#8b5cf6" />
+      <pointLight position={[0, 2, -2]} intensity={2.5} distance={8} color="#38bdf8" />
 
-      {/* Central coral glowing point light */}
-      <pointLight position={[0, 0, 1.5]} intensity={3.5} distance={8} color="#ff4d6d" />
-
-      {/* Central Glowing Pink-Red Cube */}
+      {/* 1. Outer Spatial Monolith (Electric Violet Frosted Glass) */}
       <mesh ref={centerMeshRef} position={[0, 0, 0]}>
-        <boxGeometry args={[1.55, 1.55, 1.55]} />
+        <octahedronGeometry args={[1.5, 0]} />
+        <meshPhysicalMaterial
+          color="#1e1338"
+          emissive="#7c3aed"
+          emissiveIntensity={0.45}
+          roughness={0.12}
+          metalness={0.2}
+          clearcoat={1}
+          clearcoatRoughness={0.1}
+          transparent
+          opacity={0.88}
+        />
+      </mesh>
+
+      {/* 2. Inner Glowing Core (Electric Violet Star) */}
+      <mesh ref={innerCoreRef} position={[0, 0, 0]}>
+        <boxGeometry args={[0.75, 0.75, 0.75]} />
         <meshStandardMaterial
-          color="#ff4d6d"
-          emissive="#ff2a55"
+          color="#a78bfa"
+          emissive="#8b5cf6"
+          emissiveIntensity={1.8}
+          roughness={0.2}
+          metalness={0.8}
+        />
+      </mesh>
+
+      {/* 3. Primary Energy Orbital Ring */}
+      <mesh ref={ring1Ref}>
+        <torusGeometry args={[2.9, 0.016, 16, 120]} />
+        <meshStandardMaterial
+          color="#a78bfa"
+          emissive="#7c3aed"
+          emissiveIntensity={0.6}
+          roughness={0.2}
+          metalness={0.9}
+        />
+      </mesh>
+
+      {/* 4. Secondary Counter-Tilted Datum Ring */}
+      <mesh ref={ring2Ref}>
+        <torusGeometry args={[3.3, 0.012, 16, 120]} />
+        <meshBasicMaterial color="#38bdf8" transparent opacity={0.35} />
+      </mesh>
+
+      {/* 5. Precision Satellite Node 1 */}
+      <mesh ref={orbiter1Ref} scale={0.42}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial
+          color="#27272a"
+          emissive="#8b5cf6"
+          emissiveIntensity={0.3}
+          roughness={0.25}
+          metalness={0.9}
+        />
+      </mesh>
+
+      {/* 6. Precision Satellite Node 2 */}
+      <mesh ref={orbiter2Ref} scale={0.38}>
+        <octahedronGeometry args={[1, 0]} />
+        <meshStandardMaterial
+          color="#18181b"
+          emissive="#38bdf8"
           emissiveIntensity={0.35}
-          roughness={0.15}
-          metalness={0.1}
+          roughness={0.2}
+          metalness={0.9}
         />
       </mesh>
-
-      {/* Vertical Light Beam passing through center */}
-      <mesh position={[0, 0, 0]}>
-        <cylinderGeometry args={[0.012, 0.012, 10, 8]} />
-        <meshBasicMaterial color="#ff4d6d" transparent opacity={0.35} />
-      </mesh>
-
-      {/* Fixed Tilted Orbit Ring */}
-      <mesh rotation={[Math.PI / 2.7, 0, 0.2]}>
-        <torusGeometry args={[3.2, 0.012, 16, 120]} />
-        <meshBasicMaterial color="#71717a" transparent opacity={0.25} />
-      </mesh>
-
-      {/* Orbiting Metallic Cube 1 (Upper Left) */}
-      <mesh ref={cube1Ref} position={[-2.4, 1.3, -0.6]} scale={0.65}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial
-          color="#52525b"
-          roughness={0.3}
-          metalness={0.85}
-        />
-      </mesh>
-
-      {/* Orbiting Metallic Cube 2 (Lower Right) */}
-      <mesh ref={cube2Ref} position={[2.5, -1.2, 0.5]} scale={0.6}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial
-          color="#52525b"
-          roughness={0.3}
-          metalness={0.85}
-        />
-      </mesh>
-    </>
+    </group>
   );
 }
 
 export default function R3FCanvasStage({ scrollRef, autoRotate, isVisible = true }: SceneProps) {
   return (
     <Canvas
-      camera={{ position: [0, 0, 6.8], fov: 45 }}
+      camera={{ position: [0, 0, 7.2], fov: 45 }}
       dpr={[1, 1.5]}
       className="w-full h-full"
       frameloop={isVisible ? 'always' : 'never'}

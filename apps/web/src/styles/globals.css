@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./theme.css";
+@import "./motion.css";
 
 @layer base {
   * {
@@ -138,6 +139,19 @@
 [data-scrollcraft-tier="balanced"] .glass-card {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+}
+
+/* ScrollCraft Reveal SSR FOUC Prevention & Declarative State */
+[data-scrollcraft-reveal="pending"] {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-scrollcraft-reveal="pending"] {
+    opacity: 1 !important;
+  }
+}
+noscript [data-scrollcraft-reveal="pending"] {
+  opacity: 1 !important;
 }
 
 

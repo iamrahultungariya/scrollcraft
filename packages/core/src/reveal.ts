@@ -126,6 +126,9 @@ export class GlobalRevealObserver {
   }
 
   private applyInitialHiddenState(element: HTMLElement, options: RevealOptions): void {
+    if (typeof element.setAttribute === 'function') {
+      element.setAttribute('data-scrollcraft-reveal', 'hidden');
+    }
     styleRegistry.lease(element, 'reveal', 'transition', 'none');
     styleRegistry.lease(element, 'reveal', 'opacity', '0');
     if (options.blur) {
@@ -149,14 +152,17 @@ export class GlobalRevealObserver {
 
   private applyHiddenState(element: HTMLElement, options: RevealOptions): void {
     (element as any).__sc_revealed = false;
-    const duration = options.duration ?? 0.6;
-    let transition = `opacity ${duration}s cubic-bezier(0.16, 1, 0.3, 1), transform ${duration}s cubic-bezier(0.16, 1, 0.3, 1)`;
+    if (typeof element.setAttribute === 'function') {
+      element.setAttribute('data-scrollcraft-reveal', 'hidden');
+    }
+    const duration = options.duration ?? 0.5;
+    let transition = `opacity ${duration}s cubic-bezier(0.22, 1, 0.36, 1), transform ${duration}s cubic-bezier(0.22, 1, 0.36, 1)`;
     const tier = tierStore.getTier();
     const shouldBlur = options.blur && tier !== 'low';
     if (shouldBlur) {
       const blurPx = typeof options.blur === 'number' ? options.blur : 8;
       styleRegistry.lease(element, 'reveal', 'filter', `blur(${blurPx}px)`);
-      transition += `, filter ${duration}s cubic-bezier(0.16, 1, 0.3, 1)`;
+      transition += `, filter ${duration}s cubic-bezier(0.22, 1, 0.36, 1)`;
     } else if (options.blur) {
       element.style.filter = 'none';
     }
@@ -178,15 +184,19 @@ export class GlobalRevealObserver {
       data.cleanupTimer = undefined;
     }
 
-    const duration = options.duration ?? 0.6;
+    if (typeof element.setAttribute === 'function') {
+      element.setAttribute('data-scrollcraft-reveal', 'active');
+    }
+
+    const duration = options.duration ?? 0.5;
     const delay = options.delay ?? 0;
     const delayStr = delay > 0 ? ` ${delay}s` : '';
-    let transition = `opacity ${duration}s cubic-bezier(0.16, 1, 0.3, 1)${delayStr}, transform ${duration}s cubic-bezier(0.16, 1, 0.3, 1)${delayStr}`;
+    let transition = `opacity ${duration}s cubic-bezier(0.22, 1, 0.36, 1)${delayStr}, transform ${duration}s cubic-bezier(0.22, 1, 0.36, 1)${delayStr}`;
     const tier = tierStore.getTier();
     const shouldBlur = options.blur && tier !== 'low';
     if (shouldBlur) {
       styleRegistry.lease(element, 'reveal', 'filter', 'blur(0px)');
-      transition += `, filter ${duration}s cubic-bezier(0.16, 1, 0.3, 1)${delayStr}`;
+      transition += `, filter ${duration}s cubic-bezier(0.22, 1, 0.36, 1)${delayStr}`;
     } else if (options.blur) {
       styleRegistry.release(element, 'reveal', 'filter');
     }
@@ -220,6 +230,9 @@ export class GlobalRevealObserver {
 
     if (motionStore.isReduced()) {
       (element as any).__sc_revealed = true;
+      if (typeof element.setAttribute === 'function') {
+        element.setAttribute('data-scrollcraft-reveal', 'active');
+      }
       styleRegistry.lease(element, 'reveal', 'opacity', '1');
       styleRegistry.lease(element, 'reveal', 'transition', 'none');
       if (options.blur) styleRegistry.release(element, 'reveal', 'filter');
@@ -245,6 +258,9 @@ export class GlobalRevealObserver {
 
     // If element has already completed its one-time reveal, guarantee it stays visible
     if (fullOptions.once && (element as any).__sc_revealed) {
+      if (typeof element.setAttribute === 'function') {
+        element.setAttribute('data-scrollcraft-reveal', 'active');
+      }
       styleRegistry.lease(element, 'reveal', 'opacity', '1');
       styleRegistry.release(element, 'reveal', 'willChange');
       styleRegistry.release(element, 'reveal', 'transition');
@@ -282,6 +298,9 @@ export class GlobalRevealObserver {
     if (rect.bottom < 0) {
       entry.hasRevealed = true;
       (element as any).__sc_revealed = true;
+      if (typeof element.setAttribute === 'function') {
+        element.setAttribute('data-scrollcraft-reveal', 'active');
+      }
       styleRegistry.lease(element, 'reveal', 'opacity', '1');
       if (fullOptions.blur) styleRegistry.lease(element, 'reveal', 'filter', 'none');
       TransformComposer.setNumeric(element, 'reveal', { x: 0, y: 0, z: 0, format: 'reveal' });
@@ -300,6 +319,9 @@ export class GlobalRevealObserver {
     if (!observer) {
       entry.hasRevealed = true;
       (element as any).__sc_revealed = true;
+      if (typeof element.setAttribute === 'function') {
+        element.setAttribute('data-scrollcraft-reveal', 'active');
+      }
       styleRegistry.lease(element, 'reveal', 'opacity', '1');
       if (fullOptions.blur) styleRegistry.lease(element, 'reveal', 'filter', 'none');
       TransformComposer.setNumeric(element, 'reveal', { x: 0, y: 0, z: 0, format: 'reveal' });
@@ -328,6 +350,9 @@ export class GlobalRevealObserver {
     
     this.entries.delete(element);
     delete (element as any).__sc_revealed;
+    if (typeof element.removeAttribute === 'function') {
+      element.removeAttribute('data-scrollcraft-reveal');
+    }
     styleRegistry.release(element, 'reveal', 'opacity');
     styleRegistry.release(element, 'reveal', 'willChange');
     styleRegistry.release(element, 'reveal', 'transition');
@@ -351,6 +376,9 @@ export class GlobalRevealObserver {
         entry.cleanupTimer = undefined;
       }
       delete (entry.element as any).__sc_revealed;
+      if (typeof entry.element.removeAttribute === 'function') {
+        entry.element.removeAttribute('data-scrollcraft-reveal');
+      }
       styleRegistry.release(entry.element, 'reveal', 'opacity');
       styleRegistry.release(entry.element, 'reveal', 'willChange');
       styleRegistry.release(entry.element, 'reveal', 'transition');

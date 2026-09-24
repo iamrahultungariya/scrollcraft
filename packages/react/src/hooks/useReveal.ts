@@ -19,7 +19,7 @@ import { useEffect, useRef } from 'react';
 import { revealObserver } from '@scrollcraft/core';
 import { useScrollCraft } from '../context';
 import { RevealOptions } from '../types';
-import { useDualRef, captureNode } from '../utils/ref';
+import { useDualRef, watchRefAttachment } from '../utils/ref';
 
 export function useReveal<T extends HTMLElement = HTMLDivElement>(
   options?: RevealOptions
@@ -42,36 +42,38 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>(
   callbacksRef.current.onReset = options.onReset;
 
   useEffect(() => {
-    const node = captureNode(ref);
-    if (!node || typeof window === 'undefined') return;
+    return watchRefAttachment(ref as React.RefObject<HTMLElement | null>, (node) => {
+      if (reducedMotion && respectReducedMotion) {
+        node.style.opacity = '1';
+        node.style.transform = 'none';
+        if (options.blur) node.style.filter = 'none';
+        if (typeof node.setAttribute === 'function') {
+          node.setAttribute('data-scrollcraft-reveal', 'active');
+        }
+        callbacksRef.current.onReveal?.();
+        return;
+      }
 
-    if (reducedMotion && respectReducedMotion) {
-      node.style.opacity = '1';
-      node.style.transform = 'none';
-      if (options.blur) node.style.filter = 'none';
-      callbacksRef.current.onReveal?.();
-      return;
-    }
+      // Calculate auto-stagger delay if index is provided
+      const baseDelay = options.delay ?? 0;
+      const staggerIncrement = options.stagger ?? 0.04;
+      const computedDelay = options.index !== undefined
+        ? baseDelay + (options.index * staggerIncrement)
+        : baseDelay;
 
-    // Calculate auto-stagger delay if index is provided
-    const baseDelay = options.delay ?? 0;
-    const staggerIncrement = options.stagger ?? 0.05;
-    const computedDelay = options.index !== undefined
-      ? baseDelay + (options.index * staggerIncrement)
-      : baseDelay;
+      const resolvedOptions = {
+        ...options,
+        delay: computedDelay,
+        onReveal: () => callbacksRef.current.onReveal?.(),
+        onReset: () => callbacksRef.current.onReset?.(),
+      };
 
-    const resolvedOptions = {
-      ...options,
-      delay: computedDelay,
-      onReveal: () => callbacksRef.current.onReveal?.(),
-      onReset: () => callbacksRef.current.onReset?.(),
-    };
+      revealObserver.observe(node, resolvedOptions);
 
-    revealObserver.observe(node, resolvedOptions);
-
-    return () => {
-      revealObserver.unobserve(node);
-    };
+      return () => {
+        revealObserver.unobserve(node);
+      };
+    });
   }, [
     options.direction,
     options.distance,

@@ -49,6 +49,10 @@ export class SpatialTriggerRegistry {
   private triggers: Map<string, SpatialTriggerState> = new Map();
   private sortedTriggers: SpatialTriggerState[] = [];
   private isDirty: boolean = true;
+  private resizeObserver: ResizeObserver | null = null;
+  private observedElements: Map<HTMLElement, number> = new Map();
+  private refreshScheduled: boolean = false;
+  private isListeningGlobal: boolean = false;
 
   private constructor() {}
 
@@ -59,7 +63,39 @@ export class SpatialTriggerRegistry {
     return SpatialTriggerRegistry.instance;
   }
 
+  private initObserver(): void {
+    if (typeof window === 'undefined') return;
+
+    if (!this.resizeObserver && typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.scheduleRefresh();
+      });
+    }
+
+    if (!this.isListeningGlobal) {
+      this.isListeningGlobal = true;
+      window.addEventListener('resize', this.scheduleRefresh, { passive: true });
+      window.addEventListener('load', this.scheduleRefresh, { passive: true });
+      if (typeof document !== 'undefined' && 'fonts' in document) {
+        document.fonts.ready.then(() => {
+          this.scheduleRefresh();
+        }).catch(() => {});
+      }
+    }
+  }
+
+  public scheduleRefresh = (): void => {
+    if (this.refreshScheduled || typeof window === 'undefined') return;
+    this.refreshScheduled = true;
+    requestAnimationFrame(() => {
+      this.refreshScheduled = false;
+      this.refresh();
+    });
+  };
+
   public register(config: SpatialTriggerConfig): () => void {
+    this.initObserver();
+
     const state: SpatialTriggerState = {
       config,
       startScroll: 0,
@@ -75,9 +111,31 @@ export class SpatialTriggerRegistry {
     this.isDirty = true;
     this.measureTrigger(state);
 
+    if (config.element && this.resizeObserver) {
+      const count = this.observedElements.get(config.element) ?? 0;
+      if (count === 0) {
+        try {
+          this.resizeObserver.observe(config.element);
+        } catch {}
+      }
+      this.observedElements.set(config.element, count + 1);
+    }
+
     return () => {
       this.triggers.delete(config.id);
       this.isDirty = true;
+
+      if (config.element && this.resizeObserver) {
+        const count = this.observedElements.get(config.element) ?? 1;
+        if (count <= 1) {
+          try {
+            this.resizeObserver.unobserve(config.element);
+          } catch {}
+          this.observedElements.delete(config.element);
+        } else {
+          this.observedElements.set(config.element, count - 1);
+        }
+      }
     };
   }
 
@@ -224,9 +282,22 @@ export class SpatialTriggerRegistry {
   }
 
   public clear(): void {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+    this.observedElements.clear();
     this.triggers.clear();
     this.sortedTriggers = [];
     this.isDirty = false;
+  }
+
+  public destroy(): void {
+    this.clear();
+    if (this.isListeningGlobal && typeof window !== 'undefined') {
+      window.removeEventListener('resize', this.scheduleRefresh);
+      window.removeEventListener('load', this.scheduleRefresh);
+      this.isListeningGlobal = false;
+    }
   }
 }
 

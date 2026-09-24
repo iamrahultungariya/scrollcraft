@@ -54,6 +54,14 @@ export function injectNativeStyles(nonce?: string): void {
         0%, 100% { transform: none; }
       }
     }
+    [data-scrollcraft-reveal="pending"] {
+      opacity: 0;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      [data-scrollcraft-reveal="pending"] {
+        opacity: 1 !important;
+      }
+    }
   `;
   document.head.appendChild(style);
   injected = true;

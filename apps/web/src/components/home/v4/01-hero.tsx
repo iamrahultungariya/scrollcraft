@@ -2,99 +2,24 @@
 
 /**
  * ScrollCraft Section 1: Hero
- * Pixel-perfect redesign matching Image specification:
  * - Left column:
- *   - Overline: CORE PRIMITIVES • BETA
+ *   - Overline: CORE PRIMITIVES ? BETA
  *   - Dual-tone Headline: "You build the markup. / We handle the physics."
  *   - Description: Declarative, slot-based components that mutate hardware transform styles directly on the GPU thread.
- *   - 4 Interactive Pills: </> Parallax, Reveal, Pin, ScrollProgress
  *   - 4 Feature Cards: React Re-Renders, Lenis Physics, RSC Safe, Tree-shakeable
- *   - Scroll Indicator: SCROLL TO EXPLORE
  * - Right column:
  *   - Tag: FOR MODERN / WEB CREATORS
  *   - High-fidelity 3D Mountain & Code Block visual (/images/hero-mountain-code.webp)
  *   - Tag: SMOOTH / SCROLL. / REAL IMPACT.
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Parallax, Reveal, useScrollCraft, ScrollMetrics } from '@scrollcraft/react';
-import { Zap, Box, Leaf, Eye, Lock, Disc3, Layers } from 'lucide-react';
-
-interface PrimitivePill {
-  id: string;
-  name: string;
-  icon: React.ReactNode;
-  tagline: string;
-  codeSnippet: string;
-}
+import { Parallax, Reveal } from '@scrollcraft/react';
+import { Zap, Box, Leaf } from 'lucide-react';
 
 export function HeroSection() {
-  const [activePrimitive, setActivePrimitive] = useState<string>('parallax');
-  const velocityTextRef = useRef<HTMLSpanElement>(null);
-  const progressTextRef = useRef<HTMLSpanElement>(null);
-  const progressBarRef = useRef<HTMLDivElement>(null);
-  const { subscribe } = useScrollCraft();
-
-  useEffect(() => {
-    // Zero-rerender DOM subscription for live telemetry
-    const unsub = subscribe((m: ScrollMetrics) => {
-      if (velocityTextRef.current) {
-        velocityTextRef.current.textContent = `${Math.abs(m.velocity || 0).toFixed(1)} px/f`;
-      }
-      if (progressTextRef.current) {
-        progressTextRef.current.textContent = `${Math.round((m.progress || 0) * 100)}%`;
-      }
-      if (progressBarRef.current) {
-        progressBarRef.current.style.width = `${Math.max(4, Math.round((m.progress || 0) * 100))}%`;
-      }
-    });
-    return () => unsub();
-  }, [subscribe]);
-
-  const primitives: PrimitivePill[] = [
-    {
-      id: 'parallax',
-      name: 'Parallax',
-      tagline: 'Multi-depth hardware offset',
-      codeSnippet: '<Parallax speed={0.25} min={-30} max={30}>',
-      icon: (
-        <span className="font-mono font-semibold text-xs tracking-tight">&lt;/&gt;</span>
-      ),
-    },
-    {
-      id: 'reveal',
-      name: 'Reveal',
-      tagline: 'Batched GPU intersection observer',
-      codeSnippet: '<Reveal direction="up" distance={25} delay={0.1}>',
-      icon: <Eye className="w-3.5 h-3.5 shrink-0" />,
-    },
-    {
-      id: 'pin',
-      name: 'Pin',
-      tagline: 'Spacer-free sticky layout mutex',
-      codeSnippet: '<Pin top={0} end="+=100%">',
-      icon: <Lock className="w-3.5 h-3.5 shrink-0" />,
-    },
-    {
-      id: 'progress',
-      name: 'ScrollProgress',
-      tagline: 'Subpixel normalized scrub progress',
-      codeSnippet: '<ScrollProgress className="h-1 bg-violet-500" />',
-      icon: <Disc3 className="w-3.5 h-3.5 shrink-0" />,
-    },
-    {
-      id: 'stacked-cards',
-      name: 'StackedCards',
-      tagline: 'Kinetic 3D card deck (v0.2.0 Soon)',
-      codeSnippet: '<StackedCards items={cards} fadeBuried={true} />',
-      icon: <Layers className="w-3.5 h-3.5 shrink-0" />,
-    },
-  ];
-
-  const currentPrim = primitives.find((p) => p.id === activePrimitive) || primitives[0];
-
   return (
     <section className="relative w-full min-h-[92vh] lg:min-h-screen bg-[#070709] text-zinc-100 flex flex-col justify-between pt-24 pb-12 overflow-hidden">
       {/* Architectural Background Grid Texture */}
@@ -146,32 +71,10 @@ export function HeroSection() {
 
             {/* Subtitle Description */}
             <Reveal direction="up" distance={15} delay={0.1}>
-              <p className="text-sm sm:text-base md:text-lg text-zinc-400 max-w-xl font-normal leading-relaxed mb-6 sm:mb-8">
+              <p className="text-sm sm:text-base md:text-lg text-zinc-400 max-w-xl font-normal leading-relaxed mb-12 sm:mb-16">
                 Declarative, slot-based components that mutate hardware transform styles directly on the GPU thread.
               </p>
             </Reveal>
-
-            {/* Interactive Primitive Selection Pills */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-8 sm:mb-12">
-              {primitives.map((prim) => {
-                const isActive = activePrimitive === prim.id;
-                return (
-                  <button
-                    key={prim.id}
-                    onClick={() => setActivePrimitive(prim.id)}
-                    type="button"
-                    className={`flex items-center gap-1.5 sm:gap-2 px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer ${
-                      isActive
-                        ? 'bg-violet-600 text-white shadow-[0_0_24px_rgba(124,58,237,0.45)] border border-violet-400/50 scale-[1.02]'
-                        : 'bg-[#0d0f14]/90 text-zinc-300 border border-white/[0.08] hover:border-violet-500/40 hover:bg-[#151922] hover:text-white'
-                    }`}
-                  >
-                    {prim.icon}
-                    <span>{prim.name}</span>
-                  </button>
-                );
-              })}
-            </div>
 
             {/* 4 Feature Spec Cards Row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6 pt-4 border-t border-white/[0.06]">
@@ -264,10 +167,9 @@ export function HeroSection() {
 
             {/* Multi-Depth Kinetic Stage */}
             <div className="relative w-full flex items-center justify-center my-auto">
-              
               {/* Layer 1: Parallax 3D Perspective Mountain Base */}
               <Parallax speed={0.06} min={-20} max={20} className="w-full flex items-center justify-center">
-                <div className="relative w-full max-w-[580px] xl:max-w-[640px] transform transition-transform duration-500 hover:scale-[1.01] cursor-default">
+                <div className="relative w-full max-w-[580px] xl:max-w-[640px] transform transition-transform duration-[250ms] [transition-timing-function:var(--ease-smooth-out)] hover:scale-[1.01] cursor-default">
                   <Image
                     src="/images/hero-mountain-code.webp"
                     alt="ScrollCraft 3D Mountain and Code Window"
@@ -278,56 +180,8 @@ export function HeroSection() {
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 640px"
                     className="w-full h-auto object-contain drop-shadow-[0_25px_60px_rgba(0,0,0,0.9)] select-none pointer-events-none"
                   />
-
-                  {/* Layer 2: Floating Reactive HUD Card connected to Active Primitive Pill */}
-                  <div className="absolute -bottom-2 sm:-bottom-4 left-2 right-2 sm:left-6 sm:right-6 bg-[#0c0d12]/95 backdrop-blur-md border border-violet-500/30 rounded-xl p-3 sm:p-4 shadow-[0_12px_40px_rgba(0,0,0,0.8)] transition-all duration-300">
-                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/[0.08]">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.9)]" />
-                        <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
-                          {currentPrim.name} Active
-                        </span>
-                      </div>
-                      <span className="text-[10px] font-mono text-violet-300 bg-violet-500/15 px-2 py-0.5 rounded border border-violet-500/30">
-                        GPU Mutex Locked
-                      </span>
-                    </div>
-
-                    <div className="text-[11px] font-mono text-zinc-300 bg-[#060709] px-2.5 sm:px-3 py-1.5 rounded-lg border border-white/5 mb-2.5 sm:mb-3 overflow-x-auto whitespace-nowrap no-scrollbar">
-                      <span className="text-violet-400 font-semibold">{currentPrim.codeSnippet}</span>
-                    </div>
-
-                    {/* Dynamic Real-time Metric scrub per active primitive (Zero React re-render via DOM refs) */}
-                    {activePrimitive === 'progress' ? (
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between text-[10px] font-mono text-zinc-400">
-                          <span>Normalized Scroll Progress</span>
-                          <span ref={progressTextRef} className="text-violet-400 font-bold">0%</span>
-                        </div>
-                        <div className="w-full h-1.5 rounded-full bg-zinc-800 overflow-hidden">
-                          <div
-                            ref={progressBarRef}
-                            style={{ width: '4%' }}
-                            className="h-full bg-gradient-to-r from-violet-500 to-indigo-400 transition-all duration-75"
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-[9.5px] sm:text-[10px] font-mono text-zinc-400">
-                        <div className="flex items-center justify-between px-2 py-1 rounded bg-zinc-900/80 border border-white/5">
-                          <span>Velocity:</span>
-                          <span ref={velocityTextRef} className="text-emerald-400 font-bold ml-1">0.0 px/f</span>
-                        </div>
-                        <div className="flex items-center justify-between px-2 py-1 rounded bg-zinc-900/80 border border-white/5">
-                          <span>Compositor:</span>
-                          <span className="text-violet-400 font-bold ml-1">GPU Active</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 </div>
               </Parallax>
-
             </div>
 
             {/* Bottom Right Tag */}
@@ -341,16 +195,6 @@ export function HeroSection() {
 
           </div>
 
-        </div>
-
-        {/* Bottom Bar: Scroll To Explore Indicator */}
-        <div className="pt-8 flex items-center gap-3 border-t border-white/[0.04]">
-          <div className="w-5 h-9 rounded-full border border-violet-500/40 flex justify-center pt-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" />
-          </div>
-          <span className="text-[11px] font-mono tracking-[0.25em] text-zinc-400 font-medium uppercase select-none">
-            SCROLL TO EXPLORE
-          </span>
         </div>
 
       </div>

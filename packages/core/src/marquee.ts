@@ -38,7 +38,12 @@ export class VelocityMarqueeSolver implements ScrollDriver {
       maxSpeed: options?.maxSpeed ?? 50,
     };
 
-this.measure();
+    if (this.element && this.element.style) {
+      this.element.style.backfaceVisibility = 'hidden';
+      (this.element.style as any).webkitBackfaceVisibility = 'hidden';
+    }
+    this.measure();
+    smartCompositor.promote(this.element);
   }
 
   public setVisible(visible: boolean): void {
@@ -46,7 +51,12 @@ this.measure();
     this.isVisible = visible;
 
     if (visible) {
-} else {
+      if (this.element && this.element.style) {
+        this.element.style.backfaceVisibility = 'hidden';
+        (this.element.style as any).webkitBackfaceVisibility = 'hidden';
+      }
+      smartCompositor.promote(this.element);
+    } else {
       smartCompositor.demote(this.element, 300);
     }
   }

@@ -24,7 +24,7 @@ import {
 } from '@scrollcraft/core';
 import { useScrollCraft, useScrollState } from '../context';
 import { ScrollProgressOptions } from '../types';
-import { isRefObject, captureNode } from '../utils/ref';
+import { isRefObject, watchRefAttachment } from '../utils/ref';
 
 export type UseScrollProgressOptions = ScrollProgressOptions;
 
@@ -64,6 +64,7 @@ export function useScrollProgress<T extends HTMLElement = HTMLElement>(
     ? (maybeOptions ?? {})
     : ((targetRefOrOptions as ScrollProgressOptions) ?? {});
 
+  const hasExplicitTarget = isRefPassed || !!options.target;
   const targetRef = isRefPassed
     ? (targetRefOrOptions as React.RefObject<T | null>)
     : (options.target as React.RefObject<T | null> ?? fallbackRef);
@@ -93,10 +94,8 @@ export function useScrollProgress<T extends HTMLElement = HTMLElement>(
   onProgressRef.current = onProgress;
 
   useEffect(() => {
-    const node = captureNode(targetRef);
-
-    // Mode A: Global Viewport / Page Scroll
-    if (!node) {
+    // Mode A: Global Viewport / Page Scroll (when no target ref was explicitly supplied)
+    if (!hasExplicitTarget) {
       const unsub = subscribe((metrics) => {
         const p = orientation === 'horizontal'
           ? (metrics.scroll / Math.max(1, metrics.maxScroll))
@@ -113,69 +112,72 @@ export function useScrollProgress<T extends HTMLElement = HTMLElement>(
       return unsub;
     }
 
-    // Mode B: Target Element Scroll Progression
-    let startScroll = 0;
-    let endScroll = 0;
+    // Mode B: Target Element Scroll Progression via resilient attachment watcher
+    return watchRefAttachment(targetRef, (node) => {
+      let startScroll = 0;
+      let endScroll = 0;
 
-    const measure = () => {
-      if (!node || typeof window === 'undefined') return;
-      const rect = node.getBoundingClientRect();
-      const isVert = orientation === 'vertical';
+      const measure = () => {
+        if (!node || typeof window === 'undefined') return;
+        const rect = node.getBoundingClientRect();
+        const isVert = orientation === 'vertical';
 
-      const currentScroll = isVert
-        ? (window.scrollY || window.pageYOffset)
-        : (window.scrollX || window.pageXOffset);
+        const currentScroll = isVert
+          ? (window.scrollY || window.pageYOffset)
+          : (window.scrollX || window.pageXOffset);
 
-      const elemPos = isVert ? rect.top + currentScroll : rect.left + currentScroll;
-      const elemSize = isVert ? rect.height : rect.width;
-      const vpSize = isVert ? window.innerHeight : window.innerWidth;
+        const elemPos = isVert ? rect.top + currentScroll : rect.left + currentScroll;
+        const elemSize = isVert ? rect.height : rect.width;
+        const vpSize = isVert ? window.innerHeight : window.innerWidth;
 
-      const [startSpec = 'top bottom', endSpec = 'bottom top'] = offset;
-      const [startElemEdge, startVpEdge] = startSpec.split(' ');
-      const [endElemEdge, endVpEdge] = endSpec.split(' ');
+        const [startSpec = 'top bottom', endSpec = 'bottom top'] = offset;
+        const [startElemEdge, startVpEdge] = startSpec.split(' ');
+        const [endElemEdge, endVpEdge] = endSpec.split(' ');
 
-      const startElemOffset = parseEdge(startElemEdge, elemSize);
-      const startVpOffset = parseEdge(startVpEdge, vpSize);
-      startScroll = (elemPos + startElemOffset) - startVpOffset;
+        const startElemOffset = parseEdge(startElemEdge, elemSize);
+        const startVpOffset = parseEdge(startVpEdge, vpSize);
+        startScroll = (elemPos + startElemOffset) - startVpOffset;
 
-      const endElemOffset = parseEdge(endElemEdge, elemSize);
-      const endVpOffset = parseEdge(endVpEdge, vpSize);
-      endScroll = (elemPos + endElemOffset) - endVpOffset;
+        const endElemOffset = parseEdge(endElemEdge, elemSize);
+        const endVpOffset = parseEdge(endVpEdge, vpSize);
+        endScroll = (elemPos + endElemOffset) - endVpOffset;
 
-      if (endScroll <= startScroll) {
-        endScroll = startScroll + 1;
-      }
-    };
+        if (endScroll <= startScroll) {
+          endScroll = startScroll + 1;
+        }
+      };
 
-    measure();
-    const unobserve = GlobalResizeManager.observe(node, measure);
-    window.addEventListener('resize', measure, { passive: true });
+      measure();
+      const unobserve = GlobalResizeManager.observe(node, measure);
+      window.addEventListener('resize', measure, { passive: true });
 
-    const unsub = subscribe((metrics) => {
-      const currentScroll = orientation === 'horizontal'
-        ? (window.scrollX || window.pageXOffset)
-        : metrics.scroll;
+      const unsub = subscribe((metrics) => {
+        const currentScroll = orientation === 'horizontal'
+          ? (window.scrollX || window.pageXOffset)
+          : metrics.scroll;
 
-      const rawProgress = (currentScroll - startScroll) / (endScroll - startScroll);
-      const p = clamp(rawProgress, 0, 1);
+        const rawProgress = (currentScroll - startScroll) / (endScroll - startScroll);
+        const p = clamp(rawProgress, 0, 1);
 
-      progressValueRef.current?.set(p);
-      scrollYValueRef.current?.set(currentScroll);
-      onProgressRef.current?.(p);
+        progressValueRef.current?.set(p);
+        scrollYValueRef.current?.set(currentScroll);
+        onProgressRef.current?.(p);
 
-      if (reactive) {
-        setReactiveProgressState(p);
-        setReactiveScrollState(currentScroll);
-      }
+        if (reactive) {
+          setReactiveProgressState(p);
+          setReactiveScrollState(currentScroll);
+        }
+      });
+
+      return () => {
+        unobserve();
+        window.removeEventListener('resize', measure);
+        unsub();
+      };
     });
-
-    return () => {
-      unobserve();
-      window.removeEventListener('resize', measure);
-      unsub();
-    };
   }, [
     targetRef,
+    hasExplicitTarget,
     offset,
     orientation,
     reactive,

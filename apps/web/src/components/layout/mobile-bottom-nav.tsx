@@ -68,7 +68,7 @@ export function MobileBottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all duration-200 relative group ${
+              className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all duration-[250ms] relative group ${
                 active
                   ? 'text-white'
                   : 'text-zinc-400 hover:text-zinc-200 active:scale-95'

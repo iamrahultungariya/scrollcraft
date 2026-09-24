@@ -81,7 +81,7 @@ export default function TestLabHubPage() {
         {/* Robust Testing Benchmark Banner */}
         <div className="pt-4">
           <Link
-            href="/robust-testing"
+            href="/test/robust"
             className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-gradient-to-r from-violet-600/20 via-sky-600/20 to-emerald-600/20 border border-violet-500/30 hover:border-violet-400 text-xs sm:text-sm font-mono text-zinc-200 hover:text-white transition-all shadow-xl group cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-violet-400 group-hover:scale-110 transition-transform" />

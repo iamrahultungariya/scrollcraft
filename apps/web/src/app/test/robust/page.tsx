@@ -139,11 +139,11 @@ function RobustHeaderHUD() {
             <span className="hidden sm:inline text-zinc-400">Glass:</span>
             <span className="text-violet-300 font-bold hidden sm:inline">{allConfigs[mode].label}</span>
             <span className="text-violet-300 font-bold sm:hidden">{mode.toUpperCase()}</span>
-            <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform duration-[250ms] [transition-timing-function:var(--ease-in-out)] ${dropdownOpen ? 'rotate-180' : ''}`} />
           </button>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-72 p-2 rounded-2xl border border-white/10 bg-zinc-950/95 backdrop-blur-2xl shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
+            <div className="absolute right-0 mt-2 w-72 p-2 rounded-2xl border border-white/10 bg-zinc-950/95 backdrop-blur-2xl shadow-2xl z-50 animate-in fade-in zoom-in-[0.97] duration-[250ms] [transition-timing-function:var(--ease-smooth-out)]">
               <div className="px-3 py-2 border-b border-zinc-800/80 mb-1">
                 <p className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">
                   Glassmorphism Level
@@ -300,7 +300,7 @@ function SectionParallaxPin() {
       </div>
 
       {/* Pin Track Container */}
-      <PinContainer height="240vh" className="relative px-4 sm:px-6 max-w-6xl mx-auto flex justify-center">
+      <PinContainer height="240vh" className="relative px-4 sm:px-6 max-w-6xl mx-auto flex justify-center items-start">
         {/* Background Parallax Layer (Deep Drift) */}
         <Parallax speed={-0.35} className="absolute inset-x-0 top-12 flex justify-between pointer-events-none opacity-30 select-none">
           <div className="text-5xl sm:text-[100px] md:text-[160px] font-extrabold tracking-tighter text-zinc-800/40 leading-none">
@@ -332,9 +332,9 @@ function SectionParallaxPin() {
           top={140}
           duration={1100}
           onProgress={(p) => setPinProgress(p)}
-          className="w-full max-w-xl z-20"
+          className="w-full max-w-xl z-20 self-start"
         >
-          <GlassCard glowColor="#38bdf8" className="p-5 sm:p-8 md:p-10 shadow-2xl">
+          <GlassCard glowColor="#38bdf8" className="p-5 sm:p-8 md:p-10 shadow-2xl" style={{ willChange: 'transform', transform: 'translateZ(0)' }}>
             {/* Card Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-5 mb-6">
               <div className="flex items-center gap-3">
@@ -361,8 +361,11 @@ function SectionParallaxPin() {
               </div>
               <div className="h-2 w-full bg-zinc-800/80 rounded-full overflow-hidden p-0.5 border border-white/5">
                 <div
-                  className="h-full bg-gradient-to-r from-sky-500 via-violet-500 to-fuchsia-500 rounded-full transition-all duration-75"
-                  style={{ width: `${Math.max(4, pinProgress * 100)}%` }}
+                  className="h-full bg-gradient-to-r from-sky-500 via-violet-500 to-fuchsia-500 rounded-full origin-left"
+                  style={{
+                    transform: `scaleX(${Math.max(0.02, pinProgress)}) translateZ(0)`,
+                    willChange: 'transform',
+                  }}
                 />
               </div>
             </div>
@@ -440,7 +443,13 @@ function SectionHorizontalScroll() {
             key={card.id}
             glowColor={card.color}
             className="w-[280px] sm:w-[340px] md:w-[380px] shrink-0 p-5 sm:p-7 flex flex-col justify-between select-none"
-            style={{ minHeight: '340px' }}
+            style={{
+              minHeight: '340px',
+              willChange: 'transform',
+              transform: 'translate3d(0px, 0px, 0px)',
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
+            }}
           >
             <div>
               {/* Card Header */}
@@ -531,7 +540,13 @@ function SectionStackedCards() {
             <GlassCard
               key={card.id}
               className="w-full p-5 sm:p-8 md:p-10 shadow-2xl"
-              style={{ minHeight: '340px' }}
+              style={{
+                minHeight: '340px',
+                willChange: 'transform',
+                transform: 'translate3d(0px, 0px, 0px)',
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden',
+              }}
             >
               <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
                 <div className="flex items-center gap-3">
@@ -727,23 +742,23 @@ function SectionVelocityMarquee() {
           className="py-4"
         >
           <div className="flex items-center gap-5">
-            <GlassCard activeHover={false} className="px-5 py-2.5 flex items-center gap-2.5 text-xs font-mono text-zinc-200">
+            <GlassCard activeHover={false} className="px-5 py-2.5 flex items-center gap-2.5 text-xs font-mono text-zinc-200" style={{ willChange: 'transform', transform: 'translate3d(0px, 0px, 0px)', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}>
               <Zap className="w-4 h-4 text-violet-400" />
               <span>TransformComposer.ts</span>
             </GlassCard>
-            <GlassCard activeHover={false} className="px-5 py-2.5 flex items-center gap-2.5 text-xs font-mono text-zinc-200">
+            <GlassCard activeHover={false} className="px-5 py-2.5 flex items-center gap-2.5 text-xs font-mono text-zinc-200" style={{ willChange: 'transform', transform: 'translate3d(0px, 0px, 0px)', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}>
               <Cpu className="w-4 h-4 text-cyan-400" />
               <span>FrustumShield Active</span>
             </GlassCard>
-            <GlassCard activeHover={false} className="px-5 py-2.5 flex items-center gap-2.5 text-xs font-mono text-zinc-200">
+            <GlassCard activeHover={false} className="px-5 py-2.5 flex items-center gap-2.5 text-xs font-mono text-zinc-200" style={{ willChange: 'transform', transform: 'translate3d(0px, 0px, 0px)', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}>
               <Shield className="w-4 h-4 text-pink-400" />
               <span>StyleLeasing Safe</span>
             </GlassCard>
-            <GlassCard activeHover={false} className="px-5 py-2.5 flex items-center gap-2.5 text-xs font-mono text-zinc-200">
+            <GlassCard activeHover={false} className="px-5 py-2.5 flex items-center gap-2.5 text-xs font-mono text-zinc-200" style={{ willChange: 'transform', transform: 'translate3d(0px, 0px, 0px)', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}>
               <Activity className="w-4 h-4 text-amber-400" />
               <span>Subpixel Lenis Kinetics</span>
             </GlassCard>
-            <GlassCard activeHover={false} className="px-5 py-2.5 flex items-center gap-2.5 text-xs font-mono text-zinc-200">
+            <GlassCard activeHover={false} className="px-5 py-2.5 flex items-center gap-2.5 text-xs font-mono text-zinc-200" style={{ willChange: 'transform', transform: 'translate3d(0px, 0px, 0px)', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}>
               <Database className="w-4 h-4 text-emerald-400" />
               <span>Zero GC Allocations</span>
             </GlassCard>
@@ -762,7 +777,7 @@ function SectionFooterProgress() {
   return (
     <footer className="relative w-full border-t border-zinc-900 bg-zinc-950 pt-16 pb-32 sm:pb-20 px-4 sm:px-6">
       {/* Top Edge Progress Bar Primitive */}
-      <div className="absolute top-0 inset-x-0 h-1 bg-zinc-900 overflow-hidden">
+      <div className="absolute top-0 inset-x-0 h-1 bg-zinc-900 overflow-hidden" style={{ isolation: 'isolate', transform: 'translate3d(0, 0, 0)', backfaceVisibility: 'hidden' }}>
         <ScrollProgress className="h-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-cyan-400" />
       </div>
 
@@ -839,6 +854,11 @@ export default function RobustShowcasePage() {
   return (
     <GlassThemeProvider initialMode="raw">
       <div className="min-h-screen bg-[#050505] text-zinc-100 selection:bg-violet-600/30 selection:text-white">
+        {/* Global Hardware-Accelerated Progress Indicator (Top Edge) */}
+        <div className="fixed top-0 inset-x-0 z-[60] h-1 pointer-events-none" style={{ isolation: 'isolate', transform: 'translate3d(0, 0, 0)', backfaceVisibility: 'hidden' }}>
+          <ScrollProgress className="h-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-cyan-400" />
+        </div>
+
         {/* Fixed Header HUD with Glassmorphism Selector */}
         <RobustHeaderHUD />
 

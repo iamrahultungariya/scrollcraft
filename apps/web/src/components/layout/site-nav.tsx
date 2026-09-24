@@ -25,7 +25,7 @@ const NAV_LINKS = [
   { href: '/showcase', label: 'Showcase' },
   { href: '/roadmap', label: 'Roadmap' },
   { href: '/test', label: 'Test Lab', badge: '25' },
-  { href: '/robust-testing', label: 'Robust Testing', badge: '21 Cards' },
+  { href: '/test/robust', label: 'Robust Testing', badge: '21 Cards' },
 ];
 
 export function SiteNav({
@@ -84,7 +84,7 @@ export function SiteNav({
           ref={bgRef}
           aria-hidden="true"
           style={{ opacity: 0, willChange: 'opacity' }}
-          className="absolute inset-0 -z-10 glass-surface border-b border-white/10 shadow-2xl transition-opacity duration-200 pointer-events-none"
+          className="absolute inset-0 -z-10 glass-surface border-b border-white/10 shadow-2xl transition-opacity duration-[250ms] [transition-timing-function:var(--ease-smooth-out)] pointer-events-none"
         />
       )}
 

@@ -8,6 +8,10 @@
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "bin"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "tsc",

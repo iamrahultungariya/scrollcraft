@@ -93,7 +93,7 @@ export const DocsSidebar: React.FC<DocsSidebarProps> = ({
               >
                 <div className="flex items-center gap-2">
                   <span
-                    className={`transition-transform duration-200 text-zinc-500 group-hover:text-zinc-300 ${
+                    className={`transition-transform duration-[250ms] [transition-timing-function:var(--ease-in-out)] text-zinc-500 group-hover:text-zinc-300 ${
                       isOpen ? 'rotate-90' : ''
                     }`}
                   >
@@ -123,7 +123,7 @@ export const DocsSidebar: React.FC<DocsSidebarProps> = ({
 
               {/* Items List (Collapsible) */}
               {isOpen && (
-                <ul className="flex flex-col gap-0.5 ml-4 pl-2.5 border-l border-zinc-800/60 mt-1 mb-2 animate-in fade-in duration-150">
+                <ul className="flex flex-col gap-0.5 ml-4 pl-2.5 border-l border-zinc-800/60 mt-1 mb-2 animate-in fade-in duration-[250ms]">
                   {matchingItems.map((item) => {
                     const isActive = activeSection === item.id;
                     const isAlpha = item.badge === 'Alpha';

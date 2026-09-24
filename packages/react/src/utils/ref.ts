@@ -60,3 +60,71 @@ export function useDualRef<T extends Element = HTMLElement, O extends object = R
 export function captureNode<T extends Element = HTMLElement>(ref: React.RefObject<T | null>): T | null {
   return ref?.current ?? null;
 }
+
+/**
+ * Resiliently observes when a ref object attaches to a DOM element.
+ * If node is immediately available, invokes onAttach synchronously.
+ * Otherwise, watches via MutationObserver and requestAnimationFrame until attached.
+ */
+export function watchRefAttachment<T extends HTMLElement = HTMLElement>(
+  ref: React.RefObject<T | null>,
+  onAttach: (node: T) => (() => void) | void
+): () => void {
+  const immediateNode = captureNode(ref);
+  if (immediateNode) {
+    const cleanup = onAttach(immediateNode);
+    return () => cleanup?.();
+  }
+
+  if (typeof window === 'undefined') {
+    return () => {};
+  }
+
+  let cleanupAttached: (() => void) | void;
+  let rafId: number | null = null;
+  let observer: MutationObserver | null = null;
+  let isDone = false;
+
+  const tryAttach = () => {
+    if (isDone) return;
+    const node = captureNode(ref);
+    if (node) {
+      isDone = true;
+      if (observer) {
+        observer.disconnect();
+        observer = null;
+      }
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      cleanupAttached = onAttach(node);
+    }
+  };
+
+  if (typeof MutationObserver !== 'undefined' && (document.body || document.documentElement)) {
+    observer = new MutationObserver(() => tryAttach());
+    observer.observe(document.body || document.documentElement, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  let attempts = 0;
+  const poll = () => {
+    tryAttach();
+    if (!isDone && attempts++ < 30) {
+      rafId = requestAnimationFrame(poll);
+    }
+  };
+  rafId = requestAnimationFrame(poll);
+
+  return () => {
+    isDone = true;
+    if (observer) observer.disconnect();
+    if (rafId !== null) cancelAnimationFrame(rafId);
+    if (typeof cleanupAttached === 'function') {
+      cleanupAttached();
+    }
+  };
+}

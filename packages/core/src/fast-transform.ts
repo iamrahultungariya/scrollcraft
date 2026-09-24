@@ -33,6 +33,9 @@ export interface ElementTransformRecord {
   isDirty: boolean;
   lastWrittenTransform: string;
   lastWrittenOpacity: string;
+  lastX?: number;
+  lastY?: number;
+  lastZ?: number;
 }
 
 export class FastTransformBuffer {
@@ -206,9 +209,22 @@ export class FastTransformBuffer {
         totalRotateZ !== 0;
 
       if (hasNumericTransforms) {
-        const sx = snapToDevicePixel(totalX, dpr);
-        const sy = snapToDevicePixel(totalY, dpr);
-        const sz = snapToDevicePixel(totalZ, dpr);
+        // Calculate frame delta to determine motion velocity
+        const dx = totalX - (record.lastX ?? totalX);
+        const dy = totalY - (record.lastY ?? totalY);
+        const dz = totalZ - (record.lastZ ?? totalZ);
+        const velocity = Math.hypot(dx, dy, dz);
+        record.lastX = totalX;
+        record.lastY = totalY;
+        record.lastZ = totalZ;
+
+        // Subpixel Snapping Policy:
+        // Active motion (|v| > 0.05px): render subpixel floats directly for 120Hz/144Hz silky interpolation.
+        // Settled (|v| <= 0.05px): snap to device pixel boundary to ensure crisp resting text and edges.
+        const isSettled = velocity <= 0.05;
+        const sx = isSettled ? snapToDevicePixel(totalX, dpr) : totalX;
+        const sy = isSettled ? snapToDevicePixel(totalY, dpr) : totalY;
+        const sz = isSettled ? snapToDevicePixel(totalZ, dpr) : totalZ;
 
         const numericStr = `translate3d(${sx.toFixed(2)}px, ${sy.toFixed(2)}px, ${sz.toFixed(2)}px) rotateX(${totalRotateX.toFixed(2)}deg) rotateY(${totalRotateY.toFixed(2)}deg) rotateZ(${totalRotateZ.toFixed(2)}deg) scale(${totalScaleX.toFixed(4)}, ${totalScaleY.toFixed(4)})`;
         composed = composed ? `${composed} ${numericStr}` : numericStr;

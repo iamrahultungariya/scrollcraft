@@ -2,12 +2,9 @@
 
 /**
  * ScrollCraft Section 5: Engine Architecture
- * - Pixel-perfect match to media_1789367813271.png
- * - Headline: "Not a wrapper. An engine."
- * - 3-phase microtask pipeline: 01 Schedule Ticket -> 02 Inertia Physics -> 03 ScrollValue Mutators
- * - Reactive Context & Headless Bindings Bridge
- * - 3 Specs: Deterministic, Hardware Timed, Framework Agnostic
- * - Scroll To Explore indicator
+ * - Clean, equalized fixed-height pipeline cards (no dynamic height jumping)
+ * - Professional 3-phase microtask architecture explanation
+ * - Strictly under 650 LOC.
  */
 
 import React from 'react';
@@ -26,7 +23,7 @@ export function EngineArchitectureSection() {
   return (
     <section
       id="architecture"
-      className="relative w-full bg-[#050505] py-16 sm:py-32 px-4 sm:px-6 lg:px-8 border-t border-zinc-800/80 overflow-hidden"
+      className="relative w-full bg-[#050505] py-16 sm:py-28 px-4 sm:px-6 lg:px-8 border-t border-zinc-800/80 overflow-hidden"
     >
       {/* Background Ambience Lines */}
       <svg
@@ -47,24 +44,6 @@ export function EngineArchitectureSection() {
         />
       </svg>
 
-      {/* Left Outer Floating Watermark */}
-      <div className="hidden xl:flex absolute left-8 bottom-24 flex-col items-start font-mono text-[10px] tracking-[0.25em] text-zinc-600 uppercase select-none pointer-events-none">
-        <span>BUILT</span>
-        <span>FOR</span>
-        <span>REAL</span>
-        <span>SCROLL.</span>
-        <div className="w-5 h-[1.5px] bg-zinc-700 mt-2" />
-      </div>
-
-      {/* Right Outer Floating Watermark */}
-      <div className="hidden xl:flex absolute right-8 bottom-24 flex-col items-end text-right font-mono text-[10px] tracking-[0.25em] text-zinc-600 uppercase select-none pointer-events-none">
-        <span>MORE</span>
-        <span>THAN</span>
-        <span>AN</span>
-        <span>ABSTRACTION.</span>
-        <div className="w-5 h-[1.5px] bg-zinc-700 mt-2" />
-      </div>
-
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
@@ -75,15 +54,15 @@ export function EngineArchitectureSection() {
               </span>
               <span className="text-xs font-mono text-zinc-600">&bull;</span>
               <span className="text-[11px] sm:text-xs font-mono font-bold tracking-[0.25em] uppercase text-violet-400">
-                Engineering Authority
+                Deterministic Kernel
               </span>
             </div>
           </Reveal>
 
           <Reveal direction="up" distance={20} delay={0.1}>
-            <h2 className="text-3xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.08] mb-3 sm:mb-4 break-words">
-              <span className="text-white block">Not a wrapper.</span>
-              <span className="text-zinc-500 block">An engine.</span>
+            <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold tracking-tight leading-[1.08] mb-3 sm:mb-4 break-words">
+              <span className="text-white block font-extrabold">Not a wrapper.</span>
+              <span className="bg-gradient-to-r from-violet-400 via-purple-300 to-indigo-300 bg-clip-text text-transparent block font-extrabold mt-1">An engine.</span>
             </h2>
           </Reveal>
 
@@ -96,11 +75,11 @@ export function EngineArchitectureSection() {
 
         {/* Main Architecture Diagram Container */}
         <Reveal direction="up" distance={25} delay={0.25}>
-          <div className="w-full max-w-5xl mx-auto rounded-2xl border border-zinc-800/90 bg-[#09090b] p-4 sm:p-8 shadow-2xl relative overflow-hidden mb-10 sm:mb-14">
+          <div className="w-full max-w-5xl mx-auto rounded-3xl border border-white/[0.08] bg-[#09090b] p-5 sm:p-8 shadow-2xl relative overflow-hidden mb-12 sm:mb-16">
             {/* Top Bar inside card */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-zinc-800/80 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/[0.06] mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-violet-400 shrink-0 shadow-inner">
+                <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 shrink-0 shadow-inner">
                   <Box className="w-5 h-5" />
                 </div>
                 <div>
@@ -108,11 +87,8 @@ export function EngineArchitectureSection() {
                     <span className="font-mono text-sm sm:text-base font-bold text-white">
                       @scrollcraft/core
                     </span>
-                    <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-mono font-bold text-emerald-400">
-                      v0.2.0 (LIVE)
-                    </span>
-                    <span className="px-2 py-0.5 rounded bg-violet-500/10 border border-violet-500/30 text-[10px] font-mono font-bold text-violet-300">
-                      v0.3.0 Horizon
+                    <span className="px-2 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/30 text-[10px] font-mono font-bold text-violet-300">
+                      Phase-Locked Pipeline
                     </span>
                   </div>
                   <p className="text-xs text-zinc-400 mt-0.5">
@@ -130,129 +106,124 @@ export function EngineArchitectureSection() {
               </div>
             </div>
 
-            {/* 3 Pipeline Flow Cards */}
-            <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4 lg:gap-3">
+            {/* 3 Pipeline Flow Cards - Equalized Balanced Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
               {/* Phase 1: Schedule Ticket */}
-              <div className="rounded-xl border border-zinc-800/90 bg-[#060608] p-4 sm:p-5 flex items-start gap-4 flex-1 shadow-md">
-                <div className="w-10 h-10 rounded-lg bg-zinc-900/90 border border-zinc-800 flex items-center justify-center text-violet-400 shrink-0">
-                  <Layers className="w-5 h-5" />
-                </div>
+              <div className="rounded-2xl border border-white/[0.06] bg-[#060608] p-5 flex flex-col justify-between shadow-md hover:border-violet-500/30 transition-all duration-[250ms] [transition-timing-function:var(--ease-smooth-out)]">
                 <div>
-                  <div className="flex items-center gap-2 font-mono text-[11px]">
-                    <span className="text-violet-400 font-bold">01</span>
-                    <span className="text-zinc-500">Phase 1</span>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-900 border border-white/[0.08] flex items-center justify-center text-violet-400 shrink-0">
+                      <Layers className="w-4 h-4" />
+                    </div>
+                    <div className="flex items-center gap-1.5 font-mono text-[11px]">
+                      <span className="text-violet-400 font-bold">01</span>
+                      <span className="text-zinc-600">/</span>
+                      <span className="text-zinc-400">Phase 1</span>
+                    </div>
                   </div>
-                  <h4 className="text-sm sm:text-base font-bold text-white mt-0.5">
+                  <h4 className="text-sm sm:text-base font-bold text-white tracking-tight">
                     Schedule Ticket
                   </h4>
-                  <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                    Measure &rarr; Mutate &rarr; Render loop eliminates layout thrashing.
+                  <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
+                    Microtask queue separating DOM measurements from style mutations to eliminate layout thrashing.
                   </p>
                 </div>
-              </div>
-
-              {/* Connecting Dot 1 */}
-              <div className="hidden lg:flex items-center justify-center shrink-0 px-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.9)]" />
+                <div className="mt-4 pt-3 border-t border-white/[0.04] text-[11px] font-mono text-zinc-500">
+                  Measure Phase &bull; Batching
+                </div>
               </div>
 
               {/* Phase 2: Inertia Normalizer */}
-              <div className="rounded-xl border border-zinc-800/90 bg-[#060608] p-4 sm:p-5 flex items-start gap-4 flex-1 shadow-md">
-                <div className="w-10 h-10 rounded-lg bg-zinc-900/90 border border-zinc-800 flex items-center justify-center text-violet-400 shrink-0">
-                  <Activity className="w-5 h-5" />
-                </div>
+              <div className="rounded-2xl border border-white/[0.06] bg-[#060608] p-5 flex flex-col justify-between shadow-md hover:border-violet-500/30 transition-all duration-[250ms] [transition-timing-function:var(--ease-smooth-out)]">
                 <div>
-                  <div className="flex items-center gap-2 font-mono text-[11px]">
-                    <span className="text-violet-400 font-bold">02</span>
-                    <span className="text-zinc-500">Phase 2</span>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-900 border border-white/[0.08] flex items-center justify-center text-violet-400 shrink-0">
+                      <Activity className="w-4 h-4" />
+                    </div>
+                    <div className="flex items-center gap-1.5 font-mono text-[11px]">
+                      <span className="text-violet-400 font-bold">02</span>
+                      <span className="text-zinc-600">/</span>
+                      <span className="text-zinc-400">Phase 2</span>
+                    </div>
                   </div>
-                  <h4 className="text-sm sm:text-base font-bold text-white mt-0.5">
+                  <h4 className="text-sm sm:text-base font-bold text-white tracking-tight">
                     Inertia Normalizer
                   </h4>
-                  <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                    Powered by smooth scrolling physics inspired by Lenis, wired directly into ScrollCraft&apos;s proprietary zero-rerender animation engine.
+                  <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
+                    High-precision subpixel physics solver calculating normalized delta velocity and damping curves.
                   </p>
                 </div>
-              </div>
-
-              {/* Connecting Dot 2 */}
-              <div className="hidden lg:flex items-center justify-center shrink-0 px-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.9)]" />
+                <div className="mt-4 pt-3 border-t border-white/[0.04] text-[11px] font-mono text-zinc-500">
+                  Physics Phase &bull; Damping
+                </div>
               </div>
 
               {/* Phase 3: ScrollValue Mutators */}
-              <div className="rounded-xl border border-zinc-800/90 bg-[#060608] p-4 sm:p-5 flex items-start gap-4 flex-1 shadow-md">
-                <div className="w-10 h-10 rounded-lg bg-zinc-900/90 border border-zinc-800 flex items-center justify-center text-violet-400 shrink-0">
-                  <SlidersHorizontal className="w-5 h-5" />
-                </div>
+              <div className="rounded-2xl border border-white/[0.06] bg-[#060608] p-5 flex flex-col justify-between shadow-md hover:border-violet-500/30 transition-all duration-[250ms] [transition-timing-function:var(--ease-smooth-out)]">
                 <div>
-                  <div className="flex items-center gap-2 font-mono text-[11px]">
-                    <span className="text-violet-400 font-bold">03</span>
-                    <span className="text-zinc-500">Phase 3</span>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-900 border border-white/[0.08] flex items-center justify-center text-violet-400 shrink-0">
+                      <SlidersHorizontal className="w-4 h-4" />
+                    </div>
+                    <div className="flex items-center gap-1.5 font-mono text-[11px]">
+                      <span className="text-violet-400 font-bold">03</span>
+                      <span className="text-zinc-600">/</span>
+                      <span className="text-zinc-400">Phase 3</span>
+                    </div>
                   </div>
-                  <h4 className="text-sm sm:text-base font-bold text-white mt-0.5">
+                  <h4 className="text-sm sm:text-base font-bold text-white tracking-tight">
                     ScrollValue Mutators
                   </h4>
-                  <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                    Direct GPU style value bypassing React virtual DOM diffing.
+                  <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
+                    Direct compositor style injection writing hardware transforms with 0 React reconciler cycles.
                   </p>
+                </div>
+                <div className="mt-4 pt-3 border-t border-white/[0.04] text-[11px] font-mono text-zinc-500">
+                  Mutate Phase &bull; GPU Inline
                 </div>
               </div>
             </div>
 
             {/* Bottom Bridge Line inside card */}
-            <div className="relative mt-6 sm:mt-8 pt-4 border-t border-zinc-800/80 flex items-center justify-center">
-              <span className="text-[9px] sm:text-[11px] font-mono tracking-[0.1em] sm:tracking-[0.2em] text-zinc-500 uppercase bg-[#09090b] px-2.5 sm:px-3 text-center break-words">
-                REACTIVE CONTEXT &amp; HEADLESS BINDINGS BRIDGE
+            <div className="relative mt-6 sm:mt-8 pt-4 border-t border-white/[0.06] flex items-center justify-center">
+              <span className="text-[10px] sm:text-[11px] font-mono tracking-[0.15em] text-zinc-500 uppercase bg-[#09090b] px-3 text-center">
+                REACTIVE CONTEXT &bull; HEADLESS BINDINGS BRIDGE
               </span>
             </div>
           </div>
         </Reveal>
 
         {/* 3 Spec Pillars */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto mb-12 sm:mb-16">
-          {/* Spec 1 */}
-          <div className="flex items-center gap-3.5 justify-start">
-            <div className="text-violet-400 shrink-0">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="flex items-center gap-3.5">
+            <div className="p-2.5 rounded-xl bg-violet-500/10 border border-violet-500/20 text-violet-400 shrink-0">
               <Zap className="w-5 h-5" />
             </div>
             <div>
               <h4 className="text-sm font-bold text-white">Deterministic</h4>
-              <p className="text-xs text-zinc-400 mt-0.5">Runs between vSync ticks</p>
+              <p className="text-xs text-zinc-400 mt-0.5">Executes synchronously between vSync ticks</p>
             </div>
           </div>
 
-          {/* Spec 2 */}
-          <div className="flex items-center gap-3.5 justify-start">
-            <div className="text-violet-400 shrink-0">
+          <div className="flex items-center gap-3.5">
+            <div className="p-2.5 rounded-xl bg-violet-500/10 border border-violet-500/20 text-violet-400 shrink-0">
               <Box className="w-5 h-5" />
             </div>
             <div>
               <h4 className="text-sm font-bold text-white">Hardware Timed</h4>
-              <p className="text-xs text-zinc-400 mt-0.5">Built for real devices</p>
+              <p className="text-xs text-zinc-400 mt-0.5">Precision timing for 60Hz and 120Hz displays</p>
             </div>
           </div>
 
-          {/* Spec 3 */}
-          <div className="flex items-center gap-3.5 justify-start">
-            <div className="text-violet-400 shrink-0">
+          <div className="flex items-center gap-3.5">
+            <div className="p-2.5 rounded-xl bg-violet-500/10 border border-violet-500/20 text-violet-400 shrink-0">
               <Leaf className="w-5 h-5" />
             </div>
             <div>
               <h4 className="text-sm font-bold text-white">Framework Agnostic</h4>
-              <p className="text-xs text-zinc-400 mt-0.5">Use anywhere</p>
+              <p className="text-xs text-zinc-400 mt-0.5">Core engine operates with or without React</p>
             </div>
           </div>
-        </div>
-
-        {/* Scroll To Explore Indicator */}
-        <div className="flex flex-col items-center justify-center text-center">
-          <div className="w-5 h-8 rounded-full border-2 border-zinc-700/80 flex items-start justify-center p-1 shadow-inner">
-            <span className="w-1 h-2 rounded-full bg-violet-400 animate-bounce" />
-          </div>
-          <span className="text-[10px] font-mono font-semibold tracking-[0.25em] text-zinc-500 uppercase mt-2.5">
-            SCROLL TO EXPLORE
-          </span>
         </div>
       </div>
     </section>

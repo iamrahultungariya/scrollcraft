@@ -107,7 +107,7 @@ export function ShowcaseHub() {
               <img
                 src="/images/showcase-img.webp"
                 alt="ScrollCraft Exhibition Showcase"
-                className="w-full h-auto object-cover rounded-2xl transition-transform duration-500 ease-out group-hover:scale-[1.01] select-none"
+                className="w-full h-auto object-cover rounded-2xl transition-transform duration-[250ms] [transition-timing-function:var(--ease-smooth-out)] group-hover:scale-[1.01] select-none"
                 loading="eager"
                 decoding="async"
               />
@@ -231,12 +231,12 @@ export function ShowcaseHub() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-[250ms]"
           onClick={() => setIsSubmitModalOpen(false)}
         >
           {/* Modal Card */}
           <div
-            className="relative w-full max-w-md rounded-3xl border border-zinc-700/80 bg-[#0d0e14] p-6 sm:p-8 shadow-[0_25px_70px_rgba(0,0,0,0.9)] overflow-hidden transition-all transform animate-in zoom-in-95 duration-200"
+            className="relative w-full max-w-md rounded-3xl border border-zinc-700/80 bg-[#0d0e14] p-6 sm:p-8 shadow-[0_25px_70px_rgba(0,0,0,0.9)] overflow-hidden transition-all transform animate-in zoom-in-[0.96] duration-[250ms] [transition-timing-function:var(--ease-smooth-out)]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Top Glow Accent */}

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useMemo } from 'react';
 
-export type GlassMode = 'raw' | '50%' | 'low' | 'flat';
+export type GlassMode = 'dragon' | 'child-dragon' | 'raw' | '50%' | 'low' | 'flat';
 
 export interface GlassThemeConfig {
   mode: GlassMode;
@@ -13,6 +13,30 @@ export interface GlassThemeConfig {
 }
 
 const GLASS_CONFIGS: Record<GlassMode, { label: string; blurPx: number; description: string; style: React.CSSProperties }> = {
+  dragon: {
+    label: 'Dragon (50px)',
+    blurPx: 50,
+    description: 'Extreme heavy blur. Ultimate GPU stress test.',
+    style: {
+      backdropFilter: 'blur(50px)',
+      WebkitBackdropFilter: 'blur(50px)',
+      backgroundColor: 'rgba(24, 24, 32, 0.3)',
+      borderColor: 'rgba(255, 255, 255, 0.25)',
+      boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.3)',
+    },
+  },
+  'child-dragon': {
+    label: 'Child Dragon (35px)',
+    blurPx: 35,
+    description: 'Very heavy blur.',
+    style: {
+      backdropFilter: 'blur(35px)',
+      WebkitBackdropFilter: 'blur(35px)',
+      backgroundColor: 'rgba(24, 24, 32, 0.35)',
+      borderColor: 'rgba(255, 255, 255, 0.22)',
+      boxShadow: '0 25px 55px -12px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.25)',
+    },
+  },
   raw: {
     label: 'Raw (Full 24px)',
     blurPx: 24,

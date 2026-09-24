@@ -38,15 +38,42 @@ export class PinSolver {
     pinOffsetY: 0,
   };
 
+  private detectClippingAncestor(el: HTMLElement): boolean {
+    if (typeof window === 'undefined' || typeof window.getComputedStyle !== 'function' || !el || !el.parentElement) {
+      return false;
+    }
+    let parent: HTMLElement | null = el.parentElement;
+    while (parent && parent !== document.body && parent !== document.documentElement) {
+      try {
+        const computed = window.getComputedStyle(parent);
+        if (computed) {
+          const overflow = (computed.overflow + computed.overflowY + computed.overflowX).toLowerCase();
+          if (/(hidden|auto|scroll|clip)/.test(overflow)) {
+            return true;
+          }
+        }
+      } catch {
+        break;
+      }
+      parent = parent.parentElement;
+    }
+    return false;
+  }
+
   constructor(element: HTMLElement, options?: PinOptions) {
     this.element = element;
     const rawDuration = options?.duration ?? (typeof window !== 'undefined' ? window.innerHeight : DEFAULT_PIN_DURATION);
+    const hasClipping = this.detectClippingAncestor(element);
+    const isSticky = typeof element?.style?.position === 'string' && element.style.position === 'sticky';
+
     this.options = {
       duration: Math.max(1, rawDuration),
       topOffset: options?.topOffset ?? 0,
       bottomOffset: options?.bottomOffset ?? 0,
       onProgress: options?.onProgress ?? (() => {}),
-      disableTransform: options?.disableTransform ?? false,
+      // Default to native CSS sticky (disableTransform: true) when element is styled sticky and safe,
+      // preventing translate3d containing block traps for position: fixed descendants
+      disableTransform: options?.disableTransform ?? (isSticky && !hasClipping),
     };
     this.measure();
   }
@@ -56,6 +83,12 @@ export class PinSolver {
    */
   public measure(): void {
     if (typeof window === 'undefined') return;
+    if (this.options.disableTransform && this.element?.style) {
+      if (this.element.style.position !== 'sticky') {
+        this.element.style.position = 'sticky';
+        this.element.style.top = `${this.options.topOffset}px`;
+      }
+    }
     const rect = this.element.getBoundingClientRect();
     const scrollTop = window.scrollY || window.pageYOffset;
     // Current top position relative to document minus existing pin offset
@@ -137,6 +170,9 @@ export class PinSolver {
   public destroy(): void {
     if (!this.options.disableTransform) {
       TransformComposer.clear(this.element, 'pin');
+    } else if (this.element?.style && this.element.style.position === 'sticky') {
+      this.element.style.position = '';
+      this.element.style.top = '';
     }
   }
 }

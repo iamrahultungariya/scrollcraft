@@ -17,7 +17,7 @@ export const Reveal = React.memo(
       asChild = false,
       direction = 'up',
       distance = 32,
-      duration = 0.6,
+      duration = 0.5,
       delay = 0,
       threshold = 0.15,
       once = true,
@@ -55,17 +55,21 @@ export const Reveal = React.memo(
     });
 
     const mergedRef = composeRefs(forwardedRef, internalRef);
+    const revealProps = {
+      'data-scrollcraft-reveal': (domProps as Record<string, any>)['data-scrollcraft-reveal'] || 'pending',
+      ...domProps,
+    };
 
     if (asChild) {
       return (
-        <Slot ref={mergedRef} {...domProps}>
+        <Slot ref={mergedRef} {...revealProps}>
           {children}
         </Slot>
       );
     }
 
     return (
-      <div ref={mergedRef as React.Ref<HTMLDivElement>} {...domProps}>
+      <div ref={mergedRef as React.Ref<HTMLDivElement>} {...revealProps}>
         {children}
       </div>
     );

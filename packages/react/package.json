@@ -85,6 +85,16 @@
       "types": "./dist/components/magnetic.d.ts",
       "import": "./dist/components/magnetic.js",
       "default": "./dist/components/magnetic.js"
+    },
+    "./horizontal": {
+      "types": "./dist/components/horizontal-scroll.d.ts",
+      "import": "./dist/components/horizontal-scroll.js",
+      "default": "./dist/components/horizontal-scroll.js"
+    },
+    "./skew-gallery": {
+      "types": "./dist/components/skew-gallery.d.ts",
+      "import": "./dist/components/skew-gallery.js",
+      "default": "./dist/components/skew-gallery.js"
     }
   },
   "scripts": {

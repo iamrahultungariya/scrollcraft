@@ -25,7 +25,7 @@ import {
 } from '@scrollcraft/core';
 import { useScrollCraft } from '../context';
 import { ScrollTimelineOptions } from '../types';
-import { isRefObject, captureNode } from '../utils/ref';
+import { isRefObject, watchRefAttachment } from '../utils/ref';
 
 function buildTimelineFromKeyframes(
   keyframes: Record<string, (number | string)[]> | Array<{ progress: number; transform?: any; opacity?: number }>
@@ -134,64 +134,63 @@ export function useScrollTimeline<T extends HTMLElement = HTMLDivElement>(
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    const node = captureNode(targetRef);
-    if (!node || typeof window === 'undefined') return;
+    return watchRefAttachment(targetRef, (node) => {
+      const timeline: PropertyTimeline = options.timeline
+        ?? (options.keyframes ? buildTimelineFromKeyframes(options.keyframes) : {});
 
-    const timeline: PropertyTimeline = options.timeline
-      ?? (options.keyframes ? buildTimelineFromKeyframes(options.keyframes) : {});
+      const taskId = `timeline-${Math.random().toString(36).slice(2, 8)}`;
+      const evaluatedValues: Record<string, number> = {};
 
-    const taskId = `timeline-${Math.random().toString(36).slice(2, 8)}`;
-    const evaluatedValues: Record<string, number> = {};
+      const applyProgress = (p: number) => {
+        TimelineSolver.evaluateTimeline(timeline, p, evaluatedValues);
 
-    const applyProgress = (p: number) => {
-      TimelineSolver.evaluateTimeline(timeline, p, evaluatedValues);
+        const hasTransform =
+          evaluatedValues.x !== undefined ||
+          evaluatedValues.y !== undefined ||
+          evaluatedValues.z !== undefined ||
+          evaluatedValues.scale !== undefined ||
+          evaluatedValues.rotate !== undefined ||
+          evaluatedValues.rotateX !== undefined ||
+          evaluatedValues.rotateY !== undefined;
 
-      const hasTransform =
-        evaluatedValues.x !== undefined ||
-        evaluatedValues.y !== undefined ||
-        evaluatedValues.z !== undefined ||
-        evaluatedValues.scale !== undefined ||
-        evaluatedValues.rotate !== undefined ||
-        evaluatedValues.rotateX !== undefined ||
-        evaluatedValues.rotateY !== undefined;
+        if (hasTransform) {
+          TransformComposer.setNumeric(node, 'timeline', {
+            x: evaluatedValues.x,
+            y: evaluatedValues.y,
+            z: evaluatedValues.z,
+            scale: evaluatedValues.scale,
+            rotate: evaluatedValues.rotate,
+            rotateX: evaluatedValues.rotateX,
+            rotateY: evaluatedValues.rotateY,
+          });
+        } else {
+          TransformComposer.clear(node, 'timeline');
+        }
 
-      if (hasTransform) {
-        TransformComposer.setNumeric(node, 'timeline', {
-          x: evaluatedValues.x,
-          y: evaluatedValues.y,
-          z: evaluatedValues.z,
-          scale: evaluatedValues.scale,
-          rotate: evaluatedValues.rotate,
-          rotateX: evaluatedValues.rotateX,
-          rotateY: evaluatedValues.rotateY,
-        });
+        if (evaluatedValues.opacity !== undefined) {
+          styleRegistry.lease(node, 'timeline', 'opacity', String(evaluatedValues.opacity));
+        }
+
+        onUpdateRef.current?.(evaluatedValues);
+      };
+
+      let unsub: (() => void) | null = null;
+
+      if (options.progress !== undefined) {
+        applyProgress(options.progress);
       } else {
+        unsub = subscribe((metrics) => {
+          applyProgress(metrics.progress);
+        });
+      }
+
+      return () => {
+        unsub?.();
+        ticker.remove(taskId);
+        styleRegistry.release(node, 'timeline', 'opacity');
         TransformComposer.clear(node, 'timeline');
-      }
-
-      if (evaluatedValues.opacity !== undefined) {
-        styleRegistry.lease(node, 'timeline', 'opacity', String(evaluatedValues.opacity));
-      }
-
-      onUpdateRef.current?.(evaluatedValues);
-    };
-
-    let unsub: (() => void) | null = null;
-
-    if (options.progress !== undefined) {
-      applyProgress(options.progress);
-    } else {
-      unsub = subscribe((metrics) => {
-        applyProgress(metrics.progress);
-      });
-    }
-
-    return () => {
-      unsub?.();
-      ticker.remove(taskId);
-      styleRegistry.release(node, 'timeline', 'opacity');
-      TransformComposer.clear(node, 'timeline');
-    };
+      };
+    });
   }, [
     targetRef,
     options.progress,

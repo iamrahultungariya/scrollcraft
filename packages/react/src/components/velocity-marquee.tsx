@@ -93,7 +93,16 @@ export const VelocityMarquee: React.FC<VelocityMarqueeProps> = ({
 
   return (
     <div ref={containerRef} className={`overflow-hidden flex flex-nowrap w-full ${className}`} {...domProps}>
-      <div ref={trackRef} className="flex flex-nowrap whitespace-nowrap min-w-max shrink-0">
+      <div
+        ref={trackRef}
+        className="flex flex-nowrap whitespace-nowrap min-w-max shrink-0"
+        style={{
+          willChange: 'transform',
+          transform: 'translate3d(0px, 0px, 0px)',
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+        }}
+      >
         <div className="shrink-0 flex items-center pr-8">{children}</div>
         <div className="shrink-0 flex items-center pr-8" aria-hidden="true">{children}</div>
         <div className="shrink-0 flex items-center pr-8" aria-hidden="true">{children}</div>

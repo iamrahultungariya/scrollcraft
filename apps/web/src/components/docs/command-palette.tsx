@@ -127,14 +127,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 sm:pt-28 px-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity animate-in fade-in duration-150"
+        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity animate-in fade-in duration-[250ms]"
         onClick={onClose}
       />
 
       {/* Modal Dialog */}
       <div 
         onWheel={(e) => e.stopPropagation()}
-        className="relative w-full max-w-xl rounded-2xl bg-[#09090b] border border-zinc-800 shadow-2xl overflow-hidden z-10 flex flex-col max-h-[75vh] animate-in zoom-in-95 duration-150"
+        className="relative w-full max-w-xl rounded-2xl bg-[#09090b] border border-zinc-800 shadow-2xl overflow-hidden z-10 flex flex-col max-h-[75vh] animate-in zoom-in-[0.96] duration-[250ms] [transition-timing-function:var(--ease-smooth-out)]"
       >
         {/* Search Input Bar */}
         <div className="flex items-center gap-3 px-4 py-3.5 border-b border-zinc-800 bg-[#0c0c0e]">
