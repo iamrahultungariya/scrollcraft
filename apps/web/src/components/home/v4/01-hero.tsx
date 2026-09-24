@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Terminal, Copy, Check, ArrowRight, Activity, Cpu, Zap, ShieldCheck } from 'lucide-react';
+import { Copy, Check, ArrowRight, Activity, Cpu, Zap, ShieldCheck } from 'lucide-react';
 
 export function HeroSection() {
   const [copied, setCopied] = useState(false);

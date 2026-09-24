@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Terminal, Copy, Check, ArrowRight, BookOpen, FlaskConical } from 'lucide-react';
+import { Copy, Check, ArrowRight, BookOpen, FlaskConical } from 'lucide-react';
 
 export function FinalCTASection() {
   const [copied, setCopied] = useState(false);

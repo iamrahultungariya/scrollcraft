@@ -1,8 +1,8 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Parallax, Reveal } from '@scrollcraft/react';
+
 import { ArrowUpRight, Copy, Check, Layers, Eye, PinIcon, Repeat } from 'lucide-react';
 
 interface PrimitiveCard {
