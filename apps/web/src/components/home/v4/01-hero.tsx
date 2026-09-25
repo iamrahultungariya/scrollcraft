@@ -1,14 +1,40 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Reveal, Parallax, VelocityMarquee } from '@scrollcraft/react';
-import { Terminal, Copy, Check, ArrowRight, Activity, Cpu, Zap, ShieldCheck } from 'lucide-react';
+import { Reveal } from '@scrollcraft/react';
+import { Copy, Check, ArrowRight, BookOpen } from 'lucide-react';
+import { GithubIcon } from '@/components/ui/social-icons';
+
+const STATS = [
+  { value: '4.8 kB', label: 'gzipped core' },
+  { value: '0', label: 'VDOM re-renders' },
+  { value: '120', label: 'FPS native sync' },
+  { value: '4', label: 'phase engine loop' },
+];
+
+const FEATURE_GRID = [
+  {
+    heading: 'Zero Re-renders',
+    body: 'Hardware GPU transform writes bypass React reconciliation entirely. Scroll events never touch the VDOM.',
+  },
+  {
+    heading: 'Composable Primitives',
+    body: '<Parallax />, <Reveal />, <Pin />, <VelocityMarquee /> — each configurable via props, each tree-shakable.',
+  },
+  {
+    heading: 'Native ViewTimeline',
+    body: 'Runs on the compositor thread when the browser supports it. Falls back to a JS driver transparently.',
+  },
+  {
+    heading: 'SSR & Next.js Ready',
+    body: 'Zero-FOUC hydration lifecycle. Works with React 19, Next.js App Router, and Turbopack out of the box.',
+  },
+];
 
 export function HeroSection() {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'npm' | 'pnpm' | 'bun'>('npm');
-  const [telemetry, setTelemetry] = useState({ fps: 120, velocity: 0, state: 'IDLE' });
 
   const installCmds = {
     npm: 'npm i @scrollcraft/react @scrollcraft/core',
@@ -22,163 +48,160 @@ export function HeroSection() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  useEffect(() => {
-    let lastY = window.scrollY;
-    let lastTime = performance.now();
-    const handleScroll = () => {
-      const now = performance.now();
-      const currentY = window.scrollY;
-      const dt = Math.max(1, now - lastTime);
-      const vel = Math.abs(currentY - lastY) / dt;
-      setTelemetry({
-        fps: 120,
-        velocity: Number(vel.toFixed(2)),
-        state: vel > 0.05 ? 'ACTIVE' : 'IDLE',
-      });
-      lastY = currentY;
-      lastTime = now;
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
-    <section className="relative w-full min-h-[96vh] flex flex-col justify-between items-center px-4 sm:px-6 lg:px-8 pt-28 pb-12 overflow-hidden bg-[#050505]">
-      {/* Dogfooded Decorative Parallax Layer 1 (Left floating HUD stamp) */}
-      <Parallax speed={-0.18} className="absolute left-6 top-36 hidden lg:block pointer-events-none z-0">
-        <div className="p-3 rounded-lg border border-zinc-800/50 bg-zinc-950/60 backdrop-blur-md font-mono text-[10px] text-zinc-600 space-y-1">
-          <div>DRIVER // LENIS_VIRTUAL</div>
-          <div>SOLVER // WEAKMAP_REGISTRY</div>
-          <div>FRAME // 120HZ_LOCKED</div>
+    <section className="relative w-full bg-[#0a0a0a] border-b border-[#1c1c1e]">
+      {/* Top rule */}
+      <div className="border-b border-[#1c1c1e]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-3 flex items-center justify-between">
+          <span className="text-[11px] font-mono text-[#52525b] tracking-[0.18em] uppercase">
+            ScrollCraft — v0.2.0 Beta
+          </span>
+          <span className="text-[11px] font-mono text-[#52525b]">
+            The Zero-VDOM Scroll Engine
+          </span>
         </div>
-      </Parallax>
-
-      {/* Dogfooded Decorative Parallax Layer 2 (Right floating matrix stamp) */}
-      <Parallax speed={0.22} className="absolute right-8 top-48 hidden lg:block pointer-events-none z-0">
-        <div className="p-3 rounded-lg border border-zinc-800/50 bg-zinc-950/60 backdrop-blur-md font-mono text-[10px] text-zinc-600 space-y-1">
-          <div>RECONCILER // BYPASS_VDOM</div>
-          <div>TRANSFORM // GPU_COMPOSITE</div>
-          <div>SUBPIXEL // SETTLED_AUTO</div>
-        </div>
-      </Parallax>
-
-      {/* Subtle Grid Backdrop */}
-      <div 
-        className="absolute inset-0 pointer-events-none opacity-[0.035]"
-        style={{
-          backgroundImage: 'linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)',
-          backgroundSize: '64px 64px',
-        }}
-      />
-
-      {/* Radial Center Ambient Glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[720px] h-[380px] bg-gradient-to-b from-violet-600/10 via-zinc-800/10 to-transparent blur-3xl pointer-events-none -z-10" />
-
-      <div className="w-full max-w-5xl flex flex-col items-center text-center relative z-10 my-auto">
-        {/* Live Engine HUD Badge */}
-        <Reveal effect="fade-up" duration={450}>
-          <div className="inline-flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-zinc-900/90 border border-zinc-800/80 backdrop-blur-md text-xs font-mono text-zinc-400 mb-8 shadow-sm">
-            <span className="flex items-center gap-1.5">
-              <span className={`w-2 h-2 rounded-full ${telemetry.state === 'ACTIVE' ? 'bg-emerald-400 animate-pulse' : 'bg-zinc-500'}`} />
-              ENGINE {telemetry.state}
-            </span>
-            <span className="w-px h-3 bg-zinc-700" />
-            <span className="text-zinc-300">120 FPS</span>
-            <span className="w-px h-3 bg-zinc-700" />
-            <span className="text-zinc-400">{telemetry.velocity} px/ms</span>
-            <span className="w-px h-3 bg-zinc-700 hidden sm:inline" />
-            <span className="text-emerald-400 hidden sm:inline">ZERO VDOM OVERHEAD</span>
-          </div>
-        </Reveal>
-
-        {/* Main Title with Reveal */}
-        <Reveal effect="fade-up" duration={600} delay={100}>
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white max-w-4xl leading-[1.08] font-sans">
-            The Zero-VDOM Scroll Engine for <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 via-zinc-400 to-zinc-600">React</span>.
-          </h1>
-        </Reveal>
-
-        {/* Subhead with Reveal */}
-        <Reveal effect="fade-up" duration={600} delay={200}>
-          <p className="mt-6 text-base sm:text-lg md:text-xl text-zinc-400 max-w-2xl leading-relaxed font-sans font-normal mx-auto">
-            Composable primitives and low-level reactive hooks that write hardware transforms directly to the GPU layer. Silky 120 FPS motion without per-frame React reconciliation.
-          </p>
-        </Reveal>
-
-        {/* Install Terminal Box */}
-        <Reveal effect="fade-up" duration={600} delay={300} className="w-full max-w-lg mt-10">
-          <div className="w-full bg-zinc-950/90 border border-zinc-800/90 rounded-xl p-2.5 shadow-2xl backdrop-blur-xl">
-            <div className="flex items-center justify-between pb-2 px-2 border-b border-zinc-900">
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
-                <div className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
-                <div className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
-                <span className="ml-2 text-[11px] font-mono text-zinc-500">install package</span>
-              </div>
-              <div className="flex gap-1">
-                {(['npm', 'pnpm', 'bun'] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors ${
-                      activeTab === tab ? 'bg-zinc-800 text-zinc-200' : 'text-zinc-500 hover:text-zinc-300'
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center justify-between px-3 py-2.5 mt-1 font-mono text-xs sm:text-sm text-zinc-200">
-              <span className="select-all truncate text-zinc-300 font-mono">
-                <span className="text-zinc-600 mr-2">$</span>
-                {installCmds[activeTab]}
-              </span>
-              <button
-                onClick={copyInstall}
-                className="ml-3 p-1.5 rounded-md hover:bg-zinc-800/80 text-zinc-400 hover:text-white transition-colors flex-shrink-0"
-                title="Copy to clipboard"
-              >
-                {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-        </Reveal>
-
-        {/* CTA Buttons */}
-        <Reveal effect="fade-up" duration={600} delay={380}>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/test"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-black font-medium text-sm hover:bg-zinc-200 transition-all shadow-md active:scale-[0.98]"
-            >
-              Launch Interactive Lab
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/docs"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 font-medium text-sm hover:bg-zinc-800/80 hover:text-white transition-all active:scale-[0.98]"
-            >
-              Documentation
-            </Link>
-          </div>
-        </Reveal>
       </div>
 
-      {/* Live Dogfooded Velocity Marquee at bottom of Hero */}
-      <div className="w-full border-t border-zinc-900/80 pt-6 mt-12 overflow-hidden">
-        <VelocityMarquee baseVelocity={1} velocityFactor={2.2} className="font-mono text-xs text-zinc-500 uppercase tracking-widest">
-          <span className="mx-6 text-zinc-400">⚡ ZERO VDOM RE-RENDERS</span>
-          <span className="mx-6 text-zinc-600">•</span>
-          <span className="mx-6 text-zinc-400">120 FPS FLUID MOTION</span>
-          <span className="mx-6 text-zinc-600">•</span>
-          <span className="mx-6 text-zinc-400">WEAKMAP SPATIAL REGISTRY</span>
-          <span className="mx-6 text-zinc-600">•</span>
-          <span className="mx-6 text-zinc-400">SUBPIXEL VELOCITY SETTLING</span>
-          <span className="mx-6 text-zinc-600">•</span>
-          <span className="mx-6 text-zinc-400">NEXT.JS APP ROUTER & REACT 19</span>
-          <span className="mx-6 text-zinc-600">•</span>
-        </VelocityMarquee>
+      {/* Hero content */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        {/* Main hero grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-0 border-b border-[#1c1c1e]">
+          {/* Left: Big headline */}
+          <div className="py-16 lg:py-24 pr-0 lg:pr-16 lg:border-r border-[#1c1c1e]">
+            <Reveal duration={0.45}>
+              <div className="mb-6 inline-flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6]" />
+                <span className="text-[11px] font-mono text-[#71717a] uppercase tracking-[0.2em]">
+                  Performance-first · React 19 · Next.js App Router
+                </span>
+              </div>
+            </Reveal>
+
+            <Reveal duration={0.5} delay={0.06}>
+              <h1 className="text-[3rem] sm:text-[4rem] lg:text-[4.75rem] font-bold tracking-[-0.03em] text-white leading-[1.02] font-sans">
+                The scroll engine<br />
+                React deserves.
+              </h1>
+            </Reveal>
+
+            <Reveal duration={0.5} delay={0.12}>
+              <p className="mt-6 text-base text-[#a1a1aa] max-w-lg leading-[1.7] font-sans">
+                Composable primitives and low-level reactive hooks that write hardware transforms directly to the GPU layer. Silky 120 FPS motion — no per-frame React reconciliation.
+              </p>
+            </Reveal>
+
+            {/* Install block */}
+            <Reveal duration={0.5} delay={0.18}>
+              <div className="mt-10 max-w-lg">
+                <div className="border border-[#2a2a2e] bg-[#111113] rounded-lg overflow-hidden">
+                  {/* Tab bar */}
+                  <div className="flex items-center border-b border-[#1c1c1e] px-3 py-2 gap-1">
+                    {(['npm', 'pnpm', 'bun'] as const).map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`px-3 py-1 rounded text-[11px] font-mono transition-colors cursor-pointer ${
+                          activeTab === tab
+                            ? 'bg-[#1c1c1e] text-white'
+                            : 'text-[#71717a] hover:text-[#a1a1aa]'
+                        }`}
+                      >
+                        {tab}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Command */}
+                  <div className="flex items-center justify-between px-4 py-3">
+                    <div className="flex items-center gap-2 overflow-x-auto font-mono text-sm">
+                      <span className="text-[#52525b] select-none shrink-0">$</span>
+                      <span className="text-[#e4e4e7] select-all whitespace-nowrap">
+                        {installCmds[activeTab]}
+                      </span>
+                    </div>
+                    <button
+                      onClick={copyInstall}
+                      className="ml-3 p-1.5 rounded hover:bg-[#1c1c1e] text-[#52525b] hover:text-white transition-colors cursor-pointer shrink-0"
+                      title="Copy command"
+                    >
+                      {copied ? (
+                        <Check className="w-3.5 h-3.5 text-[#3b82f6]" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* CTA buttons */}
+            <Reveal duration={0.5} delay={0.24}>
+              <div className="mt-7 flex flex-wrap items-center gap-3">
+                <Link
+                  href="/docs"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-black text-sm font-semibold rounded-lg hover:bg-[#e4e4e7] transition-colors"
+                >
+                  Get Started
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link
+                  href="/docs"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#2a2a2e] text-[#a1a1aa] text-sm font-medium rounded-lg hover:border-[#3f3f46] hover:text-white transition-colors"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  Documentation
+                </Link>
+                <a
+                  href="https://github.com/ScrollCraft/scrollcraft"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#2a2a2e] text-[#a1a1aa] text-sm font-medium rounded-lg hover:border-[#3f3f46] hover:text-white transition-colors"
+                >
+                  <GithubIcon className="w-4 h-4" />
+                  Star on GitHub
+                  <span className="text-[10px] px-1.5 py-0.5 bg-[#1c1c1e] text-[#71717a] font-mono rounded">2.1k</span>
+                </a>
+              </div>
+            </Reveal>
+          </div>
+
+          {/* Right: Stats column */}
+          <Reveal duration={0.5} delay={0.1}>
+            <div className="hidden lg:flex flex-col divide-y divide-[#1c1c1e] py-24">
+              {STATS.map((stat) => (
+                <div key={stat.label} className="flex-1 flex flex-col justify-center px-8">
+                  <div className="text-[2.5rem] font-bold text-white tracking-[-0.04em] font-sans leading-none tabular-nums">
+                    {stat.value}
+                  </div>
+                  <div className="mt-1.5 text-xs text-[#71717a] font-sans uppercase tracking-[0.12em]">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+
+        {/* Feature grid — 4 columns below the fold */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[#1c1c1e] border-b border-[#1c1c1e]">
+          {FEATURE_GRID.map((item, i) => (
+            <Reveal key={item.heading} duration={0.45} delay={i * 0.06}>
+              <div className="py-10 px-7 group">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-[10px] font-mono text-[#3b82f6] uppercase tracking-[0.18em]">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                </div>
+                <h3 className="text-sm font-semibold text-white mb-2.5 font-sans">
+                  {item.heading}
+                </h3>
+                <p className="text-xs text-[#71717a] leading-[1.75] font-sans">
+                  {item.body}
+                </p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );

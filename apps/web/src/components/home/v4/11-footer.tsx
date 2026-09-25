@@ -4,52 +4,90 @@ import React from 'react';
 import Link from 'next/link';
 import { ScrollCraftEmblem } from '@/components/ui/scrollcraft-logo';
 
+const NAV_COLS = [
+  {
+    heading: 'Product',
+    links: [
+      { href: '/docs', label: 'Documentation' },
+      { href: '/showcase', label: 'Showcase' },
+      { href: '/roadmap', label: 'Roadmap' },
+      { href: '/test', label: 'Test Lab' },
+    ],
+  },
+  {
+    heading: 'Community',
+    links: [
+      { href: 'https://discord.gg/scrollcraft', label: 'Discord', external: true },
+      { href: 'https://github.com/ScrollCraft/scrollcraft', label: 'GitHub', external: true },
+      { href: 'https://twitter.com/scrollcraft', label: 'Twitter', external: true },
+    ],
+  },
+  {
+    heading: 'Legal',
+    links: [
+      { href: '#', label: 'MIT License' },
+      { href: '#', label: 'Privacy' },
+    ],
+  },
+];
+
 export function Footer() {
   return (
-    <footer className="w-full bg-[#050505] border-t border-white/5 pt-12 pb-28 md:py-12 px-4 sm:px-6">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8 md:gap-0">
-        
-        <div className="flex flex-col gap-2">
-          <Link href="/" className="flex items-center gap-2.5">
-            <ScrollCraftEmblem size={24} />
-            <span className="text-xl font-bold text-white tracking-tight">ScrollCraft</span>
-          </Link>
-          <p className="text-sm text-zinc-500">
-            The declarative React scroll engine.
-          </p>
+    <footer className="w-full bg-[#0a0a0a] border-t border-[#1c1c1e]">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        {/* Main footer grid */}
+        <div className="py-14 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-12 border-b border-[#1c1c1e]">
+          {/* Brand */}
+          <div>
+            <Link href="/" className="flex items-center gap-2.5 mb-4">
+              <ScrollCraftEmblem size={22} />
+              <span className="text-base font-bold text-white tracking-tight">ScrollCraft</span>
+            </Link>
+            <p className="text-sm text-[#52525b] max-w-xs leading-[1.7] font-sans">
+              The declarative React scroll engine. Zero VDOM re-renders. 120 FPS native GPU sync.
+            </p>
+          </div>
+
+          {/* Nav columns */}
+          <div className="flex flex-wrap gap-12">
+            {NAV_COLS.map((col) => (
+              <div key={col.heading}>
+                <div className="text-[10px] font-mono text-[#52525b] uppercase tracking-[0.18em] mb-4">
+                  {col.heading}
+                </div>
+                <div className="flex flex-col gap-2.5">
+                  {col.links.map((link) =>
+                    'external' in link && link.external ? (
+                      <a
+                        key={link.href}
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-[#71717a] hover:text-white transition-colors font-sans"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className="text-sm text-[#71717a] hover:text-white transition-colors font-sans"
+                      >
+                        {link.label}
+                      </Link>
+                    )
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="flex flex-wrap gap-4 sm:gap-8 text-sm font-medium text-zinc-400">
-          <Link href="/docs" className="hover:text-white transition-colors">Documentation</Link>
-          <Link href="/showcase" className="hover:text-white transition-colors">Showcase</Link>
-          <Link href="/roadmap" className="hover:text-white transition-colors">Roadmap</Link>
-          <Link href="/test" className="hover:text-white transition-colors">Test Lab</Link>
+        {/* Bottom bar */}
+        <div className="py-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px] text-[#3f3f46] font-mono">
+          <span>&copy; {new Date().getFullYear()} ScrollCraft (v0.2.0 Beta). MIT Licensed.</span>
+          <span>Make the web move.</span>
         </div>
-
-        <div className="flex items-center gap-6 text-sm font-medium text-zinc-400">
-          <a
-            href="https://discord.gg/scrollcraft"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-white transition-colors"
-          >
-            Discord
-          </a>
-          <a
-            href="https://github.com/ScrollCraft/scrollcraft"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-white transition-colors flex items-center gap-2"
-          >
-            GitHub
-          </a>
-        </div>
-        
-      </div>
-      
-      <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-4 text-xs text-zinc-600">
-        <span>&copy; {new Date().getFullYear()} ScrollCraft (v0.2.0 Beta). MIT Licensed. Physics inspired by Studio Freight&apos;s Lenis.</span>
-        <span>Make the web move.</span>
       </div>
     </footer>
   );

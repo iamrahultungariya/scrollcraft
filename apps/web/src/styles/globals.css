@@ -16,8 +16,8 @@
 
   html,
   body {
-    background-color: #050505;
-    color: #f4f4f5;
+    background-color: #0a0a0a;
+    color: #e4e4e7;
     font-family: var(--font-sans, 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -37,8 +37,8 @@
   }
 
   ::selection {
-    background: rgba(124, 58, 237, 0.3);
-    color: #ede9fe;
+    background: #1c1c1e;
+    color: #ffffff;
   }
 
   /* Minimalist Obsidian Scrollbar */

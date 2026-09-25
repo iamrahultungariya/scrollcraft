@@ -10,14 +10,17 @@ import {
 } from '@/components/home/v4';
 
 // Code-split below-the-fold sections for instant initial render
-const HooksRawSection = dynamic(
-  () => import('@/components/home/v4/03-hooks-raw').then((m) => m.HooksRawSection)
+const PinnedEngineSection = dynamic(
+  () => import('@/components/home/v4/03-pinned-engine').then((m) => m.PinnedEngineSection)
 );
-const EngineArchitectureSection = dynamic(
-  () => import('@/components/home/v4/04-engine-arch').then((m) => m.EngineArchitectureSection)
+const HooksDeveloperSection = dynamic(
+  () => import('@/components/home/v4/04-hooks-developer').then((m) => m.HooksDeveloperSection)
 );
-const R3FPreviewSection = dynamic(
-  () => import('@/components/home/v4/05-r3f-preview').then((m) => m.R3FPreviewSection)
+const BenchmarksSection = dynamic(
+  () => import('@/components/home/v4/05-benchmarks').then((m) => m.BenchmarksSection)
+);
+const MomentumStripSection = dynamic(
+  () => import('@/components/home/v4/06-momentum-strip').then((m) => m.MomentumStripSection)
 );
 const FinalCTASection = dynamic(
   () => import('@/components/home/v4/07-final-cta').then((m) => m.FinalCTASection)
@@ -30,7 +33,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="relative w-full min-h-screen bg-[#050505] text-zinc-100 overflow-x-clip selection:bg-zinc-800 selection:text-white font-sans antialiased">
+    <div className="relative w-full min-h-screen bg-[#0a0a0a] text-[#e4e4e7] overflow-x-clip selection:bg-[#1c1c1e] selection:text-white font-sans antialiased">
       {/* Keyboard Accessibility Skip Link */}
       <a
         href="#main-content"
@@ -42,22 +45,25 @@ export default function HomePage() {
       <Navbar />
       
       <main id="main-content" className="flex flex-col w-full items-center justify-start">
-        {/* Section 1: Hero */}
+        {/* Section 1: Hero with 3D Spatial Multi-Plane Stage & Logo Cloud */}
         <HeroSection />
 
-        {/* Section 2: Primitives Showcase */}
+        {/* Section 2: Declarative Primitives Showcase */}
         <PrimitivesShowcase />
 
-        {/* Section 3: Raw Hooks */}
-        <HooksRawSection />
+        {/* Section 3: 4-Phase Game Engine Loop (Dogfooded via <Pin />) */}
+        <PinnedEngineSection />
 
-        {/* Section 4: Engine & 4-Phase Architecture */}
-        <EngineArchitectureSection />
+        {/* Section 4: Headless Reactive Hooks & Live Telemetry */}
+        <HooksDeveloperSection />
 
-        {/* Section 5: R3F Canvas Stage */}
-        <R3FPreviewSection />
+        {/* Section 5: Head-to-Head Architecture Benchmarks */}
+        <BenchmarksSection />
 
-        {/* Section 6: Final CTA & Install */}
+        {/* Section 6: Scroll Momentum Velocity Marquee Ticker */}
+        <MomentumStripSection />
+
+        {/* Section 7: Final Production CTA & Test Lab */}
         <FinalCTASection />
       </main>
 
