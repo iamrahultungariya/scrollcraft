@@ -66,16 +66,62 @@ import { ScrollProgress } from '@scrollcraft/react';
 <ScrollProgress className="fixed top-0 left-0 right-0 h-1 bg-violet-600 origin-left" />
 ```
 
+### `<ScrollTransform>`
+Direct GPU multi-property compositor interpolator (scale, opacity, 3D tilt, rotation):
+
+```tsx
+import { ScrollTransform } from '@scrollcraft/react';
+
+<ScrollTransform preset="3d-flip" start="top center" end="bottom top">
+  <div className="card">Hardware Compositor Morph</div>
+</ScrollTransform>
+```
+
+### `<ScrollDraw>`
+Universal SVG geometry line-drawing scrubber for vectors, paths, polylines, and circles:
+
+```tsx
+import { ScrollDraw } from '@scrollcraft/react';
+
+<ScrollDraw start="top 75%" end="center center">
+  <path d="M 50 150 C 250 50, 450 250, 650 150" stroke="#8b5cf6" strokeWidth="4" fill="none" />
+</ScrollDraw>
+```
+
+---
+
+## High-Performance Components & DevTools
+
+- `<VelocityMarquee />`: Kinetic continuous marquee accelerating dynamically with scroll velocity.
+- `<HorizontalScroll />`: Pinned horizontal gallery converting vertical scroll into smooth horizontal track translation.
+- `<ScrollSequence />`: Canvas-based high-DPI image sequence scrubber with automatic frame preloading.
+- `<TextReveal />`: Split-text reveal by word, character, or line with SSR zero-layout-shift fallback.
+- `<Magnetic />`: Cursor proximity magnetic spring physics with automatic bounce-back.
+- `<SkewGallery />`: Scroll velocity-reactive image gallery with dynamic angular shear deformation.
+- `<StackedCards />`: Pinned 3D card deck with automatic height calculation and depth-gated pointer events.
+- `<ScrollInspector />`: Development HUD featuring frame-drop telemetry ribbon, live spring tuner, and trigger visualizer.
+
 ---
 
 ## Headless Hooks
 
 For direct ref control with zero component re-renders:
 
-- `useScrollProgress()`: Returns normalized progress (`0–1`), direction (`'up' | 'down'`), and instantaneous scroll velocity.
-- `useParallax({ speed })`: Returns element ref and calculated transform offsets.
-- `useReveal({ threshold, delay })`: Returns element ref and `inView` status.
-- `usePin({ start, end })`: Returns container ref, `isPinned` boolean, and relative pin progression.
+- `useScrollProgress()`: Returns normalized progress (`0–1`), direction, velocity, and observable `progressValue`.
+- `useParallax(ref, options)`: Headless multi-layer subpixel displacement.
+- `useReveal(ref, options)`: Batched IntersectionObserver entrance trigger.
+- `usePin(ref, options)`: Sticky viewport locking and travel budget tracking.
+- `useScrollTransform(ref, options)`: Headless multi-property style map interpolation.
+- `useScrollDraw(ref, options)`: Dynamic SVG path length measurement and stroke scrub.
+- `useMagnetic(options)`: Cursor spring-physics pull attached to element ref.
+- `useScrollTimeline(ref, options)`: Multi-stage normalized keyframe sequencing.
+- `useScrollDirection(options)`: Hysteresis-gated direction detection with iOS rubber-band guard.
+- `useTicker(callback, phase)`: Direct subscription to the 4-phase microtask game loop.
+- `useRenderTracker(name)`: Dev-mode audit utility verifying the zero-re-render invariant.
+- `useScrollRestoration(options)`: Eliminates Next.js App Router scroll jumps on route transitions.
+- `useTextReveal(ref, options)`: Headless split-text token animator.
+- `useScrollCraft()`: Direct context access to the core engine instance and controls.
+- `useScrollState(selector)`: Fine-grained slice subscription backed by `useSyncExternalStore`.
 
 ---
 

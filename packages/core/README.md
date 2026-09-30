@@ -22,11 +22,24 @@ pnpm add @scrollcraft/core
 
 ## Features
 
-- **3-Phase Ticker**: Deterministic `Measure -> Update -> Render` execution loop prevents layout thrashing.
-- **Inertia Normalizer**: Virtual inertia physics inspired by Lenis, normalizing trackpad and wheel inputs into ScrollCraft's multi-phase ticker.
-- **Timeline Solver**: High-precision progress mapping across arbitrary viewport and element intersections.
-- **Pin Solver**: Sticky-pinning calculations and pin-spacing geometry.
-- **DOM Compositor**: Direct ref-based hardware-accelerated style mutations (`transform`, `opacity`) bypassing framework re-renders.
+- **4-Phase Engine Ticker**: Deterministic `Measure -> Driver -> Update -> Flush` execution loop guarantees strict read/write layout separation and eliminates forced reflow cascades.
+- **FastTransformBuffer**: Zero-allocation numeric matrix buffer applying `translate3d`, `scale`, and `rotate` directly with velocity-gated subpixel snapping.
+- **Inertia Normalizer**: Virtual inertia physics inspired by Lenis, normalizing trackpad, wheel, and touch inputs into high-precision subpixel trajectories.
+- **SpatialRegistry**: Shared ResizeObserver pool with WeakMap caching that automatically invalidates trigger bounds upon layout shifts without memory leaks.
+- **VisibilityManager**: Frustum culling and sleep mode that pauses offscreen calculations and puts the engine to sleep during scroll idle.
+- **Kinetic Solvers & Controllers**:
+  - `PinningController`: Ghost-spacer pinning with clipping-ancestor detection and zero DOM distortion.
+  - `ParallaxController`: Multi-plane subpixel speed differential calculations.
+  - `RevealController`: Batched viewport intersection observer tracking.
+  - `StackedCardsSolver`: Pinned 3D card deck layout with depth-gated pointer events.
+  - `TransformSolver`: Multi-property curve interpolator (scale, opacity, 3D tilt, rotation).
+  - `DrawSolver`: Vector path measurement and normalized stroke scrubbing.
+  - `HorizontalScrollController`: Pinned vertical-to-horizontal translation converter.
+  - `VelocityMarqueeController`: Dynamic velocity-reactive endless ribbon loop.
+  - `ImageSequenceController`: High-framerate canvas frame scrubber with LRU caching.
+  - `MagneticController`: Physical spring-pointer proximity attraction and bounce-back.
+  - `AdaptiveQualityManager`: Real-time frame dropped-time monitoring with dynamic degradation levels.
+- **GSAP & CSS Standards Bridge**: Seamless bi-directional timeline interpolation and CSS ViewTimeline support.
 
 ---
 

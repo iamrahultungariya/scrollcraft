@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Reveal } from '@scrollcraft/react';
-import { Copy, Check, ExternalLink } from 'lucide-react';
+import { Copy, Check, ExternalLink, Code2 } from 'lucide-react';
 
 type HookKey = 'useScrollProgress' | 'useParallax' | 'useReveal' | 'usePin';
 type Framework = 'Next.js' | 'React';
@@ -12,6 +12,8 @@ interface HookDoc {
   name: string;
   badge: string;
   desc: string;
+  signature: string;
+  returns: string;
   code: Record<Framework, string>;
 }
 
@@ -20,6 +22,8 @@ const HOOKS: Record<HookKey, HookDoc> = {
     name: 'useScrollProgress()',
     badge: 'CONTINUOUS OBSERVABLE',
     desc: 'Provides continuous scroll progress [0.0 to 1.0], instantaneous subpixel velocity, and scroll direction vector.',
+    signature: 'useScrollProgress(options?: { smooth?: boolean; dampening?: number }): ScrollProgressState',
+    returns: '{ progress: number; velocity: number; direction: 1 | -1 | 0 }',
     code: {
       'Next.js': `'use client';
 
@@ -29,9 +33,9 @@ export function ScrollProgressBar() {
   const { progress, velocity } = useScrollProgress({ smooth: true });
 
   return (
-    <div className="fixed top-0 left-0 right-0 h-1 bg-zinc-900 z-50">
+    <div className="fixed top-0 left-0 right-0 h-1 bg-[#121214] z-50">
       <div
-        className="h-full bg-blue-500 origin-left"
+        className="h-full bg-[#3b82f6] origin-left"
         style={{ transform: \`scaleX(\${progress})\` }}
       />
     </div>
@@ -39,11 +43,11 @@ export function ScrollProgressBar() {
 }`,
       React: `import { useScrollProgress } from '@scrollcraft/react';
 
-export function TelemetryIndicator() {
+export function Indicator() {
   const { progress, velocity, direction } = useScrollProgress();
 
   return (
-    <div className="telemetry-chip font-mono">
+    <div className="font-mono text-xs">
       <span>Progress: {(progress * 100).toFixed(0)}%</span>
       <span>Velocity: {velocity.toFixed(2)} px/ms</span>
       <span>Direction: {direction > 0 ? 'DOWN' : 'UP'}</span>
@@ -56,6 +60,8 @@ export function TelemetryIndicator() {
     name: 'useParallax()',
     badge: 'HARDWARE TRANSFORM',
     desc: 'Computes velocity-aware hardware matrix transforms and binds directly to DOM element styles bypassing React reconciliation.',
+    signature: 'useParallax(ref: RefObject<HTMLElement>, options: ParallaxOptions): void',
+    returns: 'void (Mutates DOM style directly via GPU layer)',
     code: {
       'Next.js': `'use client';
 
@@ -100,6 +106,8 @@ export function ParallaxStack() {
     name: 'useReveal()',
     badge: 'SSR-SAFE ENTRANCES',
     desc: 'Coordinates IntersectionObserver pools for zero-FOUC entrance animations with atmospheric blur and automatic stagger sequencing.',
+    signature: 'useReveal(ref: RefObject<HTMLElement>, options?: RevealOptions): void',
+    returns: 'void (Observer pool manages active transitions)',
     code: {
       'Next.js': `'use client';
 
@@ -136,6 +144,8 @@ export function StaggeredDeck() {
     name: 'usePin()',
     badge: 'STICKY CONTAINMENT',
     desc: 'Smart layout containment engine that prefers native position: sticky with transform fallbacks and automatic ghost spacer teardown.',
+    signature: 'usePin(ref: RefObject<HTMLElement>, options?: PinOptions): PinHandle',
+    returns: '{ unpin: () => void; isPinned: boolean }',
     code: {
       'Next.js': `'use client';
 
@@ -189,19 +199,19 @@ function highlightCode(code: string): React.ReactNode {
       }
       const [full, str, tag, kw, prop, num, punct] = match;
       if (str) {
-        parts.push(<span key={`str-${match.index}`} className="text-[#6ee7b7]">{str}</span>);
+        parts.push(<span key={`str-${match.index}`} className="text-[#10b981]">{str}</span>);
       } else if (tag) {
         parts.push(<span key={`tag-${match.index}`} className="text-[#93c5fd] font-semibold">{tag}</span>);
       } else if (kw) {
-        parts.push(<span key={`kw-${match.index}`} className="text-[#c4b5fd] font-semibold">{kw}</span>);
+        parts.push(<span key={`kw-${match.index}`} className="text-[#3b82f6] font-semibold">{kw}</span>);
       } else if (prop) {
         parts.push(<span key={`prop-${match.index}`} className="text-[#c4b5fd]">{prop}</span>);
       } else if (num) {
-        parts.push(<span key={`num-${match.index}`} className="text-[#fcd34d]">{num}</span>);
+        parts.push(<span key={`num-${match.index}`} className="text-[#f59e0b]">{num}</span>);
       } else if (punct) {
         parts.push(<span key={`punct-${match.index}`} className="text-[#52525b]">{punct}</span>);
       } else {
-        parts.push(<span key={`other-${match.index}`} className="text-[#e4e4e7]">{full}</span>);
+        parts.push(<span key={`other-${match.index}`} className="text-[#fafafa]">{full}</span>);
       }
       lastIndex = tokenRegex.lastIndex;
     }
@@ -215,7 +225,7 @@ function highlightCode(code: string): React.ReactNode {
         <span className="w-6 shrink-0 text-right pr-3 select-none text-[#3f3f46] text-[11px]">
           {idx + 1}
         </span>
-        <span className="whitespace-pre text-[#e4e4e7]">
+        <span className="whitespace-pre text-[#fafafa]">
           {parts.length > 0 ? parts : <span>&nbsp;</span>}
         </span>
       </div>
@@ -228,31 +238,6 @@ export function HooksDeveloperSection() {
   const [activeFramework, setActiveFramework] = useState<Framework>('Next.js');
   const [copied, setCopied] = useState(false);
 
-  const velRef = useRef<HTMLSpanElement>(null);
-  const dirRef = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    let lastY = window.scrollY;
-    let lastTime = performance.now();
-
-    const onScroll = () => {
-      const now = performance.now();
-      const currentY = window.scrollY;
-      const dt = Math.max(1, now - lastTime);
-      const vel = Math.abs(currentY - lastY) / dt;
-      const dir = currentY >= lastY ? 'DOWN' : 'UP';
-
-      if (velRef.current) velRef.current.textContent = `${vel.toFixed(2)} px/ms`;
-      if (dirRef.current) dirRef.current.textContent = dir;
-
-      lastY = currentY;
-      lastTime = now;
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
   const current = HOOKS[activeHook];
   const currentCode = current.code[activeFramework];
 
@@ -263,23 +248,23 @@ export function HooksDeveloperSection() {
   };
 
   return (
-    <section className="relative w-full border-b border-[#1c1c1e] bg-[#0a0a0a]">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <section className="relative w-full border-b border-[#1c1c1f] bg-[#09090b]">
+      <div className="max-w-5xl mx-auto px-6 lg:px-8">
         {/* Section header */}
         <Reveal duration={0.45}>
-          <div className="py-14 border-b border-[#1c1c1e] flex flex-col md:flex-row md:items-end gap-6 justify-between">
+          <div className="py-14 border-b border-[#1c1c1f] flex flex-col md:flex-row md:items-end gap-6 justify-between">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6]" />
-                <span className="text-[11px] font-mono text-[#52525b] uppercase tracking-[0.18em]">
+                <span className="text-[11px] font-mono text-[#71717a] uppercase tracking-[0.2em]">
                   Headless Reactive Hooks
                 </span>
               </div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-[-0.025em] font-sans">
-                Prefer headless code?<br />Here&apos;s the raw data.
+              <h2 className="text-3xl sm:text-4xl font-bold text-[#fafafa] tracking-[-0.03em] font-sans">
+                Prefer headless code?<br />Direct reactive primitives.
               </h2>
             </div>
-            <p className="text-sm text-[#71717a] max-w-sm leading-[1.75] font-sans md:text-right">
+            <p className="text-sm text-[#a1a1aa] max-w-sm leading-[1.75] font-sans md:text-right">
               Composable reactive hooks exposing sub-frame scroll telemetry, mutable ref binds, and 4-phase microtask lifecycle events.
             </p>
           </div>
@@ -287,55 +272,62 @@ export function HooksDeveloperSection() {
 
         <div className="py-10">
           {/* Hook selector */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 border border-[#1c1c1e] rounded-lg overflow-hidden mb-6">
-            {(Object.keys(HOOKS) as HookKey[]).map((key, i) => {
+          <div className="grid grid-cols-2 sm:grid-cols-4 border border-[#27272a] rounded-lg overflow-hidden mb-6">
+            {(Object.keys(HOOKS) as HookKey[]).map((key) => {
               const h = HOOKS[key];
               const isSelected = activeHook === key;
               return (
                 <button
                   key={key}
                   onClick={() => setActiveHook(key)}
-                  className={`p-4 text-left font-mono transition-colors cursor-pointer border-r last:border-r-0 border-b sm:border-b-0 border-[#1c1c1e] ${
+                  className={`p-4 text-left font-mono transition-colors cursor-pointer border-r last:border-r-0 border-b sm:border-b-0 border-[#27272a] ${
                     isSelected
-                      ? 'bg-[#111113] text-white'
-                      : 'bg-[#0a0a0a] text-[#52525b] hover:text-[#a1a1aa] hover:bg-[#0d0d0f]'
+                      ? 'bg-[#18181b] text-white'
+                      : 'bg-[#121214] text-[#71717a] hover:text-[#a1a1aa] hover:bg-[#151518]'
                   }`}
                 >
                   <div className="text-xs font-semibold mb-1">{h.name}</div>
-                  <div className="text-[10px] text-[#52525b] uppercase truncate">{h.badge}</div>
+                  <div className="text-[10px] text-[#71717a] uppercase truncate">{h.badge}</div>
                 </button>
               );
             })}
           </div>
 
           {/* Code studio */}
-          <div className="border border-[#1c1c1e] rounded-lg overflow-hidden">
+          <div className="border border-[#27272a] rounded-lg overflow-hidden bg-[#121214]">
             {/* Studio header */}
-            <div className="px-5 py-4 border-b border-[#1c1c1e] bg-[#0d0d0f] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <div className="text-sm font-semibold text-white font-mono mb-0.5">{current.name}</div>
-                <div className="text-xs text-[#71717a]">{current.desc}</div>
+            <div className="px-5 py-4 border-b border-[#1c1c1f] bg-[#0d0d0f] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded bg-[#18181b] border border-[#27272a] text-[#3b82f6]">
+                  <Code2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-[#fafafa] font-mono mb-0.5">{current.name}</div>
+                  <div className="text-xs text-[#a1a1aa]">{current.desc}</div>
+                </div>
               </div>
+
               <div className="flex items-center gap-2">
                 {/* Framework switcher */}
-                <div className="flex items-center gap-0.5 bg-[#111113] border border-[#1c1c1e] rounded p-0.5">
+                <div className="flex items-center gap-0.5 bg-[#18181b] border border-[#27272a] rounded p-0.5">
                   {(['Next.js', 'React'] as const).map((fw) => (
                     <button
                       key={fw}
                       onClick={() => setActiveFramework(fw)}
                       className={`px-3 py-1 text-[11px] font-mono rounded transition-colors cursor-pointer ${
                         activeFramework === fw
-                          ? 'bg-[#1c1c1e] text-white'
-                          : 'text-[#52525b] hover:text-[#a1a1aa]'
+                          ? 'bg-[#27272a] text-white font-medium'
+                          : 'text-[#71717a] hover:text-[#a1a1aa]'
                       }`}
                     >
                       {fw}
                     </button>
                   ))}
                 </div>
+
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1.5 px-3 py-1.5 border border-[#1c1c1e] hover:border-[#2a2a2e] rounded text-xs font-mono text-[#71717a] hover:text-white transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 border border-[#27272a] hover:border-[#3f3f46] rounded text-xs font-mono text-[#a1a1aa] hover:text-white transition-colors cursor-pointer"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-[#3b82f6]" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? 'Copied' : 'Copy'}</span>
@@ -344,31 +336,21 @@ export function HooksDeveloperSection() {
             </div>
 
             {/* Code body */}
-            <div className="p-5 bg-[#0d0d0f] overflow-y-auto max-h-[380px] select-text">
+            <div className="p-5 bg-[#09090b] overflow-y-auto max-h-[380px] select-text">
               {highlightCode(currentCode)}
             </div>
 
-            {/* Live telemetry footer */}
-            <div className="px-5 py-3 border-t border-[#1c1c1e] bg-[#0d0d0f] flex flex-wrap items-center justify-between text-xs font-mono text-[#52525b] gap-4">
-              <div className="flex items-center gap-4">
-                <span className="flex items-center gap-1.5 text-[#a1a1aa]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6]" />
-                  LIVE HUD TELEMETRY
-                </span>
-                <span className="text-[#3f3f46]">//</span>
-                <span>
-                  VEL: <span ref={velRef} className="text-[#3b82f6]">0.00 px/ms</span>
-                </span>
-                <span className="text-[#3f3f46]">//</span>
-                <span>
-                  DIR: <span ref={dirRef} className="text-[#a1a1aa]">IDLE</span>
-                </span>
+            {/* API Contract & Return Signature Bar */}
+            <div className="px-5 py-3 border-t border-[#1c1c1f] bg-[#0d0d0f] flex flex-col sm:flex-row sm:items-center justify-between text-xs font-mono text-[#71717a] gap-3">
+              <div className="flex items-center gap-2 overflow-x-auto">
+                <span className="text-[#3b82f6] font-semibold">RETURN:</span>
+                <code className="text-[#a1a1aa] text-[11px]">{current.returns}</code>
               </div>
               <Link
                 href="/docs#hooks"
-                className="inline-flex items-center gap-1.5 text-[#52525b] hover:text-white transition-colors"
+                className="inline-flex items-center gap-1.5 text-[#71717a] hover:text-[#fafafa] transition-colors shrink-0"
               >
-                <span>Full Hook API Reference</span>
+                <span>Full Hook Specification</span>
                 <ExternalLink className="w-3 h-3" />
               </Link>
             </div>

@@ -277,10 +277,64 @@ export function Product360Canvas({ frames }: { frames: string[] }) {
     ],
   },
 
+  magnetic: {
+    name: 'Magnetic',
+    tag: '<Magnetic />',
+    status: 'Beta',
+    code: `import { Magnetic } from '@scrollcraft/react';
+
+export function MagneticCTA() {
+  return (
+    <Magnetic strength={0.35} radius={120} stiffness={180} damping={18}>
+      <button className="px-6 py-3 rounded-full bg-violet-600 text-white font-medium shadow-lg hover:shadow-violet-500/25">
+        Explore Engine
+      </button>
+    </Magnetic>
+  );
+}`,
+    whatItDoes: 'Attaches spring-physics cursor pull to an element with automatic spring-back on cursor departure.',
+    capabilities: [
+      { prop: 'strength', type: 'number', defaultValue: '0.3', desc: 'Magnetic attraction intensity towards pointer position.' },
+      { prop: 'radius', type: 'number', defaultValue: '150', desc: 'Detection threshold in pixels detecting pointer proximity.' },
+      { prop: 'stiffness', type: 'number', defaultValue: '150', desc: 'Physics spring stiffness constant.' },
+      { prop: 'damping', type: 'number', defaultValue: '15', desc: 'Physics spring damping resistance.' },
+      { prop: 'asChild', type: 'boolean', defaultValue: 'false', desc: 'Passes magnetic physics transform directly to child element.' },
+    ],
+  },
+
+  'skew-gallery': {
+    name: 'SkewGallery',
+    tag: '<SkewGallery />',
+    status: 'Beta',
+    code: `import { SkewGallery } from '@scrollcraft/react';
+
+const IMAGES = [
+  '/showcase/img1.webp',
+  '/showcase/img2.webp',
+  '/showcase/img3.webp',
+];
+
+export function VelocitySkewShowcase() {
+  return (
+    <SkewGallery
+      images={IMAGES}
+      intensity={1.8}
+      className="max-w-5xl mx-auto py-12"
+    />
+  );
+}`,
+    whatItDoes: 'Scroll velocity-reactive image gallery with dynamic skew angle deformation and smooth spring recovery.',
+    capabilities: [
+      { prop: 'images', type: 'string[]', defaultValue: 'required', desc: 'Array of image URLs rendered into velocity-skewed grid columns.' },
+      { prop: 'intensity', type: 'number', defaultValue: '1.8', desc: 'Skew sensitivity multiplier responsive to instantaneous scroll velocity.' },
+      { prop: 'className', type: 'string', defaultValue: "''", desc: 'CSS class names merged onto the outer grid container.' },
+    ],
+  },
+
   'stacked-cards': {
     name: 'StackedCards',
     tag: '<StackedCards />',
-    status: 'v0.2.0 (Coming Soon)',
+    status: 'Beta',
     code: `import { StackedCards } from '@scrollcraft/react';
 
 const CARDS = [
@@ -320,7 +374,7 @@ export function CardDeckSection() {
   'text-reveal': {
     name: 'TextReveal',
     tag: '<TextReveal />',
-    status: 'v0.2.0 (Coming Soon)',
+    status: 'Beta',
     code: `import { TextReveal } from '@scrollcraft/react';
 
 export function HeadlineReveal() {
@@ -351,7 +405,7 @@ export function HeadlineReveal() {
   'scroll-transform': {
     name: 'ScrollTransform',
     tag: '<ScrollTransform />',
-    status: 'v0.2.0 (Coming Soon)',
+    status: 'Beta',
     code: `import { ScrollTransform } from '@scrollcraft/react';
 
 export function DynamicMorphHero() {
@@ -382,7 +436,7 @@ export function DynamicMorphHero() {
   'scroll-draw': {
     name: 'ScrollDraw',
     tag: '<ScrollDraw />',
-    status: 'v0.2.0 (Coming Soon)',
+    status: 'Beta',
     code: `import { ScrollDraw } from '@scrollcraft/react';
 
 export function VectorPathScrub() {
@@ -413,7 +467,7 @@ export function VectorPathScrub() {
   'scroll-inspector': {
     name: 'ScrollInspector',
     tag: '<ScrollInspector />',
-    status: 'v0.2.0 (Coming Soon)',
+    status: 'Beta',
     code: `import { ScrollInspector } from '@scrollcraft/react';
 
 export function RootLayout({ children }: { children: React.ReactNode }) {

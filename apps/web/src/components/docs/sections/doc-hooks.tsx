@@ -201,7 +201,7 @@ export function MagneticButton() {
   'use-scroll-direction': {
     name: 'useScrollDirection',
     signature: 'useScrollDirection(options?: ScrollDirectionOptions)',
-    status: 'v0.2.0 (Coming Soon)',
+    status: 'Beta',
     code: `import { useScrollDirection } from '@scrollcraft/react';
 
 export function SmartNavbar() {
@@ -233,7 +233,7 @@ export function SmartNavbar() {
   'use-scroll-timeline': {
     name: 'useScrollTimeline',
     signature: 'useScrollTimeline<T>(targetRefOrOptions, keyframes?, options?)',
-    status: 'v0.2.0 (Coming Soon)',
+    status: 'Beta',
     code: `import { useScrollTimeline } from '@scrollcraft/react';
 
 export function KeyframeSequencer() {
@@ -263,7 +263,7 @@ export function KeyframeSequencer() {
   'use-scroll-transform': {
     name: 'useScrollTransform',
     signature: 'useScrollTransform<T>(targetRefOrOptions, options?)',
-    status: 'v0.2.0 (Coming Soon)',
+    status: 'Beta',
     code: `import { useScrollTransform } from '@scrollcraft/react';
 
 export function InterpolatedSection() {
@@ -292,7 +292,7 @@ export function InterpolatedSection() {
   'use-scroll-draw': {
     name: 'useScrollDraw',
     signature: 'useScrollDraw<T extends SVGGeometryElement>(targetRefOrOptions, options?)',
-    status: 'v0.2.0 (Coming Soon)',
+    status: 'Beta',
     code: `import { useScrollDraw } from '@scrollcraft/react';
 
 export function AnimatedLogo() {
@@ -321,7 +321,7 @@ export function AnimatedLogo() {
   'use-scroll-restoration': {
     name: 'useScrollRestoration',
     signature: 'useScrollRestoration(options?: ScrollRestorationOptions)',
-    status: 'v0.2.0 (Coming Soon)',
+    status: 'Beta',
     code: `import { useScrollRestoration } from '@scrollcraft/react';
 
 export function NavigationProvider({ children }: { children: React.ReactNode }) {
@@ -342,6 +342,73 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
       { param: 'killInertiaOnNavigate', type: 'boolean', desc: 'Immediately cancels lingering momentum from prior page upon route boundary transition (default: true).' },
       { param: 'maxRetries', type: 'number', desc: 'Number of frame retry checks for slow RSC streaming hydration before settling (default: 5).' },
       { param: 'storageKey', type: 'string', desc: 'Custom sessionStorage LRU cache key namespace (default: "__scrollcraft_restore__").' },
+    ],
+  },
+
+  'use-text-reveal': {
+    name: 'useTextReveal',
+    signature: 'useTextReveal<T>(targetRefOrOptions, options?)',
+    status: 'Beta',
+    code: `import { useRef } from 'react';
+import { useTextReveal } from '@scrollcraft/react';
+
+export function KineticTitle() {
+  const containerRef = useRef<HTMLHeadingElement>(null);
+  useTextReveal(containerRef, {
+    by: 'word',
+    stagger: 0.04,
+    scrub: true,
+  });
+
+  return <h1 ref={containerRef}>Hardware Accelerated Split Text</h1>;
+}`,
+    whatItDoes: 'Splits text into animated tokens (word, character, line) with direct GPU composite opacity and translateY.',
+    capabilities: [
+      { param: 'targetRef', type: 'RefObject<HTMLElement>', desc: 'Target text container ref.' },
+      { param: 'by', type: "'character' | 'word' | 'line'", desc: 'Token segmentation mode (default: "word").' },
+      { param: 'stagger', type: 'number', desc: 'Delay increment between tokens in seconds (default: 0.03).' },
+      { param: 'scrub', type: 'boolean', desc: 'Scrub tokens directly from scroll progress (default: true).' },
+    ],
+  },
+
+  'use-ticker': {
+    name: 'useTicker',
+    signature: 'useTicker(callback, phase?, deps?)',
+    status: 'Beta',
+    code: `import { useTicker } from '@scrollcraft/react';
+
+export function CanvasAnimation() {
+  useTicker((dt) => {
+    // Runs inside ScrollCraft deterministic 4-phase microtask loop
+    drawFrame(dt);
+  }, 'render');
+
+  return <canvas />;
+}`,
+    whatItDoes: 'Direct subscription to the ScrollCraft high-precision game-dev engine ticker without React re-renders.',
+    capabilities: [
+      { param: 'callback', type: '(dt: number) => void', desc: 'Hardware tick callback function with high-precision delta time.' },
+      { param: 'phase', type: "'measure' | 'driver' | 'update' | 'render'", desc: 'Execution loop phase (default: "update").' },
+      { param: 'deps', type: 'DependencyList', desc: 'React effect dependency array for callback lifecycle management.' },
+    ],
+  },
+
+  'use-render-tracker': {
+    name: 'useRenderTracker',
+    signature: 'useRenderTracker(componentName)',
+    status: 'Beta',
+    code: `import { useRenderTracker } from '@scrollcraft/react';
+
+export function HeavyWidget() {
+  // Logs warning in development console if component re-renders during active scroll
+  useRenderTracker('HeavyWidget');
+
+  return <div>Zero Re-Render Invariant</div>;
+}`,
+    whatItDoes: 'Dev-mode audit utility validating the zero-re-render invariant during high-frequency scroll gestures.',
+    capabilities: [
+      { param: 'componentName', type: 'string', desc: 'Name of component tracked in telemetry console.' },
+      { param: 'renderCount', type: 'number', desc: 'Total number of component render passes.' },
     ],
   },
 };

@@ -218,6 +218,9 @@ export function DocsView() {
         direction: 'use-scroll-direction',
         timeline: 'use-scroll-timeline',
         restoration: 'use-scroll-restoration',
+        magnetic: 'magnetic',
+        skew: 'skew-gallery',
+        gallery: 'skew-gallery',
       };
 
       const targetId = aliasMap[rawHash] || rawHash;
