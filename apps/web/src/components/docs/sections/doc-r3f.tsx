@@ -11,8 +11,9 @@
  */
 
 import React from 'react';
+import Link from 'next/link';
 import { CodeViewer } from '@/components/ui/code-viewer';
-import { Box, Zap } from 'lucide-react';
+import { Zap, ExternalLink, Box } from 'lucide-react';
 
 interface DocR3FProps {
   sectionId: string;
@@ -37,7 +38,7 @@ export function KineticMesh({ target }: { target: HTMLElement | null }) {
   return (
     <mesh ref={meshRef}>
       <icosahedronGeometry args={[1.5, 1]} />
-      <meshStandardMaterial wireframe color="#8b5cf6" />
+      <meshStandardMaterial wireframe color="#DFFF00" />
     </mesh>
   );
 }`;
@@ -53,57 +54,70 @@ const CAPABILITIES = [
 
 export const DocR3F: React.FC<DocR3FProps> = () => {
   return (
-    <div className="space-y-10 not-prose">
+    <div className="space-y-10 not-prose font-body">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-zinc-800 pb-6">
-        <div>
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-mono break-all sm:break-normal">
-              useScroll3D()
-            </h1>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-red-500/15 text-red-400 border border-red-500/30">
-              Alpha
-            </span>
+      <div className="border-b-2 border-line pb-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="border-2 border-line bg-bg inline-flex items-center gap-2 px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-accent shadow-rest w-fit">
+            <span className="w-2 h-2 bg-accent inline-block" />
+            <span>[CANVAS / R3F BRIDGE]</span>
           </div>
-          <p className="text-sm text-zinc-300 font-sans leading-relaxed">
-            <strong className="text-white">What it does:</strong> Pull-based Three.js scroll metrics bridge for R3F Canvas without double-pumping RequestAnimationFrame.
-          </p>
+
+          <Link
+            href="/test"
+            className="h-10 px-4 border-2 border-line bg-bg hover:bg-accent text-fg hover:text-black font-mono text-xs font-bold uppercase transition-all shadow-rest hover:shadow-hover hover:-translate-x-0.5 hover:-translate-y-0.5 inline-flex items-center gap-2 self-start sm:self-auto cursor-pointer"
+          >
+            <span>TEST IN LAB</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </Link>
         </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-accent tracking-tight font-mono uppercase">
+            useScroll3D()
+          </h1>
+          <span className="px-2.5 py-1 border-2 text-[10px] font-mono font-bold uppercase tracking-wider bg-bg text-muted border-line-soft">
+            Alpha
+          </span>
+        </div>
+        <p className="text-base text-fg/90 font-body leading-relaxed max-w-3xl">
+          <strong className="text-fg font-mono font-bold uppercase mr-1">WHAT IT DOES:</strong> Pull-based Three.js scroll metrics bridge for R3F Canvas without double-pumping RequestAnimationFrame.
+        </p>
       </div>
 
       {/* Minimal 5-10 Line Syntax Highlighted Code Snippet */}
       <div id="syntax" className="space-y-3 scroll-mt-24">
-        <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 block font-semibold">
-          Syntax &bull; 5–10 Line Reference
+        <span className="text-xs font-mono uppercase tracking-wider text-muted block font-bold">
+          SYNTAX &bull; 5–10 LINE REFERENCE
         </span>
         <CodeViewer code={R3F_CODE} fileName="use-scroll-3d.tsx" />
       </div>
 
-      {/* Capabilities & Options */}
+      {/* Capabilities & Options - NO PURPLE, 2 neutrals + 1 accent */}
       <div id="capabilities" className="space-y-4 pt-4 scroll-mt-24">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-400 font-semibold">
-            <Zap className="w-3.5 h-3.5 text-red-400" />
-            <span>Capabilities &amp; Parameters</span>
+          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted font-bold">
+            <Zap className="w-3.5 h-3.5 text-accent" />
+            <span>CAPABILITIES &amp; PARAMETERS</span>
           </div>
-          <span className="text-[10px] font-mono text-zinc-500 sm:hidden">Swipe table &rarr;</span>
+          <span className="text-[10px] font-mono text-muted sm:hidden">SWIPE TABLE &rarr;</span>
         </div>
 
-        <div className="rounded-xl border border-zinc-800 overflow-x-auto bg-[#0a0a0c]">
+        <div className="border-2 border-line bg-bg shadow-rest overflow-x-auto">
           <table className="w-full text-left text-xs font-mono min-w-[500px]">
-            <thead className="bg-zinc-900/80 text-zinc-400 border-b border-zinc-800">
+            <thead className="bg-line-soft/30 text-muted uppercase text-[11px] border-b-2 border-line font-bold">
               <tr>
-                <th className="px-4 py-2.5 font-semibold">Parameter / Method</th>
-                <th className="px-4 py-2.5 font-semibold">Type</th>
-                <th className="px-4 py-2.5 font-semibold">Description</th>
+                <th className="px-4 py-3 font-bold text-fg">PARAMETER / METHOD</th>
+                <th className="px-4 py-3 font-bold">TYPE</th>
+                <th className="px-4 py-3 font-bold">DESCRIPTION</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800/60 font-sans text-zinc-300">
+            <tbody className="divide-y-2 divide-line-soft font-mono">
               {CAPABILITIES.map((c) => (
-                <tr key={c.param} className="hover:bg-zinc-900/40 transition-colors">
-                  <td className="px-4 py-3 font-mono text-red-400 font-semibold">{c.param}</td>
-                  <td className="px-4 py-3 font-mono text-purple-300 text-[11px]">{c.type}</td>
-                  <td className="px-4 py-3 text-zinc-300 text-xs">{c.desc}</td>
+                <tr key={c.param} className="hover:bg-fg hover:text-black transition-colors group">
+                  <td className="px-4 py-3 text-accent group-hover:text-black font-bold">{c.param}</td>
+                  <td className="px-4 py-3 text-fg font-mono text-xs">{c.type}</td>
+                  <td className="px-4 py-3 text-fg group-hover:text-black text-xs font-body">{c.desc}</td>
                 </tr>
               ))}
             </tbody>
@@ -112,12 +126,12 @@ export const DocR3F: React.FC<DocR3FProps> = () => {
       </div>
 
       {/* Alpha Notice */}
-      <div className="p-4 rounded-xl bg-red-950/20 border border-red-500/30 text-xs font-mono text-zinc-300 flex items-center justify-between">
+      <div className="p-4 border-2 border-line bg-bg text-xs font-mono text-fg flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-rest">
         <div className="flex items-center gap-2">
-          <Box className="w-4 h-4 text-red-400 shrink-0" />
-          <span>Status: <strong className="text-red-400 uppercase">Alpha</strong> &bull; API surface in active preview</span>
+          <Box className="w-4 h-4 text-accent shrink-0" />
+          <span>STATUS: <strong className="text-accent uppercase font-bold">ALPHA</strong> &bull; API SURFACE IN ACTIVE PREVIEW</span>
         </div>
-        <span className="text-[11px] text-zinc-400 font-sans hidden sm:inline">
+        <span className="text-xs text-muted font-body">
           Requires @react-three/fiber and three peer dependencies
         </span>
       </div>

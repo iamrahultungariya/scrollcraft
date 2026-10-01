@@ -111,51 +111,51 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   const getCategoryIcon = (catId: string) => {
     switch (catId) {
       case 'getting-started':
-        return <BookOpen className="w-3.5 h-3.5 text-violet-400" />;
+        return <BookOpen className="w-3.5 h-3.5 text-accent" />;
       case 'primitives':
-        return <Layers className="w-3.5 h-3.5 text-emerald-400" />;
+        return <Layers className="w-3.5 h-3.5 text-accent" />;
       case 'hooks':
-        return <Terminal className="w-3.5 h-3.5 text-purple-400" />;
+        return <Terminal className="w-3.5 h-3.5 text-accent" />;
       case 'r3f':
-        return <Sparkles className="w-3.5 h-3.5 text-amber-400" />;
+        return <Sparkles className="w-3.5 h-3.5 text-accent" />;
       default:
-        return <Hash className="w-3.5 h-3.5 text-zinc-400" />;
+        return <Hash className="w-3.5 h-3.5 text-muted" />;
     }
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 sm:pt-28 px-4">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 sm:pt-28 px-4 font-mono">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity animate-in fade-in duration-[250ms]"
+        className="fixed inset-0 bg-black/85 transition-opacity"
         onClick={onClose}
       />
 
       {/* Modal Dialog */}
       <div 
         onWheel={(e) => e.stopPropagation()}
-        className="relative w-full max-w-xl rounded-2xl bg-[#09090b] border border-zinc-800 shadow-2xl overflow-hidden z-10 flex flex-col max-h-[75vh] animate-in zoom-in-[0.96] duration-[250ms] [transition-timing-function:var(--ease-smooth-out)]"
+        className="relative w-full max-w-xl border-2 border-line bg-bg shadow-[8px_8px_0px_var(--accent)] overflow-hidden z-10 flex flex-col max-h-[75vh]"
       >
         {/* Search Input Bar */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-zinc-800 bg-[#0c0c0e]">
-          <Search className="w-4 h-4 text-zinc-400 shrink-0" />
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b-2 border-line bg-bg">
+          <Search className="w-4 h-4 text-accent shrink-0" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search documentation, primitives, hooks..."
-            className="flex-1 bg-transparent text-sm text-white placeholder:text-zinc-500 focus:outline-none"
+            placeholder="SEARCH DOCUMENTATION, PRIMITIVES, HOOKS..."
+            className="flex-1 bg-transparent text-sm text-fg placeholder:text-muted font-mono uppercase focus:outline-none"
           />
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="text-zinc-500 hover:text-zinc-300 p-0.5 rounded transition-colors"
+              className="text-muted hover:text-fg p-1 border border-line-soft transition-colors"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           )}
-          <kbd className="hidden sm:inline-flex items-center px-2 py-0.5 text-[10px] font-mono text-zinc-400 bg-zinc-800/80 border border-zinc-700/60 rounded">
+          <kbd className="hidden sm:inline-flex items-center px-2 py-0.5 text-[10px] font-mono text-black bg-accent border-2 border-line font-bold">
             ESC
           </kbd>
         </div>
@@ -163,78 +163,78 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         {/* Results List */}
         <div 
           onWheel={(e) => e.stopPropagation()}
-          className="flex-1 overflow-y-auto max-h-[55vh] overscroll-contain p-2 divide-y divide-zinc-900/60 touch-pan-y"
+          className="flex-1 overflow-y-auto max-h-[55vh] overscroll-contain p-2 space-y-1 touch-pan-y"
         >
           {filteredItems.length === 0 ? (
-            <div className="py-12 text-center text-sm text-zinc-500">
-              No results found for &ldquo;<span className="text-zinc-300">{query}</span>&rdquo;
+            <div className="py-12 text-center text-xs font-mono uppercase text-muted">
+              NO RESULTS FOUND FOR &ldquo;<span className="text-fg font-bold">{query}</span>&rdquo;
             </div>
           ) : (
-            <div className="space-y-0.5">
-              {filteredItems.map((item, index) => {
-                const isSelected = index === selectedIndex;
-                return (
-                  <button
-                    key={`${item.categoryId}-${item.id}`}
-                    ref={(el) => {
-                      itemRefs.current[index] = el;
-                    }}
-                    onClick={() => {
-                      onSelectSection(item.id);
-                      onClose();
-                    }}
-                    onMouseEnter={() => setSelectedIndex(index)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-colors cursor-pointer ${
-                      isSelected
-                        ? 'bg-zinc-800/90 text-white'
-                        : 'text-zinc-300 hover:bg-zinc-800/50 hover:text-white'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="p-1.5 rounded-lg bg-zinc-900 border border-zinc-800 shrink-0">
-                        {getCategoryIcon(item.categoryId)}
+            filteredItems.map((item, index) => {
+              const isSelected = index === selectedIndex;
+              return (
+                <button
+                  key={`${item.categoryId}-${item.id}`}
+                  ref={(el) => {
+                    itemRefs.current[index] = el;
+                  }}
+                  onClick={() => {
+                    onSelectSection(item.id);
+                    onClose();
+                  }}
+                  onMouseEnter={() => setSelectedIndex(index)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 text-left transition-colors cursor-pointer border-2 ${
+                    isSelected
+                      ? 'bg-accent text-black border-accent font-bold shadow-rest'
+                      : 'text-fg border-transparent hover:bg-fg hover:text-black hover:border-line'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="p-1.5 border border-line-soft bg-bg shrink-0">
+                      {getCategoryIcon(item.categoryId)}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-bold uppercase truncate flex items-center gap-2">
+                        <span>{item.title}</span>
+                        {item.badge && (
+                          <span className={`text-[9px] font-mono px-1.5 py-0.2 border uppercase font-bold ${
+                            isSelected ? 'bg-black text-accent border-black' : 'bg-bg text-muted border-line-soft'
+                          }`}>
+                            {item.badge}
+                          </span>
+                        )}
                       </div>
-                      <div className="min-w-0">
-                        <div className="text-sm font-medium truncate flex items-center gap-2">
-                          <span>{item.title}</span>
-                          {item.badge && (
-                            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-zinc-900 text-zinc-400 border border-zinc-800">
-                              {item.badge}
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-[11px] text-zinc-500 flex items-center gap-1.5">
-                          <span>{item.categoryTitle}</span>
-                        </div>
+                      <div className={`text-[11px] uppercase font-mono ${isSelected ? 'text-black/80' : 'text-muted'}`}>
+                        <span>{item.categoryTitle}</span>
                       </div>
                     </div>
+                  </div>
 
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform ${
-                        isSelected ? 'text-zinc-300 translate-x-0.5' : 'text-zinc-600'
-                      }`}
-                    />
-                  </button>
-                );
-              })}
-            </div>
+                  <ChevronRight
+                    className={`w-4 h-4 shrink-0 transition-transform ${
+                      isSelected ? 'text-black translate-x-0.5' : 'text-muted'
+                    }`}
+                  />
+                </button>
+              );
+            })
           )}
         </div>
 
         {/* Footer info */}
-        <div className="px-4 py-2.5 bg-[#0a0a0c] border-t border-zinc-800/80 flex items-center justify-between text-[11px] text-zinc-500 font-mono">
+        <div className="px-4 py-2.5 bg-line-soft/30 border-t-2 border-line flex items-center justify-between text-[11px] text-muted font-mono font-bold uppercase">
           <div className="flex items-center gap-3">
             <span>
-              <kbd className="text-zinc-400">↑↓</kbd> Navigate
+              <kbd className="text-accent font-bold">↑↓</kbd> NAVIGATE
             </span>
             <span>
-              <kbd className="text-zinc-400">↵</kbd> Select
+              <kbd className="text-accent font-bold">↵</kbd> SELECT
             </span>
             <span>
-              <kbd className="text-zinc-400">ESC</kbd> Close
+              <kbd className="text-accent font-bold">ESC</kbd> CLOSE
             </span>
           </div>
-          <span>{filteredItems.length} results</span>
+          <span>{filteredItems.length} RESULTS</span>
         </div>
       </div>
     </div>

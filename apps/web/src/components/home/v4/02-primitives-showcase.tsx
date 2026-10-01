@@ -1,43 +1,45 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Parallax, Reveal, VelocityMarquee } from '@scrollcraft/react';
-import { ArrowUpRight, Copy, Check, Layers, Eye, PinIcon, Repeat, Code2, Play } from 'lucide-react';
+import { useScrollCraft } from '@scrollcraft/react';
+import { ArrowRight, Check, Copy } from 'lucide-react';
+import { Eyebrow } from './01-hero';
 
-interface PrimitiveSpec {
+interface PrimitiveCard {
   id: string;
+  number: string;
   name: string;
-  category: string;
-  icon: React.ReactNode;
-  description: string;
+  meta: string;
+  tagline: string;
+  desc: string;
   specs: string[];
-  snippet: string;
+  code: string;
   testSlug: string;
 }
 
-const PRIMITIVES: PrimitiveSpec[] = [
+const PRIMITIVES: PrimitiveCard[] = [
   {
     id: 'parallax',
-    name: '<Parallax />',
-    category: 'HARDWARE TRANSFORM DEPTH',
-    icon: <Layers className="w-4 h-4 text-[#3b82f6]" />,
-    description:
-      'Multi-layer depth container with real velocity responsiveness. Writes numeric translate3d matrices directly to GPU layers with zero layout thrashing.',
-    specs: ['Numeric 3D transform matrix', 'Hardware composite layer lock', 'WeakMap coordinate cache'],
-    snippet: `import { Parallax } from '@scrollcraft/react';
+    number: '01',
+    name: 'Parallax',
+    meta: 'translate',
+    tagline: 'Multi-layer depth with real velocity responsiveness.',
+    desc: 'Bypasses React Fiber to compute 3D matrix transforms and writes directly to hardware style declarations with zero layout thrashing.',
+    specs: ['Direct GPU matrix writes', 'WeakMap coordinate cache', 'Velocity-coupled gliding'],
+    code: `import { Parallax } from '@scrollcraft/react';
 
-export function DepthSection() {
+export function DepthHero() {
   return (
     <div className="relative h-96 overflow-hidden">
-      {/* Background layer moves at -0.15x speed */}
-      <Parallax speed={-0.15} className="absolute inset-0">
-        <div className="grid-pattern opacity-20" />
+      {/* Background layer moves slower */}
+      <Parallax speed={-0.2} className="absolute inset-0">
+        <div className="grid-layer" />
       </Parallax>
 
-      {/* Foreground card moves at +0.25x speed */}
-      <Parallax speed={0.25} className="relative z-10 m-auto">
-        <div className="card">Hardware Accelerated Depth</div>
+      {/* Foreground card moves faster */}
+      <Parallax speed={0.3} className="relative z-10 m-auto">
+        <div className="card">Hardware Depth</div>
       </Parallax>
     </div>
   );
@@ -46,20 +48,20 @@ export function DepthSection() {
   },
   {
     id: 'reveal',
-    name: '<Reveal />',
-    category: 'SSR-SAFE VIEWPORT ENTRANCE',
-    icon: <Eye className="w-4 h-4 text-[#3b82f6]" />,
-    description:
-      'Zero-FOUC element and typography entrances. Preserves server-rendered HTML during hydration with native no-JS CSS fallbacks.',
-    specs: ['IntersectionObserver pooling', 'Atmospheric optical blur & 3D tilt', 'Automatic stagger sequencing'],
-    snippet: `import { Reveal } from '@scrollcraft/react';
+    number: '02',
+    name: 'Reveal',
+    meta: 'clip mask',
+    tagline: 'Content wipes in on a precise, SSR-safe mask.',
+    desc: 'Zero-FOUC typography and element entrances. Preserves server-rendered HTML during streaming hydration with native no-JS CSS fallbacks.',
+    specs: ['IntersectionObserver pooling', 'Zero FOUC hydration safety', 'Staggered sequence timing'],
+    code: `import { Reveal } from '@scrollcraft/react';
 
-export function Features() {
+export function FeatureSection() {
   return (
-    <Reveal direction="up" distance={32} duration={0.6} blur={6} scale={0.96}>
+    <Reveal direction="up" distance={32} duration={0.6}>
       <div className="feature-card">
-        <h3>120 FPS Viewport Entrance</h3>
-        <p>SSR-safe hydration with zero FOUC.</p>
+        <h3>Hardware Entrance</h3>
+        <p>SSR-safe hydration without flash.</p>
       </div>
     </Reveal>
   );
@@ -68,370 +70,234 @@ export function Features() {
   },
   {
     id: 'pin',
-    name: '<Pin />',
-    category: 'STICKY LAYOUT CONTAINMENT',
-    icon: <PinIcon className="w-4 h-4 text-[#3b82f6]" />,
-    description:
-      'Smart pinning container. Prefers native position: sticky with transform fallbacks and containing-block safety.',
-    specs: ['Native sticky preference', 'Automatic ghost spacer teardown', 'Stacking context safe'],
-    snippet: `import { Pin } from '@scrollcraft/react';
+    number: '03',
+    name: 'Pin',
+    meta: 'sticky',
+    tagline: 'Hold a stage while the scroll timeline runs.',
+    desc: 'Prefers native position: sticky with transform fallbacks and containing-block safety. Automatically dismantles ghost spacers on unmount.',
+    specs: ['Native sticky preference', 'Automatic spacer teardown', 'Stacking context safe'],
+    code: `import { Pin } from '@scrollcraft/react';
 
-export function PinnedLayout() {
+export function PinnedShowcase() {
   return (
     <div className="grid grid-cols-12">
-      <Pin top={80} pinSpacing={500} className="col-span-4">
-        <aside className="sticky-sidebar">Pinned Navigation Index</aside>
+      <Pin top={80} pinSpacing={400} className="col-span-4">
+        <aside className="sticky-stage">Pinned Runway Stage</aside>
       </Pin>
-      <main className="col-span-8">Scrollable Content Stream</main>
+      <main className="col-span-8">Scrollable Stream</main>
     </div>
   );
 }`,
     testSlug: 'pin',
   },
-  {
-    id: 'velocity-marquee',
-    name: '<VelocityMarquee />',
-    category: 'MOMENTUM ACCELERATION TICKER',
-    icon: <Repeat className="w-4 h-4 text-[#3b82f6]" />,
-    description:
-      'Infinite marquee ticker that dynamically accelerates with user scroll momentum and settles seamlessly into idle baseline speed.',
-    specs: ['Velocity-coupled acceleration', 'Subpixel modulo wrapping', 'Automatic idle sleep mode'],
-    snippet: `import { VelocityMarquee } from '@scrollcraft/react';
-
-export function MomentumTicker() {
-  return (
-    <VelocityMarquee baseSpeed={0.8} velocityMultiplier={2.5}>
-      <span>ZERO VDOM • 120 FPS • NEXT.JS 15 APP ROUTER • WEAKMAP CACHING • </span>
-    </VelocityMarquee>
-  );
-}`,
-    testSlug: 'velocity-marquee',
-  },
 ];
 
-function highlightCode(code: string): React.ReactNode {
-  return code.split('\n').map((line, idx) => {
-    const tokenRegex =
-      /(".*?"|'.*?'|`.*?`)|(<\/?(?:[A-Z][a-zA-Z0-9]*|[a-z]+)|(?:\/>|>))|(\b(?:import|export|from|function|const|return|default)\b)|(\b(?:speed|direction|duration|blur|distance|top|pinSpacing|disableTransform|smooth|scale|stagger|baseSpeed|velocityMultiplier|className)\b)|(\b\d+(?:\.\d+)?\b)|([{}(),;=.:\/<>])/g;
+function PrimitiveVisual({ id }: { id: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const pipRef = useRef<HTMLSpanElement>(null);
+  const { subscribe } = useScrollCraft();
 
-    const parts: React.ReactNode[] = [];
-    let lastIndex = 0;
-    let match: RegExpExecArray | null;
-
-    while ((match = tokenRegex.exec(line)) !== null) {
-      if (match.index > lastIndex) {
-        parts.push(
-          <span key={`txt-${lastIndex}`} className="text-[#a1a1aa]">
-            {line.slice(lastIndex, match.index)}
-          </span>
-        );
+  useEffect(() => {
+    return subscribe((m) => {
+      if (id === 'parallax' && containerRef.current) {
+        containerRef.current.style.setProperty('--vp', `${m.progress}`);
+      } else if (id === 'pin' && pipRef.current) {
+        pipRef.current.style.left = `${Math.min(m.progress * 100, 95)}%`;
       }
-      const [full, str, tag, kw, prop, num, punct] = match;
-      if (str) {
-        parts.push(<span key={`str-${match.index}`} className="text-[#10b981]">{str}</span>);
-      } else if (tag) {
-        parts.push(<span key={`tag-${match.index}`} className="text-[#93c5fd] font-semibold">{tag}</span>);
-      } else if (kw) {
-        parts.push(<span key={`kw-${match.index}`} className="text-[#3b82f6] font-semibold">{kw}</span>);
-      } else if (prop) {
-        parts.push(<span key={`prop-${match.index}`} className="text-[#c4b5fd]">{prop}</span>);
-      } else if (num) {
-        parts.push(<span key={`num-${match.index}`} className="text-[#f59e0b]">{num}</span>);
-      } else if (punct) {
-        parts.push(<span key={`punct-${match.index}`} className="text-[#52525b]">{punct}</span>);
-      } else {
-        parts.push(<span key={`other-${match.index}`} className="text-[#fafafa]">{full}</span>);
-      }
-      lastIndex = tokenRegex.lastIndex;
-    }
+    });
+  }, [id, subscribe]);
 
-    if (lastIndex < line.length) {
-      parts.push(<span key={`end-${idx}`} className="text-[#a1a1aa]">{line.slice(lastIndex)}</span>);
-    }
-
+  if (id === 'parallax') {
     return (
-      <div key={idx} className="flex leading-relaxed font-mono text-[12px] px-1 py-[1px]">
-        <span className="w-6 shrink-0 text-right pr-3 select-none text-[#3f3f46] text-[11px]">
-          {idx + 1}
-        </span>
-        <span className="whitespace-pre text-[#fafafa]">
-          {parts.length > 0 ? parts : <span>&nbsp;</span>}
+      <div ref={containerRef} className="primitive-stage">
+        <div className="absolute inset-0 grid place-items-center">
+          {[0.2, 0.5, 0.9].map((speed, index) => (
+            <span
+              key={speed}
+              className="absolute h-px bg-lime/70 motion-reduce:transform-none"
+              style={{
+                width: `${75 - index * 18}%`,
+                transform: `translateX(calc((var(--vp, 0) - 0.5) * ${speed * 80}px))`,
+              }}
+            />
+          ))}
+        </div>
+        <span className="absolute bottom-3 left-3 font-mono text-[0.62rem] text-paper/50">
+          rate: 0.32 &bull; translate3d
         </span>
       </div>
     );
-  });
+  }
+
+  if (id === 'reveal') {
+    return (
+      <div className="primitive-stage p-4">
+        <div className="grid h-full content-center gap-2">
+          <div className="h-2 w-full bg-paper/20 rounded-sm" />
+          <div className="h-2 w-4/5 bg-paper/20 rounded-sm" />
+          <div className="h-2 w-1/2 bg-lime/80 rounded-sm" />
+        </div>
+        <span className="absolute bottom-3 right-3 font-mono text-[0.62rem] text-paper/50">
+          mask: line &bull; ssr safe
+        </span>
+      </div>
+    );
+  }
+
+  // Pin
+  return (
+    <div className="primitive-stage flex flex-col justify-between p-4">
+      <div className="flex justify-center">
+        <div className="h-fit rounded bg-lime px-3 py-1 font-mono text-[0.65rem] font-bold text-ink uppercase tracking-wider">
+          PINNED STAGE
+        </div>
+      </div>
+      <div className="h-px w-full bg-paper/20 relative">
+        <span
+          ref={pipRef}
+          className="absolute -top-1 size-2 rounded-full bg-lime"
+          style={{ left: '0%' }}
+        />
+      </div>
+      <span className="font-mono text-[0.62rem] text-paper/50">
+        sticky &bull; ghost spacer auto-teardown
+      </span>
+    </div>
+  );
 }
 
 export function PrimitivesShowcase() {
-  const [selectedId, setSelectedId] = useState<string>('parallax');
-  const [activeTab, setActiveTab] = useState<'preview' | 'code'>('preview');
-  const [copied, setCopied] = useState(false);
+  const [activeTab, setActiveTab] = useState<Record<string, 'preview' | 'code'>>({
+    parallax: 'preview',
+    reveal: 'preview',
+    pin: 'preview',
+  });
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const selected = PRIMITIVES.find((p) => p.id === selectedId) ?? PRIMITIVES[0];
+  const toggleTab = (id: string, tab: 'preview' | 'code') => {
+    setActiveTab((prev) => ({ ...prev, [id]: tab }));
+  };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(selected.snippet);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const copyCode = (id: string, code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   return (
-    <section className="relative w-full border-b border-[#1c1c1f] bg-[#09090b] py-28 px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <section id="primitives" className="border-b border-paper/10 bg-panel/20">
+      <div className="mx-auto max-w-[1280px] px-5 py-20 sm:px-10 sm:py-28">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between pb-10 border-b border-[#1c1c1f] mb-12 gap-6">
+        <Eyebrow number="03">Three primitives</Eyebrow>
+        
+        <div className="mt-7 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6]" />
-              <span className="text-[11px] font-mono text-[#71717a] uppercase tracking-[0.2em]">
-                Declarative Primitives // Studio Suite
-              </span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#fafafa] tracking-[-0.03em] font-sans">
-              Declarative wrappers.<br />Engineered for zero overhead.
+            <h2 className="font-display text-4xl font-extrabold uppercase leading-[0.95] text-paper sm:text-6xl">
+              Three moves.<br />
+              <span className="text-lime">One engine.</span>
             </h2>
           </div>
-          <p className="text-sm text-[#a1a1aa] max-w-sm leading-[1.75] font-sans md:text-right">
-            Configure complex motion behaviors entirely through React props. Direct DOM manipulation executes in the render phase without React state triggers.
+          <p className="max-w-[36ch] text-sm leading-relaxed text-paper/60 font-body">
+            Small primitives, composed with intent. Each responds directly to hardware scroll ticks instead of playing on a loop.
           </p>
         </div>
 
-        {/* Studio Workspace: 2-Column Split */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
-          {/* Left Column: Primitive Selector Deck (4 Cols) */}
-          <div className="lg:col-span-4 space-y-2.5">
-            {PRIMITIVES.map((item, idx) => {
-              const isSelected = item.id === selectedId;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setSelectedId(item.id)}
-                  className={`w-full p-5 rounded-xl border text-left transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-[#18181b] border-[#3b82f6] shadow-sm'
-                      : 'bg-[#121214] border-[#27272a] hover:border-[#3f3f46] hover:bg-[#151518]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-1.5 rounded bg-[#101012] border border-[#27272a]">
-                        {item.icon}
-                      </div>
-                      <span className="text-sm font-bold text-[#fafafa] font-mono">
-                        {item.name}
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-mono text-[#71717a]">
-                      0{idx + 1}
-                    </span>
-                  </div>
+        {/* 3-Column Brutalist Grid */}
+        <div className="mt-12 grid gap-px border border-paper/10 bg-paper/10 md:grid-cols-3">
+          {PRIMITIVES.map((item) => {
+            const isCode = activeTab[item.id] === 'code';
 
-                  <div className="text-[10px] font-mono text-[#3b82f6] uppercase tracking-wider mb-2">
-                    {item.category}
-                  </div>
-
-                  <p className="text-xs text-[#a1a1aa] leading-[1.7] font-sans">
-                    {item.description}
-                  </p>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Right Column: Live Stage & Code Studio (8 Cols) */}
-          <div className="lg:col-span-8 rounded-xl border border-[#27272a] bg-[#121214] overflow-hidden shadow-2xl">
-            
-            {/* Studio Navigation Bar */}
-            <div className="px-5 py-4 border-b border-[#1c1c1f] bg-[#0d0d0f] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-[#fafafa] font-mono">
-                    {selected.name}
-                  </span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#18181b] border border-[#27272a] text-[#71717a]">
-                    PROPS CONFIGURED
-                  </span>
-                </div>
-                <div className="text-xs text-[#a1a1aa] mt-1">
-                  {selected.description}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-0.5 bg-[#18181b] border border-[#27272a] rounded p-0.5">
-                  <button
-                    onClick={() => setActiveTab('preview')}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-mono rounded transition-colors cursor-pointer ${
-                      activeTab === 'preview'
-                        ? 'bg-[#27272a] text-[#fafafa] font-medium'
-                        : 'text-[#71717a] hover:text-[#a1a1aa]'
-                    }`}
-                  >
-                    <Play className="w-3 h-3 text-[#3b82f6]" />
-                    Live Motion
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('code')}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-mono rounded transition-colors cursor-pointer ${
-                      activeTab === 'code'
-                        ? 'bg-[#27272a] text-[#fafafa] font-medium'
-                        : 'text-[#71717a] hover:text-[#a1a1aa]'
-                    }`}
-                  >
-                    <Code2 className="w-3 h-3 text-[#3b82f6]" />
-                    TSX Code
-                  </button>
-                </div>
-
-                {activeTab === 'code' && (
-                  <button
-                    onClick={handleCopy}
-                    className="p-1.5 rounded border border-[#27272a] hover:border-[#3f3f46] text-[#71717a] hover:text-[#fafafa] transition-colors cursor-pointer"
-                    title="Copy snippet"
-                  >
-                    {copied ? <Check className="w-3.5 h-3.5 text-[#3b82f6]" /> : <Copy className="w-3.5 h-3.5" />}
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Studio Canvas Area */}
-            {activeTab === 'preview' ? (
-              <div className="relative h-[340px] bg-[#09090b] p-6 overflow-hidden flex flex-col justify-between">
-                {/* Background Grid Pattern */}
-                <div
-                  className="absolute inset-0 opacity-[0.06] pointer-events-none"
-                  style={{
-                    backgroundImage: 'linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)',
-                    backgroundSize: '24px 24px',
-                  }}
-                />
-
-                {/* Live Preview Display per Selected Primitive */}
-                {selected.id === 'parallax' && (
-                  <div className="relative w-full h-full flex flex-col justify-between select-none">
-                    <Parallax speed={-0.15} className="w-full flex items-center justify-between text-xs font-mono text-[#71717a] border-b border-[#1c1c1f] pb-2">
-                      <span>PARALLAX DEPTH -0.15x</span>
-                      <span>BACKGROUND LAYER</span>
-                    </Parallax>
-
-                    <Parallax speed={0.25} className="my-auto mx-auto w-full max-w-md">
-                      <div className="p-6 rounded-xl border border-[#27272a] bg-[#18181b] shadow-2xl text-center">
-                        <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-[#101012] border border-[#27272a] text-xs font-mono text-[#3b82f6] mb-3">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" />
-                          <span>Parallax Speed: +0.25x</span>
-                        </div>
-                        <h4 className="text-lg font-bold text-[#fafafa] font-sans">
-                          Direct Hardware Compositor
-                        </h4>
-                        <p className="text-xs text-[#a1a1aa] mt-1 font-sans">
-                          Scroll to watch this card translate with continuous spring velocity.
-                        </p>
-                      </div>
-                    </Parallax>
-
-                    <div className="flex items-center justify-between text-[11px] font-mono text-[#71717a] pt-2 border-t border-[#1c1c1f]">
-                      <span>Z-INDEX: FOREGROUND</span>
-                      <span className="text-[#10b981]">0 Re-renders</span>
-                    </div>
-                  </div>
-                )}
-
-                {selected.id === 'reveal' && (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Reveal duration={0.6} blur={6} scale={0.96}>
-                      <div className="p-8 rounded-xl border border-[#27272a] bg-[#18181b] shadow-2xl text-center space-y-2 max-w-md">
-                        <div className="text-xs font-mono text-[#10b981] font-semibold flex items-center justify-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" />
-                          120 FPS Direct GPU Entrance
-                        </div>
-                        <h4 className="text-lg font-bold text-[#fafafa] font-sans">
-                          Zero-FOUC Viewport Intersection
-                        </h4>
-                        <p className="text-xs text-[#a1a1aa] font-sans leading-relaxed">
-                          Preserves pre-rendered markup during React 19 SSR hydration.
-                        </p>
-                      </div>
-                    </Reveal>
-                  </div>
-                )}
-
-                {selected.id === 'pin' && (
-                  <div className="w-full h-full flex flex-col justify-between p-4 bg-[#101012] rounded-lg border border-[#27272a] font-mono text-xs">
-                    <div className="flex items-center justify-between pb-3 border-b border-[#1c1c1f]">
-                      <span className="text-[#3b82f6] font-semibold flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6]" />
-                        STICKY POSITION: PINNED (top: 80px)
-                      </span>
-                      <span className="text-[#71717a]">CONTAINER: LOCKED</span>
-                    </div>
-                    <div className="my-auto text-center space-y-1">
-                      <div className="text-[#fafafa] font-bold text-sm">
-                        Native CSS Sticky Preference
-                      </div>
-                      <div className="text-xs text-[#a1a1aa]">
-                        Falls back to 3D matrix transform if parent has clipping masks.
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between pt-3 border-t border-[#1c1c1f] text-[11px] text-[#71717a]">
-                      <span>SPACER TEARDOWN: AUTO</span>
-                      <span className="text-[#10b981]">Safe Stacking Context</span>
-                    </div>
-                  </div>
-                )}
-
-                {selected.id === 'velocity-marquee' && (
-                  <div className="w-full h-full flex flex-col justify-center overflow-hidden">
-                    <VelocityMarquee baseSpeed={0.8} velocityMultiplier={2.5} className="font-mono text-xs uppercase tracking-wider text-[#71717a] py-4">
-                      <span className="mx-3 px-3 py-1.5 rounded bg-[#18181b] border border-[#27272a] text-[#fafafa]">
-                        MOMENTUM ACCELERATION
-                      </span>
-                      <span className="mx-3 px-3 py-1.5 rounded bg-[#18181b] border border-[#3b82f6] text-[#93c5fd]">
-                        120 FPS MODULO
-                      </span>
-                      <span className="mx-3 px-3 py-1.5 rounded bg-[#18181b] border border-[#27272a] text-[#fafafa]">
-                        SUBPIXEL SNAPPING
-                      </span>
-                      <span className="mx-3 px-3 py-1.5 rounded bg-[#18181b] border border-[#27272a] text-[#fafafa]">
-                        ZERO VDOM RE-RENDERS
-                      </span>
-                    </VelocityMarquee>
-                    <div className="mt-4 text-center text-[11px] font-mono text-[#71717a]">
-                      Scroll rapidly up and down to observe velocity decay back to cruise speed.
-                    </div>
-                  </div>
-                )}
-
-              </div>
-            ) : (
-              <div className="p-5 bg-[#09090b] overflow-y-auto max-h-[340px] select-text">
-                {highlightCode(selected.snippet)}
-              </div>
-            )}
-
-            {/* Studio Footer */}
-            <div className="px-5 py-3 border-t border-[#1c1c1f] bg-[#0d0d0f] flex flex-wrap items-center justify-between text-xs font-mono text-[#71717a] gap-3">
-              <div className="flex items-center gap-3">
-                {selected.specs.map((spec, idx) => (
-                  <span key={idx} className="flex items-center gap-2">
-                    {idx > 0 && <span className="text-[#27272a]">•</span>}
-                    <span>{spec}</span>
-                  </span>
-                ))}
-              </div>
-              <Link
-                href={`/test/${selected.testSlug}`}
-                className="inline-flex items-center gap-1.5 text-[#fafafa] hover:text-[#3b82f6] transition-colors"
+            return (
+              <article
+                key={item.id}
+                className="primitive-card group flex flex-col justify-between bg-ink p-6 sm:p-7"
               >
-                <span>Open in Test Lab</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
+                <div>
+                  {/* Card Header */}
+                  <div className="mb-5 flex items-center justify-between font-mono text-[0.65rem] uppercase tracking-widest">
+                    <span className="text-lime font-bold">{item.number}</span>
+                    <span className="text-paper/40">{item.meta}</span>
+                    <div className="flex items-center gap-1 bg-panel rounded p-0.5 border border-paper/10">
+                      <button
+                        type="button"
+                        onClick={() => toggleTab(item.id, 'preview')}
+                        className={`px-2 py-0.5 text-[10px] rounded transition-colors ${
+                          !isCode ? 'bg-lime text-ink font-bold' : 'text-paper/50 hover:text-paper'
+                        }`}
+                      >
+                        Visual
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => toggleTab(item.id, 'code')}
+                        className={`px-2 py-0.5 text-[10px] rounded transition-colors ${
+                          isCode ? 'bg-lime text-ink font-bold' : 'text-paper/50 hover:text-paper'
+                        }`}
+                      >
+                        Code
+                      </button>
+                    </div>
+                  </div>
 
-          </div>
+                  {/* Visual / Code Switcher */}
+                  {isCode ? (
+                    <div className="relative h-[9rem] overflow-hidden rounded border border-paper/15 bg-panel p-3 font-mono text-[0.68rem] leading-relaxed text-paper/80">
+                      <pre className="overflow-x-auto h-full pr-6">
+                        <code>{item.code}</code>
+                      </pre>
+                      <button
+                        type="button"
+                        onClick={() => copyCode(item.id, item.code)}
+                        className="absolute top-2 right-2 p-1.5 rounded bg-ink/80 text-paper/60 hover:text-paper"
+                        title="Copy snippet"
+                      >
+                        {copiedId === item.id ? (
+                          <Check className="size-3.5 text-lime" />
+                        ) : (
+                          <Copy className="size-3.5" />
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <PrimitiveVisual id={item.id} />
+                  )}
 
+                  {/* Text Details */}
+                  <div className="mt-6">
+                    <h3 className="font-display text-xl font-bold uppercase text-paper tracking-tight">
+                      &lt;{item.name} /&gt;
+                    </h3>
+                    <p className="mt-2 text-xs text-paper/60 leading-relaxed font-body">
+                      {item.tagline}
+                    </p>
+                    <ul className="mt-4 space-y-1.5 font-mono text-[10px] text-paper/45">
+                      {item.specs.map((spec, i) => (
+                        <li key={i} className="flex items-center gap-2">
+                          <span className="size-1 bg-lime" />
+                          <span>{spec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Bottom Link to Test Lab */}
+                <div className="mt-8 pt-4 border-t border-paper/10 flex items-center justify-between">
+                  <Link
+                    href={`/test?primitive=${item.testSlug}`}
+                    className="font-mono text-[0.65rem] uppercase tracking-wider text-lime hover:underline inline-flex items-center gap-1.5"
+                  >
+                    <span>Test Lab Demo</span>
+                    <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                  <span className="font-mono text-[0.6rem] text-paper/40 uppercase">
+                    GPU COMPOSITED
+                  </span>
+                </div>
+              </article>
+            );
+          })}
         </div>
 
       </div>

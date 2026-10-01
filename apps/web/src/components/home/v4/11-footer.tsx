@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ScrollCraftEmblem } from '@/components/ui/scrollcraft-logo';
+import { ArrowUpRight } from 'lucide-react';
 
 const NAV_COLS = [
   {
@@ -34,29 +34,41 @@ const NAV_COLS = [
 
 export function Footer() {
   return (
-    <footer className="w-full bg-[#09090b] border-t border-[#1c1c1f]">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Main footer grid */}
-        <div className="py-16 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-12 border-b border-[#1c1c1f]">
+    <footer className="w-full bg-ink border-t border-paper/10 text-paper">
+      <div className="mx-auto max-w-[1280px] px-5 sm:px-10">
+        
+        {/* Main Footer Row */}
+        <div className="py-16 grid grid-cols-1 md:grid-cols-[1.2fr_auto] gap-12 border-b border-paper/10">
           {/* Brand */}
           <div>
-            <Link href="/" className="flex items-center gap-2.5 mb-4">
-              <ScrollCraftEmblem size={22} />
-              <span className="text-base font-bold text-[#fafafa] tracking-tight">ScrollCraft</span>
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 font-display text-lg font-bold uppercase tracking-tight text-paper"
+            >
+              Scroll<span className="text-lime">Craft</span>
+              <span className="size-2 bg-lime inline-block" />
             </Link>
-            <p className="text-sm text-[#71717a] max-w-xs leading-[1.7] font-sans">
-              The zero-VDOM React scroll engine. Direct hardware GPU matrix transforms with 120 FPS native display lock.
+            <p className="mt-4 text-xs sm:text-sm text-paper/50 max-w-sm leading-relaxed font-body">
+              The zero-VDOM React scroll engine. Direct hardware GPU matrix transforms with native compositor thread lock.
             </p>
+            <div className="mt-6 flex items-center gap-4 text-xs font-mono text-paper/40">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="size-1.5 rounded-full bg-lime" />
+                FRAME BUDGET LOCKED
+              </span>
+              <span>&bull;</span>
+              <span>100% TREE-SHAKABLE</span>
+            </div>
           </div>
 
-          {/* Nav columns */}
-          <div className="flex flex-wrap gap-14">
+          {/* Nav Columns */}
+          <div className="flex flex-wrap gap-12 sm:gap-16">
             {NAV_COLS.map((col) => (
               <div key={col.heading}>
-                <div className="text-[10px] font-mono text-[#71717a] uppercase tracking-[0.18em] mb-4">
+                <div className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-paper/40 mb-4 font-bold">
                   {col.heading}
                 </div>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2.5">
                   {col.links.map((link) =>
                     'external' in link && link.external ? (
                       <a
@@ -64,15 +76,16 @@ export function Footer() {
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs text-[#a1a1aa] hover:text-[#fafafa] transition-colors font-sans"
+                        className="text-xs text-paper/60 hover:text-paper hover:underline transition-colors font-mono inline-flex items-center gap-1"
                       >
-                        {link.label}
+                        <span>{link.label}</span>
+                        <ArrowUpRight className="size-2.5 opacity-60" />
                       </a>
                     ) : (
                       <Link
                         key={link.href}
                         href={link.href}
-                        className="text-xs text-[#a1a1aa] hover:text-[#fafafa] transition-colors font-sans"
+                        className="text-xs text-paper/60 hover:text-paper hover:underline transition-colors font-mono"
                       >
                         {link.label}
                       </Link>
@@ -84,11 +97,12 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="py-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px] text-[#71717a] font-mono">
-          <span>&copy; {new Date().getFullYear()} ScrollCraft (v0.2.0 Beta). MIT Licensed.</span>
-          <span>Zero VDOM diffs. Pure compositor motion.</span>
+        {/* Bottom Bar */}
+        <div className="py-6 flex flex-col sm:flex-row justify-between items-center gap-4 font-mono text-[0.62rem] uppercase tracking-widest text-paper/40">
+          <span>&copy; {new Date().getFullYear()} ScrollCraft. Built for the frame budget.</span>
+          <span>Zero VDOM diffs &bull; Pure compositor motion</span>
         </div>
+
       </div>
     </footer>
   );

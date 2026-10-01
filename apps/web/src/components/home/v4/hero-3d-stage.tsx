@@ -156,7 +156,7 @@ export function Hero3DStage() {
               <div className="absolute bottom-3.5 left-3.5 right-3.5 flex items-center justify-between pointer-events-none">
                 <div className="px-2 py-1 rounded-md bg-black/70 border border-white/15 text-[11px] font-mono text-white flex items-center gap-2 backdrop-blur-md shadow-md">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span>120 FPS Native Sync</span>
+                  <span>Native Compositor Sync</span>
                 </div>
                 <div className="text-[10px] font-mono text-zinc-300 px-2 py-0.5 rounded bg-black/60 border border-white/10 backdrop-blur-md">
                   01 // PRIMARY

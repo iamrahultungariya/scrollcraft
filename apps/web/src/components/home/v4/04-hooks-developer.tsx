@@ -1,360 +1,320 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Reveal } from '@scrollcraft/react';
-import { Copy, Check, ExternalLink, Code2 } from 'lucide-react';
+import { useScrollCraft } from '@scrollcraft/react';
+import { Copy, Check, ArrowRight } from 'lucide-react';
+import { Eyebrow } from './01-hero';
 
-type HookKey = 'useScrollProgress' | 'useParallax' | 'useReveal' | 'usePin';
-type Framework = 'Next.js' | 'React';
+type HookKey = 'useScrollProgress' | 'useParallax' | 'useReveal' | 'usePin' | 'useScrollTimeline';
 
 interface HookDoc {
   name: string;
   badge: string;
-  desc: string;
+  howItWorks: string;
   signature: string;
   returns: string;
-  code: Record<Framework, string>;
+  code: string;
 }
 
 const HOOKS: Record<HookKey, HookDoc> = {
   useScrollProgress: {
     name: 'useScrollProgress()',
-    badge: 'CONTINUOUS OBSERVABLE',
-    desc: 'Provides continuous scroll progress [0.0 to 1.0], instantaneous subpixel velocity, and scroll direction vector.',
-    signature: 'useScrollProgress(options?: { smooth?: boolean; dampening?: number }): ScrollProgressState',
-    returns: '{ progress: number; velocity: number; direction: 1 | -1 | 0 }',
-    code: {
-      'Next.js': `'use client';
+    badge: 'ZERO-RECONCILIATION OBSERVABLE',
+    howItWorks:
+      'Subscribes to scroll position outside of React Fiber. Returns both direct zero-rerender ScrollValue observables for high-performance DOM binding and an optional reactive bridge when text rendering is required.',
+    signature: 'useScrollProgress(targetRef?, options?: { offset?, orientation?, reactive? }): ScrollProgressReturn',
+    returns: '{ targetRef, progressValue, scrollYValue, progress, scrollY }',
+    code: `'use client';
 
 import { useScrollProgress } from '@scrollcraft/react';
 
 export function ScrollProgressBar() {
-  const { progress, velocity } = useScrollProgress({ smooth: true });
+  // progressValue is an observable ScrollValue<number> that updates style directly
+  const { progressValue } = useScrollProgress();
 
   return (
-    <div className="fixed top-0 left-0 right-0 h-1 bg-[#121214] z-50">
-      <div
-        className="h-full bg-[#3b82f6] origin-left"
-        style={{ transform: \`scaleX(\${progress})\` }}
-      />
+    <div className="fixed top-0 inset-x-0 h-0.5 bg-paper/10 z-50">
+      {/* Mutates hardware style directly with zero React re-renders */}
+      <div className="h-full bg-lime origin-left" style={{ transform: 'scaleX(var(--p))' }} />
     </div>
   );
 }`,
-      React: `import { useScrollProgress } from '@scrollcraft/react';
-
-export function Indicator() {
-  const { progress, velocity, direction } = useScrollProgress();
-
-  return (
-    <div className="font-mono text-xs">
-      <span>Progress: {(progress * 100).toFixed(0)}%</span>
-      <span>Velocity: {velocity.toFixed(2)} px/ms</span>
-      <span>Direction: {direction > 0 ? 'DOWN' : 'UP'}</span>
-    </div>
-  );
-}`,
-    },
   },
   useParallax: {
     name: 'useParallax()',
-    badge: 'HARDWARE TRANSFORM',
-    desc: 'Computes velocity-aware hardware matrix transforms and binds directly to DOM element styles bypassing React reconciliation.',
-    signature: 'useParallax(ref: RefObject<HTMLElement>, options: ParallaxOptions): void',
-    returns: 'void (Mutates DOM style directly via GPU layer)',
-    code: {
-      'Next.js': `'use client';
+    badge: 'DIRECT COMPOSITOR MUTATION',
+    howItWorks:
+      'Computes spatial transformation matrices based on element viewport coordinates and writes translate3d styles directly to the DOM during Phase 4 of the ticker loop, completely bypassing React reconciliation.',
+    signature: 'useParallax(ref: RefObject<HTMLElement>, options: { speed?, direction?, easing? }): void',
+    returns: 'void (Mutates target DOM style declarations directly on GPU compositor)',
+    code: `'use client';
 
 import { useRef } from 'react';
 import { useParallax } from '@scrollcraft/react';
 
-export function FloatingHeroLayer() {
+export function DepthSection() {
   const targetRef = useRef<HTMLDivElement>(null);
   
-  // Directly mutates translate3d on hardware GPU layer
+  // Directly updates translate3d(0, y, 0) on hardware layer
   useParallax(targetRef, {
     speed: 0.25,
     direction: 'vertical',
   });
 
   return (
-    <div ref={targetRef} className="floating-card">
-      <h3>Multi-Plane Depth</h3>
+    <div ref={targetRef} className="card">
+      <h3>Hardware-Accelerated Depth</h3>
     </div>
   );
 }`,
-      React: `import { useRef } from 'react';
-import { useParallax } from '@scrollcraft/react';
-
-export function ParallaxStack() {
-  const layer1 = useRef(null);
-  const layer2 = useRef(null);
-
-  useParallax(layer1, { speed: -0.15 });
-  useParallax(layer2, { speed: 0.3 });
-
-  return (
-    <div className="stack-container">
-      <div ref={layer1} className="background-layer" />
-      <div ref={layer2} className="foreground-layer" />
-    </div>
-  );
-}`,
-    },
   },
   useReveal: {
     name: 'useReveal()',
-    badge: 'SSR-SAFE ENTRANCES',
-    desc: 'Coordinates IntersectionObserver pools for zero-FOUC entrance animations with atmospheric blur and automatic stagger sequencing.',
-    signature: 'useReveal(ref: RefObject<HTMLElement>, options?: RevealOptions): void',
-    returns: 'void (Observer pool manages active transitions)',
-    code: {
-      'Next.js': `'use client';
+    badge: 'SSR-SAFE OBSERVER POOL',
+    howItWorks:
+      'Coordinates shared IntersectionObserver pools to track viewport intersections. Uses CSS data-attributes ([data-scrollcraft-reveal]) to prevent hydration flashes (zero-FOUC) while managing CSS transition lifecycles.',
+    signature: 'useReveal(ref: RefObject<HTMLElement>, options?: { direction?, distance?, duration?, threshold? }): void',
+    returns: 'void (Observer pool manages active entrance transitions)',
+    code: `'use client';
 
 import { useRef } from 'react';
 import { useReveal } from '@scrollcraft/react';
 
-export function SectionTitle() {
+export function Headline() {
   const titleRef = useRef<HTMLHeadingElement>(null);
 
   useReveal(titleRef, {
+    direction: 'up',
     distance: 24,
     duration: 0.6,
-    blur: 8,
   });
 
   return (
-    <h2 ref={titleRef} className="text-4xl font-bold">
-      Zero-FOUC Typography Entrance
+    <h2 ref={titleRef} className="text-3xl font-bold uppercase">
+      Fluid Entrance Without Layout Shift
     </h2>
   );
 }`,
-      React: `import { useRef } from 'react';
-import { useReveal } from '@scrollcraft/react';
-
-export function StaggeredDeck() {
-  const cardRef = useRef(null);
-  useReveal(cardRef, { stagger: 0.08, scale: 0.96 });
-
-  return <div ref={cardRef} className="deck-card" />;
-}`,
-    },
   },
   usePin: {
     name: 'usePin()',
-    badge: 'STICKY CONTAINMENT',
-    desc: 'Smart layout containment engine that prefers native position: sticky with transform fallbacks and automatic ghost spacer teardown.',
-    signature: 'usePin(ref: RefObject<HTMLElement>, options?: PinOptions): PinHandle',
-    returns: '{ unpin: () => void; isPinned: boolean }',
-    code: {
-      'Next.js': `'use client';
+    badge: 'CONTAINING-BLOCK PINNING',
+    howItWorks:
+      'Leverages native position: sticky with automated spacer calculation to preserve natural document flow. Detects containing-block boundaries and cleanly dismantles all ghost spacer elements when the component unmounts.',
+    signature: 'usePin(ref: RefObject<HTMLElement>, options: { top?, pinSpacing?, anticipatePin? }): void',
+    returns: 'void (Manages sticky layout pinning lifecycle and spacer cleanup)',
+    code: `'use client';
 
 import { useRef } from 'react';
 import { usePin } from '@scrollcraft/react';
 
-export function StickySidebar() {
+export function PinnedSidebar() {
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   usePin(sidebarRef, {
     top: 80,
-    pinSpacing: 500,
-    disableTransform: true, // Prevents clipping ancestor traps
+    pinSpacing: 400,
   });
 
   return (
-    <aside ref={sidebarRef} className="pinned-nav">
-      <TableOfContents />
+    <aside ref={sidebarRef} className="sidebar">
+      <div>Sticky Navigation Control</div>
     </aside>
   );
 }`,
-      React: `import { useRef } from 'react';
-import { usePin } from '@scrollcraft/react';
+  },
+  useScrollTimeline: {
+    name: 'useScrollTimeline()',
+    badge: 'NORMALIZED KEYFRAME SOLVER',
+    howItWorks:
+      'Interpolates normalized multi-track keyframe definitions ([0.0, 1.0]) against viewport scroll progress, evaluating cubic bezier easing and writing composite matrix styles without touching React component state.',
+    signature: 'useScrollTimeline(target: RefObject<HTMLElement>, keyframes: KeyframeTrack[]): void',
+    returns: 'void (Drives multi-segment keyframe transformations)',
+    code: `'use client';
 
-export function PinnedShowcase() {
-  const target = useRef(null);
-  usePin(target, { top: 96, pinSpacing: 400 });
+import { useRef } from 'react';
+import { useScrollTimeline } from '@scrollcraft/react';
 
-  return <div ref={target} className="pinned-stage" />;
+export function TimelineCanvas() {
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  useScrollTimeline(canvasRef, [
+    { at: 0.0, opacity: 0, scale: 0.9 },
+    { at: 0.5, opacity: 1, scale: 1.0 },
+    { at: 1.0, opacity: 0.2, scale: 1.05 },
+  ]);
+
+  return <div ref={canvasRef} className="timeline-stage" />;
 }`,
-    },
   },
 };
 
-function highlightCode(code: string): React.ReactNode {
-  return code.split('\n').map((line, idx) => {
-    const tokenRegex =
-      /(".*?"|'.*?'|`.*?`)|(<\/?(?:[A-Z][a-zA-Z0-9]*|[a-z]+)|(?:\/>|>))|(\b(?:import|export|from|function|const|return|default)\b)|(\b(?:speed|direction|duration|blur|distance|top|pinSpacing|disableTransform|smooth|scale|stagger)\b)|(\b\d+(?:\.\d+)?\b)|([{}(),;=.:\/<>])/g;
+function LiveTelemetry() {
+  const progressRef = useRef<HTMLSpanElement>(null);
+  const scrollRef = useRef<HTMLSpanElement>(null);
+  const { subscribe } = useScrollCraft();
 
-    const parts: React.ReactNode[] = [];
-    let lastIndex = 0;
-    let match: RegExpExecArray | null;
-
-    while ((match = tokenRegex.exec(line)) !== null) {
-      if (match.index > lastIndex) {
-        parts.push(
-          <span key={`txt-${lastIndex}`} className="text-[#a1a1aa]">
-            {line.slice(lastIndex, match.index)}
-          </span>
-        );
+  useEffect(() => {
+    // Zero-reconciliation live telemetry: updates textContent on scroll with 0 React re-renders!
+    return subscribe((m) => {
+      if (progressRef.current) {
+        progressRef.current.textContent = `${(m.progress * 100).toFixed(1)}%`;
       }
-      const [full, str, tag, kw, prop, num, punct] = match;
-      if (str) {
-        parts.push(<span key={`str-${match.index}`} className="text-[#10b981]">{str}</span>);
-      } else if (tag) {
-        parts.push(<span key={`tag-${match.index}`} className="text-[#93c5fd] font-semibold">{tag}</span>);
-      } else if (kw) {
-        parts.push(<span key={`kw-${match.index}`} className="text-[#3b82f6] font-semibold">{kw}</span>);
-      } else if (prop) {
-        parts.push(<span key={`prop-${match.index}`} className="text-[#c4b5fd]">{prop}</span>);
-      } else if (num) {
-        parts.push(<span key={`num-${match.index}`} className="text-[#f59e0b]">{num}</span>);
-      } else if (punct) {
-        parts.push(<span key={`punct-${match.index}`} className="text-[#52525b]">{punct}</span>);
-      } else {
-        parts.push(<span key={`other-${match.index}`} className="text-[#fafafa]">{full}</span>);
+      if (scrollRef.current) {
+        scrollRef.current.textContent = `${Math.round(m.scroll)} px`;
       }
-      lastIndex = tokenRegex.lastIndex;
-    }
+    });
+  }, [subscribe]);
 
-    if (lastIndex < line.length) {
-      parts.push(<span key={`end-${idx}`} className="text-[#a1a1aa]">{line.slice(lastIndex)}</span>);
-    }
-
-    return (
-      <div key={idx} className="flex leading-relaxed font-mono text-[12px] px-1 py-[1px]">
-        <span className="w-6 shrink-0 text-right pr-3 select-none text-[#3f3f46] text-[11px]">
-          {idx + 1}
-        </span>
-        <span className="whitespace-pre text-[#fafafa]">
-          {parts.length > 0 ? parts : <span>&nbsp;</span>}
-        </span>
+  return (
+    <div className="border-t border-paper/10 bg-ink/80 p-5 grid grid-cols-2 sm:grid-cols-4 gap-4 font-mono text-xs">
+      <div>
+        <span className="text-[10px] uppercase text-paper/40 block">Scroll Progress</span>
+        <span ref={progressRef} className="font-bold text-lime">0.0%</span>
       </div>
-    );
-  });
+      <div>
+        <span className="text-[10px] uppercase text-paper/40 block">Scroll Offset</span>
+        <span ref={scrollRef} className="font-bold text-paper">0 px</span>
+      </div>
+      <div>
+        <span className="text-[10px] uppercase text-paper/40 block">Motion Pipeline</span>
+        <span className="font-bold text-lime">Hardware Accelerated</span>
+      </div>
+      <div>
+        <span className="text-[10px] uppercase text-paper/40 block">Reconciliation</span>
+        <span className="font-bold text-lime">0 VDOM Dispatches</span>
+      </div>
+    </div>
+  );
 }
 
 export function HooksDeveloperSection() {
   const [activeHook, setActiveHook] = useState<HookKey>('useScrollProgress');
-  const [activeFramework, setActiveFramework] = useState<Framework>('Next.js');
   const [copied, setCopied] = useState(false);
 
-  const current = HOOKS[activeHook];
-  const currentCode = current.code[activeFramework];
+  const doc = HOOKS[activeHook];
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(currentCode);
+    navigator.clipboard.writeText(doc.code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <section className="relative w-full border-b border-[#1c1c1f] bg-[#09090b]">
-      <div className="max-w-5xl mx-auto px-6 lg:px-8">
-        {/* Section header */}
-        <Reveal duration={0.45}>
-          <div className="py-14 border-b border-[#1c1c1f] flex flex-col md:flex-row md:items-end gap-6 justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6]" />
-                <span className="text-[11px] font-mono text-[#71717a] uppercase tracking-[0.2em]">
-                  Headless Reactive Hooks
-                </span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-[#fafafa] tracking-[-0.03em] font-sans">
-                Prefer headless code?<br />Direct reactive primitives.
-              </h2>
-            </div>
-            <p className="text-sm text-[#a1a1aa] max-w-sm leading-[1.75] font-sans md:text-right">
-              Composable reactive hooks exposing sub-frame scroll telemetry, mutable ref binds, and 4-phase microtask lifecycle events.
-            </p>
-          </div>
-        </Reveal>
+    <section id="hooks" className="relative w-full border-b border-paper/10 bg-ink py-24 px-5 sm:px-10 lg:py-32">
+      <div className="mx-auto max-w-[1280px]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          
+          {/* Left Column: API Architecture & Hook Selector */}
+          <div className="lg:col-span-5 lg:sticky lg:top-24">
+            <Eyebrow number="06">Reactive hooks</Eyebrow>
 
-        <div className="py-10">
-          {/* Hook selector */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 border border-[#27272a] rounded-lg overflow-hidden mb-6">
-            {(Object.keys(HOOKS) as HookKey[]).map((key) => {
-              const h = HOOKS[key];
-              const isSelected = activeHook === key;
-              return (
+            <h2 className="mt-7 font-display text-4xl font-extrabold uppercase leading-[0.95] text-paper sm:text-6xl">
+              Tiny API.<br />
+              <span className="text-lime">Clear intent.</span>
+            </h2>
+
+            <p className="mt-6 text-sm text-paper/70 leading-relaxed font-body">
+              Import only what you need. Each hook operates as a decoupled controller that calculates numeric transform matrices and flushes directly to DOM elements with zero React state overhead.
+            </p>
+
+            {/* Architecture points */}
+            <ul className="mt-8 grid gap-px border-y border-paper/10 font-mono text-xs uppercase tracking-wider text-paper/60">
+              {[
+                'Hardware compositor style writes',
+                'Native prefers-reduced-motion fallback',
+                'Tree-shakeable architecture (<5 KB core)',
+                'WeakMap lifecycle automatic garbage collection',
+              ].map((item, index) => (
+                <li key={item} className="flex items-center gap-3.5 border-b border-paper/10 py-3 last:border-0">
+                  <span className="text-lime font-bold">0{index + 1}</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* Hook Selector Buttons */}
+            <div className="mt-8 flex flex-wrap gap-2">
+              {(Object.keys(HOOKS) as HookKey[]).map((key) => (
                 <button
                   key={key}
+                  type="button"
                   onClick={() => setActiveHook(key)}
-                  className={`p-4 text-left font-mono transition-colors cursor-pointer border-r last:border-r-0 border-b sm:border-b-0 border-[#27272a] ${
-                    isSelected
-                      ? 'bg-[#18181b] text-white'
-                      : 'bg-[#121214] text-[#71717a] hover:text-[#a1a1aa] hover:bg-[#151518]'
+                  className={`px-3 py-1.5 rounded-md font-mono text-xs transition-all cursor-pointer ${
+                    activeHook === key
+                      ? 'bg-lime text-ink font-bold shadow-sm'
+                      : 'border border-paper/15 bg-panel text-paper/70 hover:border-lime/40 hover:text-paper'
                   }`}
                 >
-                  <div className="text-xs font-semibold mb-1">{h.name}</div>
-                  <div className="text-[10px] text-[#71717a] uppercase truncate">{h.badge}</div>
+                  {key}()
                 </button>
-              );
-            })}
+              ))}
+            </div>
           </div>
 
-          {/* Code studio */}
-          <div className="border border-[#27272a] rounded-lg overflow-hidden bg-[#121214]">
-            {/* Studio header */}
-            <div className="px-5 py-4 border-b border-[#1c1c1f] bg-[#0d0d0f] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded bg-[#18181b] border border-[#27272a] text-[#3b82f6]">
-                  <Code2 className="w-4 h-4" />
+          {/* Right Column: Code Window with Live Telemetry */}
+          <div className="lg:col-span-7">
+            <div className="overflow-hidden rounded-xl border-2 border-paper/20 bg-panel shadow-[8px_8px_0px_#0e1210]">
+              
+              {/* Window Header */}
+              <div className="flex items-center justify-between border-b border-paper/10 px-5 py-3.5 bg-ink/60">
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-[0.68rem] uppercase tracking-widest text-paper/50">
+                    {activeHook}.tsx
+                  </span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-lime/10 text-lime font-bold">
+                    {doc.badge}
+                  </span>
                 </div>
-                <div>
-                  <div className="text-sm font-semibold text-[#fafafa] font-mono mb-0.5">{current.name}</div>
-                  <div className="text-xs text-[#a1a1aa]">{current.desc}</div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="inline-flex items-center gap-1.5 rounded bg-paper/10 px-2.5 py-1 text-[11px] font-mono text-paper/70 hover:text-paper hover:bg-paper/20 transition-colors cursor-pointer"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="size-3 text-lime" />
+                        <span className="text-lime">Copied</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="size-3" />
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
+                  <span className="size-2 bg-lime" />
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                {/* Framework switcher */}
-                <div className="flex items-center gap-0.5 bg-[#18181b] border border-[#27272a] rounded p-0.5">
-                  {(['Next.js', 'React'] as const).map((fw) => (
-                    <button
-                      key={fw}
-                      onClick={() => setActiveFramework(fw)}
-                      className={`px-3 py-1 text-[11px] font-mono rounded transition-colors cursor-pointer ${
-                        activeFramework === fw
-                          ? 'bg-[#27272a] text-white font-medium'
-                          : 'text-[#71717a] hover:text-[#a1a1aa]'
-                      }`}
-                    >
-                      {fw}
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  onClick={handleCopy}
-                  className="flex items-center gap-1.5 px-3 py-1.5 border border-[#27272a] hover:border-[#3f3f46] rounded text-xs font-mono text-[#a1a1aa] hover:text-white transition-colors cursor-pointer"
-                >
-                  {copied ? <Check className="w-3.5 h-3.5 text-[#3b82f6]" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copied ? 'Copied' : 'Copy'}</span>
-                </button>
+              {/* How it works banner */}
+              <div className="px-5 py-3 bg-paper/5 border-b border-paper/10 font-body text-xs text-paper/70 leading-relaxed">
+                <span className="font-mono text-[10px] text-lime font-bold uppercase tracking-wider block mb-1">
+                  How it works:
+                </span>
+                {doc.howItWorks}
               </div>
+
+              {/* Code Pre Block */}
+              <pre className="overflow-x-auto p-5 font-mono text-xs leading-6 text-paper/85 sm:p-7 sm:text-[0.82rem]">
+                <code>{doc.code}</code>
+              </pre>
+
+              {/* Live Telemetry Footer (Real-time DOM ref update without React re-renders) */}
+              <LiveTelemetry />
+
             </div>
 
-            {/* Code body */}
-            <div className="p-5 bg-[#09090b] overflow-y-auto max-h-[380px] select-text">
-              {highlightCode(currentCode)}
-            </div>
-
-            {/* API Contract & Return Signature Bar */}
-            <div className="px-5 py-3 border-t border-[#1c1c1f] bg-[#0d0d0f] flex flex-col sm:flex-row sm:items-center justify-between text-xs font-mono text-[#71717a] gap-3">
-              <div className="flex items-center gap-2 overflow-x-auto">
-                <span className="text-[#3b82f6] font-semibold">RETURN:</span>
-                <code className="text-[#a1a1aa] text-[11px]">{current.returns}</code>
-              </div>
-              <Link
-                href="/docs#hooks"
-                className="inline-flex items-center gap-1.5 text-[#71717a] hover:text-[#fafafa] transition-colors shrink-0"
-              >
-                <span>Full Hook Specification</span>
-                <ExternalLink className="w-3 h-3" />
+            <div className="mt-4 flex items-center justify-between text-xs font-mono text-paper/40">
+              <span className="text-paper/60 truncate pr-4">{doc.signature}</span>
+              <Link href="/docs#hooks" className="text-lime hover:underline shrink-0 inline-flex items-center gap-1">
+                Full API Reference <ArrowRight className="size-3" />
               </Link>
             </div>
           </div>
+
         </div>
       </div>
     </section>

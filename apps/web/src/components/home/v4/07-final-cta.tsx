@@ -3,11 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Copy, Check, ArrowRight, BookOpen, FlaskConical } from 'lucide-react';
-import { Reveal } from '@scrollcraft/react';
 
 export function FinalCTASection() {
   const [copied, setCopied] = useState(false);
-  const command = 'pnpm add @scrollcraft/react @scrollcraft/core';
+  const command = 'npm i @scrollcraft/react @scrollcraft/core';
 
   const handleCopy = () => {
     navigator.clipboard.writeText(command);
@@ -16,96 +15,105 @@ export function FinalCTASection() {
   };
 
   return (
-    <section className="relative w-full bg-[#09090b] border-b border-[#1c1c1f]">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <Reveal duration={0.5}>
-          <div className="py-24 lg:py-32 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-12 lg:gap-16 items-center">
-            {/* Left: Copy & Actions */}
-            <div>
-              <div className="flex items-center gap-2 mb-6">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6]" />
-                <span className="text-[11px] font-mono text-[#71717a] uppercase tracking-[0.2em]">
-                  Production Onboarding
-                </span>
-              </div>
+    <section id="sizes" className="relative w-full bg-lime text-ink border-b border-paper/10">
+      <div className="mx-auto max-w-[1280px] px-5 py-20 sm:px-10 lg:py-28">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
+          
+          {/* Left: Copy & Actions */}
+          <div>
+            <div className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-ink/60">
+              08 &bull; PRODUCTION SIZING
+            </div>
 
-              <h2 className="text-3xl sm:text-5xl font-bold tracking-[-0.04em] text-[#fafafa] font-sans leading-[1.08] max-w-xl">
-                Build scroll experiences with engineering confidence.
-              </h2>
+            <h2 className="mt-5 font-display text-4xl sm:text-6xl font-extrabold uppercase leading-[0.95] tracking-tight">
+              Use one primitive.<br />
+              Ship one primitive.
+            </h2>
 
-              <p className="mt-5 text-base text-[#a1a1aa] max-w-md leading-[1.75] font-sans">
-                Zero Virtual DOM re-renders. Composable primitives and low-level reactive hooks ready for Next.js 15 App Router and React 19.
-              </p>
+            <p className="mt-6 text-sm sm:text-base text-ink/75 max-w-xl leading-relaxed font-body">
+              Zero Virtual DOM re-renders. Every primitive and hook is fully tree-shakable down to sub-5 KB footprint. Optimized for Next.js 15 App Router and React 19.
+            </p>
 
-              {/* Terminal Install Box */}
-              <div className="mt-8 max-w-md">
-                <div className="border border-[#27272a] bg-[#121214] rounded-lg overflow-hidden shadow-sm">
-                  <div className="flex items-center justify-between px-4 py-3 font-mono text-sm">
-                    <div className="flex items-center gap-2 overflow-x-auto select-all pr-2">
-                      <span className="text-[#52525b] select-none shrink-0">$</span>
-                      <span className="text-[#fafafa] whitespace-nowrap">{command}</span>
-                    </div>
-                    <button
-                      onClick={handleCopy}
-                      className="p-1.5 rounded hover:bg-[#18181b] text-[#71717a] hover:text-[#fafafa] transition-colors flex-shrink-0 cursor-pointer"
-                      title="Copy command"
-                    >
-                      {copied ? <Check className="w-3.5 h-3.5 text-[#3b82f6]" /> : <Copy className="w-3.5 h-3.5" />}
-                    </button>
-                  </div>
+            {/* Terminal Box */}
+            <div className="mt-8 max-w-md">
+              <div className="flex items-center justify-between rounded-md border border-ink/20 bg-ink px-4 py-3 font-mono text-xs sm:text-sm text-paper shadow-sm">
+                <div className="flex items-center gap-2 overflow-x-auto select-all pr-2">
+                  <span className="text-lime font-bold select-none">$</span>
+                  <span className="truncate">{command}</span>
                 </div>
-                <p className="mt-2.5 text-[11px] font-mono text-[#71717a]">
-                  CLI component installer: <span className="text-[#a1a1aa]">npx scrollcraft add &lt;primitive&gt;</span> &bull; v0.3.0
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="shrink-0 p-1.5 rounded hover:bg-paper/10 text-paper/60 hover:text-paper transition-colors cursor-pointer"
+                  title="Copy command"
+                >
+                  {copied ? <Check className="size-4 text-lime" /> : <Copy className="size-4" />}
+                </button>
+              </div>
+              <p className="mt-2 font-mono text-[10px] text-ink/60 uppercase tracking-wider">
+                CLI Scaffolder: npx scrollcraft add &lt;primitive&gt;
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Link
+                href="/test"
+                className="group inline-flex items-center gap-2 rounded-md bg-ink px-6 py-3 font-display text-xs font-bold uppercase text-lime hover:bg-ink/90 transition-all shadow-md active:scale-95"
+              >
+                <FlaskConical className="size-4" />
+                <span>Open Test Lab (25 Demos)</span>
+                <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+              </Link>
+              <Link
+                href="/docs"
+                className="inline-flex items-center gap-2 rounded-md border border-ink/25 bg-transparent px-5 py-3 font-display text-xs font-bold uppercase text-ink hover:bg-ink/10 transition-colors"
+              >
+                <BookOpen className="size-4" />
+                <span>Explore Docs</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Right: Sizing Comparison Matrix */}
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-px bg-ink/20 rounded-xl overflow-hidden border-2 border-ink/30 shadow-[8px_8px_0px_#0e1210]">
+              <div className="bg-lime p-6 sm:p-8">
+                <div className="font-display text-4xl sm:text-5xl font-extrabold text-ink tracking-tight">
+                  24 KB
+                </div>
+                <div className="mt-2 font-mono text-[0.65rem] uppercase tracking-widest text-ink/60">
+                  Full Library Bundle
+                </div>
+                <p className="mt-3 text-xs text-ink/75 font-body">
+                  Includes all primitives, hooks, R3F adapter, and ticker subsystem.
                 </p>
               </div>
 
-              {/* Action Buttons */}
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Link
-                  href="/test"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#fafafa] text-[#09090b] text-sm font-semibold rounded hover:bg-[#e4e4e7] transition-colors shadow-sm"
-                >
-                  <FlaskConical className="w-4 h-4 text-[#3b82f6]" />
-                  Open Live Test Lab
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <Link
-                  href="/docs"
-                  className="inline-flex items-center gap-2 px-6 py-3 border border-[#27272a] text-[#fafafa] text-sm font-medium rounded hover:border-[#3f3f46] hover:bg-[#121214] transition-colors"
-                >
-                  <BookOpen className="w-4 h-4 text-[#71717a]" />
-                  Explore Documentation
-                </Link>
+              <div className="bg-lime p-6 sm:p-8 border-l border-ink/10">
+                <div className="font-display text-4xl sm:text-5xl font-extrabold text-ink tracking-tight">
+                  &lt;5 KB
+                </div>
+                <div className="mt-2 font-mono text-[0.65rem] uppercase tracking-widest text-ink/60">
+                  Tree-Shaken Core
+                </div>
+                <p className="mt-3 text-xs text-ink/75 font-body">
+                  Import only what you need. Zero unused dependencies or polyfills.
+                </p>
               </div>
             </div>
 
-            {/* Right: Architectural Specifications Matrix */}
-            <div className="border border-[#27272a] bg-[#121214] rounded-xl overflow-hidden w-full lg:w-[280px] shrink-0 shadow-lg">
-              <div className="px-5 py-3 border-b border-[#1c1c1f] bg-[#0d0d0f]">
-                <span className="text-[10px] font-mono text-[#71717a] uppercase tracking-[0.18em]">
-                  Architectural Matrix
-                </span>
-              </div>
-              <div className="divide-y divide-[#1c1c1f]">
-                {[
-                  { label: 'Bundle Footprint', value: '4.8 kB gzipped' },
-                  { label: 'Dependencies', value: '0 (Pure zero-dep)' },
-                  { label: 'React Support', value: '18 & 19 Native' },
-                  { label: 'Next.js Routing', value: 'App Router / RSC' },
-                  { label: 'TypeScript', value: 'Strict 5.9 Types' },
-                  { label: 'License Model', value: 'MIT Open Source' },
-                  { label: 'Current Release', value: 'v0.2.0 Beta' },
-                ].map(({ label, value }) => (
-                  <div key={label} className="px-5 py-3 flex items-center justify-between text-xs">
-                    <span className="text-[#71717a] font-sans">{label}</span>
-                    <span className="font-mono text-[#fafafa] font-medium">{value}</span>
-                  </div>
-                ))}
-              </div>
+            {/* Quick Spec Strip */}
+            <div className="rounded-lg border border-ink/15 bg-ink/5 p-4 font-mono text-xs flex flex-wrap items-center justify-between gap-3 text-ink/70">
+              <span>ZERO DEPENDENCIES</span>
+              <span>&bull;</span>
+              <span>WEAKMAP SAFE</span>
+              <span>&bull;</span>
+              <span>MIT LICENSED</span>
             </div>
-
           </div>
-        </Reveal>
+
+        </div>
       </div>
     </section>
   );

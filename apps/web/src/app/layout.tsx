@@ -1,23 +1,29 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono, Caveat } from 'next/font/google';
+import { Sora, Manrope, JetBrains_Mono } from 'next/font/google';
 import { ScrollProvider, ScrollInspector } from '@scrollcraft/react';
 import { RouteScrollSync } from '@/components/layout/route-scroll-sync';
 import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import '../styles/globals.css';
 
-const geistSans = Geist({
-  variable: '--font-sans',
+const sora = Sora({
+  variable: '--font-display',
   subsets: ['latin'],
+  weight: ['400', '600', '700', '800'],
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
+const manrope = Manrope({
+  variable: '--font-body',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
   variable: '--font-mono',
   subsets: ['latin'],
-});
-
-const caveat = Caveat({
-  variable: '--font-caveat',
-  subsets: ['latin'],
+  weight: ['400', '500'],
+  display: 'swap',
 });
 
 export const viewport: Viewport = {
@@ -80,11 +86,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${caveat.variable} bg-[#050505] text-zinc-100 min-h-screen antialiased selection:bg-violet-600/30 selection:text-white font-sans flex flex-col`}
+        className={`${sora.variable} ${manrope.variable} ${jetbrainsMono.variable} bg-ink text-paper min-h-screen antialiased selection:bg-lime selection:text-ink font-body flex flex-col`}
         suppressHydrationWarning
       >
         <ScrollProvider
-          smooth={true}
+          smooth={{
+            lerp: 0.12,
+            duration: 0.75,
+            smoothWheel: true,
+            wheelMultiplier: 1.0,
+          }}
           respectReducedMotion={true}
           autoResetOnRouteChange={true}
         >

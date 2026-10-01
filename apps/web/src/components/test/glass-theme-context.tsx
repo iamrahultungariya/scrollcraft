@@ -162,18 +162,11 @@ export const GlassCard = React.forwardRef<
         transition: 'backdrop-filter 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
         ...style,
       }}
-      className={`rounded-2xl border transition-all duration-300 relative overflow-hidden ${
-        activeHover ? 'hover:border-zinc-400/30' : ''
+      className={`border-2 border-line transition-all duration-300 relative overflow-hidden shadow-rest ${
+        activeHover ? 'hover:border-accent hover:shadow-hover' : ''
       } ${className}`}
       {...props}
     >
-      {glowColor && (
-        <div
-          className="ambient-glow absolute -top-20 -right-20 w-48 h-48 rounded-full pointer-events-none opacity-20 blur-2xl"
-          style={{ backgroundColor: glowColor }}
-          aria-hidden="true"
-        />
-      )}
       {children}
     </div>
   );

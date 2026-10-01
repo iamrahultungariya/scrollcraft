@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function DocsPage() {
   return (
-    <div className="bg-[#050505] min-h-screen text-zinc-100 selection:bg-zinc-800 selection:text-white font-sans antialiased">
+    <div className="bg-ink min-h-screen text-paper selection:bg-lime selection:text-ink font-body antialiased">
       <DocsView />
     </div>
   );

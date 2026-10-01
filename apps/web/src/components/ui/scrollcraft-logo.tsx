@@ -79,62 +79,24 @@ export const ScrollCraftLogo: React.FC<ScrollCraftLogoProps> = ({
   variant = 'full',
   size = 'md',
   className = '',
-  badgeText = 'Beta',
+  badgeText = 'BETA',
 }) => {
   const sizeConfig = {
-    sm: { iconSize: 22, textSize: 'text-sm font-bold', badgeSize: 'text-[10px] px-2 py-0.5' },
-    md: { iconSize: 28, textSize: 'text-base font-bold', badgeSize: 'text-[11px] px-2 py-0.5' },
-    lg: { iconSize: 36, textSize: 'text-xl font-bold', badgeSize: 'text-xs px-2.5 py-0.5' },
-    xl: { iconSize: 48, textSize: 'text-3xl font-extrabold', badgeSize: 'text-xs px-3 py-1' },
+    sm: { textSize: 'text-xs', badgeSize: 'text-[9px] px-1.5 py-0.5' },
+    md: { textSize: 'text-sm', badgeSize: 'text-[10px] px-2 py-0.5' },
+    lg: { textSize: 'text-base', badgeSize: 'text-xs px-2 py-0.5' },
+    xl: { textSize: 'text-xl', badgeSize: 'text-xs px-2.5 py-1' },
   }[size];
 
-  if (variant === 'icon') {
-    return <ScrollCraftEmblem size={sizeConfig.iconSize} className={className} />;
-  }
-
-  if (variant === 'app-violet' || variant === 'app-orange') {
-    return (
-      <div className={`w-12 h-12 rounded-[14px] bg-gradient-to-br from-violet-600 to-indigo-700 p-2.5 flex items-center justify-center shadow-lg shadow-violet-500/25 ${className}`}>
-        <ScrollCraftEmblem size={28} />
-      </div>
-    );
-  }
-
-  if (variant === 'app-dark') {
-    return (
-      <div className={`w-12 h-12 rounded-[14px] bg-[#0A0A0C] border border-violet-500/20 p-2 flex items-center justify-center shadow-md ${className}`}>
-        <ScrollCraftEmblem size={28} />
-      </div>
-    );
-  }
-
-  if (variant === 'lockup-dark') {
-    return (
-      <div className={`inline-flex items-center gap-2.5 px-4 py-2.5 rounded-[12px] bg-[#0A0A0C] border border-white/10 text-white shadow-sm ${className}`}>
-        <ScrollCraftEmblem size={22} />
-        <span className="font-bold tracking-tight text-white text-sm">ScrollCraft</span>
-      </div>
-    );
-  }
-
-  if (variant === 'lockup-light') {
-    return (
-      <div className={`inline-flex items-center gap-2.5 px-4 py-2.5 rounded-[12px] bg-white/5 border border-white/10 text-zinc-100 shadow-sm ${className}`}>
-        <ScrollCraftEmblem size={22} />
-        <span className="font-bold tracking-tight text-zinc-100 text-sm">ScrollCraft</span>
-      </div>
-    );
-  }
-
   return (
-    <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
-      <ScrollCraftEmblem size={sizeConfig.iconSize} />
-      <span className={`${sizeConfig.textSize} text-zinc-100 tracking-tight font-sans`}>
-        ScrollCraft
+    <div className={`inline-flex items-center gap-2 select-none font-display font-black tracking-wider uppercase text-fg ${className}`}>
+      <span className={`${sizeConfig.textSize} tracking-wider font-extrabold flex items-center gap-1.5 text-paper`}>
+        SCROLL CRAFT
+        <span className="w-2 h-2 bg-lime inline-block shrink-0" aria-hidden="true" />
       </span>
-      {variant === 'badge' && (
+      {variant === 'badge' && badgeText && (
         <span
-          className={`${sizeConfig.badgeSize} rounded-full font-mono font-semibold bg-violet-500/15 text-violet-300 border border-violet-500/30 leading-none shadow-[0_0_8px_rgba(124,58,237,0.2)]`}
+          className={`${sizeConfig.badgeSize} font-mono font-bold tracking-wider uppercase bg-lime text-black border-2 border-lime leading-none`}
         >
           {badgeText}
         </span>

@@ -11,8 +11,9 @@
  */
 
 import React from 'react';
+import Link from 'next/link';
 import { CodeViewer } from '@/components/ui/code-viewer';
-import { Zap } from 'lucide-react';
+import { Zap, ExternalLink } from 'lucide-react';
 
 interface DocPrimitivesProps {
   primitiveId: string;
@@ -164,7 +165,7 @@ export function ViewportProgressIndicator() {
       {/* GPU hardware-accelerated progress line with scaleX transform */}
       <ScrollProgress
         axis="y"
-        className="h-1 bg-gradient-to-r from-violet-500 to-indigo-500 origin-left"
+        className="h-1 bg-accent origin-left"
       />
     </header>
   );
@@ -286,7 +287,7 @@ export function Product360Canvas({ frames }: { frames: string[] }) {
 export function MagneticCTA() {
   return (
     <Magnetic strength={0.35} radius={120} stiffness={180} damping={18}>
-      <button className="px-6 py-3 rounded-full bg-violet-600 text-white font-medium shadow-lg hover:shadow-violet-500/25">
+      <button className="h-11 px-6 border-2 border-[#F4F1EA] bg-[#DFFF00] text-[#0C0F0C] font-mono font-bold uppercase shadow-[4px_4px_0px_#F4F1EA]">
         Explore Engine
       </button>
     </Magnetic>
@@ -352,9 +353,9 @@ export function CardDeckSection() {
       fadeBuried={true}
       pinBudget="250vh"
       renderCard={(item) => (
-        <div className="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl">
-          <h3 className="text-2xl font-bold text-white">{item.title}</h3>
-          <p className="text-zinc-400 mt-2">{item.desc}</p>
+        <div className="p-8 border-2 border-[#F4F1EA] bg-[#0C0F0C] shadow-[4px_4px_0px_#DFFF00]">
+          <h3 className="text-2xl font-black uppercase text-[#F4F1EA]">{item.title}</h3>
+          <p className="text-xs text-[#A8ABA0] font-mono mt-2">{item.desc}</p>
         </div>
       )}
     />
@@ -416,8 +417,8 @@ export function DynamicMorphHero() {
       end="bottom top"
       asChild
     >
-      <div className="p-10 rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-900 text-white">
-        <h2 className="text-4xl font-black">Multi-Axis GPU Morph</h2>
+      <div className="p-10 border-2 border-[#F4F1EA] bg-[#0C0F0C] shadow-[6px_6px_0px_#DFFF00]">
+        <h2 className="text-4xl font-black uppercase text-[#F4F1EA]">Multi-Axis GPU Morph</h2>
       </div>
     </ScrollTransform>
   );
@@ -446,7 +447,7 @@ export function VectorPathScrub() {
         <path
           d="M 50 150 C 250 50, 450 250, 650 150 S 950 250, 950 150"
           fill="none"
-          stroke="#8b5cf6"
+          stroke="#DFFF00"
           strokeWidth="4"
           strokeLinecap="round"
         />
@@ -504,63 +505,76 @@ export const DocPrimitives: React.FC<DocPrimitivesProps> = ({ primitiveId }) => 
   const isComingSoon = primitive.status.includes('Coming Soon');
 
   return (
-    <div className="space-y-10 not-prose">
+    <div className="space-y-10 not-prose font-body">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-zinc-800 pb-6">
-        <div>
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-mono break-all sm:break-normal">
-              {primitive.tag}
-            </h1>
-            <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
-              isComingSoon
-                ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30'
-                : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-            }`}>
-              {primitive.status}
-            </span>
+      <div className="border-b-2 border-line pb-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="border-2 border-line bg-bg inline-flex items-center gap-2 px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-accent shadow-rest w-fit">
+            <span className="w-2 h-2 bg-accent inline-block" />
+            <span>[PRIMITIVE / {primitive.name.toUpperCase()}]</span>
           </div>
-          <p className="text-sm text-zinc-300 font-sans leading-relaxed">
-            <strong className="text-white">What it does:</strong> {primitive.whatItDoes}
-          </p>
+
+          <Link
+            href={`/test/${primitiveId}`}
+            className="h-10 px-4 border-2 border-line bg-bg hover:bg-accent text-fg hover:text-black font-mono text-xs font-bold uppercase transition-all shadow-rest hover:shadow-hover hover:-translate-x-0.5 hover:-translate-y-0.5 inline-flex items-center gap-2 self-start sm:self-auto cursor-pointer"
+          >
+            <span>TEST IN LAB</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </Link>
         </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-accent tracking-tight font-mono uppercase">
+            {primitive.tag}
+          </h1>
+          <span className={`px-2.5 py-1 border-2 text-[10px] font-mono font-bold uppercase tracking-wider ${
+            isComingSoon
+              ? 'bg-bg text-muted border-line-soft'
+              : 'bg-accent text-black border-line shadow-rest'
+          }`}>
+            {primitive.status}
+          </span>
+        </div>
+        <p className="text-base text-fg/90 font-body leading-relaxed max-w-3xl">
+          <strong className="text-fg font-mono font-bold uppercase mr-1">WHAT IT DOES:</strong> {primitive.whatItDoes}
+        </p>
       </div>
 
       {/* Production Sample Code */}
       <div id="syntax" className="space-y-3 scroll-mt-24">
-        <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 block font-semibold">
-          Syntax &bull; Production Implementation
+        <span className="text-xs font-mono uppercase tracking-wider text-muted block font-bold">
+          SYNTAX &bull; PRODUCTION IMPLEMENTATION
         </span>
         <CodeViewer code={primitive.code} fileName={`${primitive.name.toLowerCase()}.tsx`} />
       </div>
 
-      {/* Capabilities Reference */}
+      {/* Capabilities Reference - NO PURPLE, 2 neutrals + 1 accent */}
       <div id="capabilities" className="space-y-4 pt-4 scroll-mt-24">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-400 font-semibold">
-            <Zap className="w-3.5 h-3.5 text-violet-400" />
-            <span>Capabilities &amp; Props</span>
+          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted font-bold">
+            <Zap className="w-3.5 h-3.5 text-accent" />
+            <span>CAPABILITIES &amp; PROPS</span>
           </div>
-          <span className="text-[10px] font-mono text-zinc-500 sm:hidden">Swipe table &rarr;</span>
+          <span className="text-[10px] font-mono text-muted sm:hidden">SWIPE TABLE &rarr;</span>
         </div>
 
-        <div className="rounded-xl border border-zinc-800 overflow-x-auto bg-[#0a0a0c]">
+        <div className="border-2 border-line bg-bg shadow-rest overflow-x-auto">
           <table className="w-full text-left text-xs font-mono min-w-[550px]">
-            <thead className="bg-zinc-900/80 text-zinc-400 border-b border-zinc-800">
+            <thead className="bg-line-soft/30 text-muted uppercase text-[11px] border-b-2 border-line font-bold">
               <tr>
-                <th className="px-4 py-2.5 font-semibold">Prop</th>
-                <th className="px-4 py-2.5 font-semibold">Type</th>
-                <th className="px-4 py-2.5 font-semibold">Default</th>
-                <th className="px-4 py-2.5 font-semibold">Description</th>
+                <th className="px-4 py-3 font-bold text-fg">PROP</th>
+                <th className="px-4 py-3 font-bold">TYPE</th>
+                <th className="px-4 py-3 font-bold">DEFAULT</th>
+                <th className="px-4 py-3 font-bold">DESCRIPTION</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800/60 font-sans text-zinc-300">
+            <tbody className="divide-y-2 divide-line-soft font-mono">
               {primitive.capabilities.map((c) => (
-                <tr key={c.prop} className="hover:bg-zinc-900/40 transition-colors">
-                  <td className="px-4 py-3 font-mono text-violet-400 font-semibold">{c.prop}</td>
-                  <td className="px-4 py-3 font-mono text-purple-300 text-[11px]">{c.type}</td>
-                  <td className="px-4 py-3 font-mono text-zinc-500 text-[11px]">{c.defaultValue ?? '—'}</td>
-                  <td className="px-4 py-3 text-zinc-300 text-xs">{c.desc}</td>
+                <tr key={c.prop} className="hover:bg-fg hover:text-black transition-colors group">
+                  <td className="px-4 py-3 text-accent group-hover:text-black font-bold">{c.prop}</td>
+                  <td className="px-4 py-3 text-fg font-mono text-xs">{c.type}</td>
+                  <td className="px-4 py-3 text-muted text-xs">{c.defaultValue ?? '—'}</td>
+                  <td className="px-4 py-3 text-fg group-hover:text-black text-xs font-body">{c.desc}</td>
                 </tr>
               ))}
             </tbody>
@@ -569,12 +583,19 @@ export const DocPrimitives: React.FC<DocPrimitivesProps> = ({ primitiveId }) => 
       </div>
 
       {/* Status Signal */}
-      <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 text-xs font-mono text-zinc-400 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <span>Status: <strong className={isComingSoon ? "text-cyan-400 uppercase" : "text-amber-400 uppercase"}>{primitive.status}</strong></span>
-        <span className="text-[11px] text-zinc-500 font-sans">
+      <div className="p-4 border-2 border-line bg-bg text-xs font-mono text-fg flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-rest">
+        <div className="flex items-center gap-2">
+          <span className="text-muted uppercase">STATUS:</span>
+          <span className={`px-2.5 py-0.5 border-2 font-bold uppercase text-[11px] ${
+            isComingSoon ? "border-line-soft text-muted bg-bg" : "border-line bg-accent text-black"
+          }`}>
+            {primitive.status}
+          </span>
+        </div>
+        <span className="text-xs text-muted font-body">
           {isComingSoon
-            ? 'Scheduled for ScrollCraft v0.2.0 Beta (1–2 weeks) • Zero-rerender DOM pipeline'
-            : 'API surface may shift before 1.0 • Direct GPU compositor writes'}
+            ? 'Scheduled for ScrollCraft v0.3.0 • Zero-rerender DOM pipeline'
+            : 'Production hardened • Direct GPU compositor writes'}
         </span>
       </div>
     </div>

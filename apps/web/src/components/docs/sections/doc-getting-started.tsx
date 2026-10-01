@@ -1,25 +1,27 @@
 'use client';
 
 /**
- * ScrollCraft Docs: Getting Started (Reference-Only)
- * Fast 15-second scanning setup reference:
- * - Package install command
- * - Root layout integration (<ScrollProvider>)
- * - Mental model & RSC rules
- * Strictly zero narrative fluff.
+ * ScrollCraft Docs: Getting Started (Ground-Up Rebuild)
+ * Clean 3-Step Setup Flow:
+ * - Step 01: Package Installation (Working PMs only, 40px square COPY button)
+ * - Step 02: Root Layout Setup (<ScrollProvider> code + 2-neutral props matrix)
+ * - Step 03: First Scroll Scene (Runnable snippet + [ TEST IN LAB ↗ ])
+ * - Guarantees: 3 Crisp Architectural Cards
+ * - Support Matrix: Transparent capabilities disclosure
  */
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { CodeViewer } from '@/components/ui/code-viewer';
-import { Check, Copy, Terminal, ShieldCheck, BookOpen, Layers, Cpu, Zap, Heart } from 'lucide-react';
+import { Check, Copy, ArrowRight, ExternalLink, ShieldCheck, Heart, Layers, Zap, Cpu } from 'lucide-react';
 
 interface DocGettingStartedProps {
   sectionId: string;
 }
 
 const PM_COMMANDS = {
-  pnpm: 'pnpm add @scrollcraft/core@beta @scrollcraft/react@beta',
   npm: 'npm install @scrollcraft/core@beta @scrollcraft/react@beta',
+  pnpm: 'pnpm add @scrollcraft/core@beta @scrollcraft/react@beta',
   yarn: 'yarn add @scrollcraft/core@beta @scrollcraft/react@beta',
   bun: 'bun add @scrollcraft/core@beta @scrollcraft/react@beta',
 };
@@ -47,26 +49,31 @@ import { Parallax, Reveal } from '@scrollcraft/react';
 
 export function HeroScene() {
   return (
-    <div className="relative min-h-screen">
-      <Parallax speed={-0.2}>
-        <div className="bg-layer" />
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background Layer: Displaces at -0.2x speed to create dimensional depth */}
+      <Parallax speed={-0.2} className="absolute inset-0">
+        <div className="w-full h-full bg-linear-to-b from-[#161c18] to-transparent opacity-50" />
       </Parallax>
-      <Reveal direction="up" distance={30} delay={0.1}>
-        <h1>High-Performance Scroll Engine</h1>
+
+      {/* Foreground Headline: Enters on viewport intersection with zero layout shift */}
+      <Reveal direction="up" distance={32} duration={0.6}>
+        <h1 className="text-5xl font-black uppercase tracking-tight text-[#F4F1EA]">
+          Make The Web Move
+        </h1>
       </Reveal>
-    </div>
+    </section>
   );
 }`;
 
 const PROVIDER_PROPS = [
-  { prop: 'smooth', type: 'boolean | InertiaConfig', defaultValue: 'true', desc: 'Enables Lenis subpixel inertia scroll normalization across all platforms.' },
-  { prop: 'respectReducedMotion', type: 'boolean', defaultValue: 'true', desc: 'Automatically disables smooth inertia and collapses animations when OS prefers-reduced-motion is active.' },
-  { prop: 'autoRecalc', type: 'boolean', defaultValue: 'true', desc: 'Monitors document body mutations and font loading to dynamically update scroll dimensions.' },
+  { prop: 'smooth', type: 'boolean | InertiaConfig', defaultValue: 'true', desc: 'Enables subpixel inertia normalization across wheel and trackpad inputs.' },
+  { prop: 'respectReducedMotion', type: 'boolean', defaultValue: 'true', desc: 'Automatically bypasses inertia smoothing and collapses animations when OS prefers-reduced-motion is active.' },
+  { prop: 'autoRecalc', type: 'boolean', defaultValue: 'true', desc: 'Monitors DOM mutations and webfont loading to dynamically recalculate scroll dimensions.' },
   { prop: 'debug', type: 'boolean | DebugOptions', defaultValue: 'false', desc: 'Mounts telemetry inspector HUD and visual scroll trigger boundaries.' },
 ];
 
 export const DocGettingStarted: React.FC<DocGettingStartedProps> = ({ sectionId }) => {
-  const [activePm, setActivePm] = useState<'pnpm' | 'npm' | 'yarn' | 'bun'>('npm');
+  const [activePm, setActivePm] = useState<'npm' | 'pnpm'>('npm');
   const [copied, setCopied] = useState(false);
 
   // Auto-scroll to requested section when sectionId changes
@@ -74,14 +81,14 @@ export const DocGettingStarted: React.FC<DocGettingStartedProps> = ({ sectionId 
     if (typeof window === 'undefined') return;
     const targetMap: Record<string, string> = {
       introduction: 'introduction-mental-model',
-      installation: 'install-package',
-      setup: 'provider-setup',
+      installation: 'step-01-install',
+      setup: 'step-02-provider',
     };
     const targetId = targetMap[sectionId];
     if (targetId) {
       const el = document.getElementById(targetId);
       if (el) {
-        const yOffset = -88;
+        const yOffset = -96;
         const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
         window.scrollTo({ top: y, behavior: 'smooth' });
       }
@@ -91,302 +98,209 @@ export const DocGettingStarted: React.FC<DocGettingStartedProps> = ({ sectionId 
   const copyInstall = () => {
     navigator.clipboard.writeText(PM_COMMANDS[activePm]);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 1200);
   };
 
   return (
-    <div className="space-y-12 not-prose">
-      {/* 0. Introduction & Mental Model */}
-      <section id="introduction-mental-model" className="space-y-4 border-b border-zinc-800 pb-8 scroll-mt-24">
-        <div className="flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-violet-400 shrink-0" />
-          <h1 className="text-xl sm:text-2xl font-bold text-white font-mono break-words">Introduction &amp; Mental Model</h1>
+    <div className="space-y-12 not-prose font-body">
+      {/* 0. Hero Header */}
+      <section id="introduction-mental-model" className="space-y-6 pb-8 border-b-2 border-line scroll-mt-24">
+        <div className="border-2 border-line bg-bg inline-flex items-center gap-2 px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-accent shadow-rest">
+          <span className="w-2 h-2 bg-accent inline-block" />
+          <span>[DOCS / 01] GETTING STARTED</span>
         </div>
-        <p className="text-sm text-zinc-300 font-sans leading-relaxed">
-          ScrollCraft is a hardware-accelerated declarative scroll engine built specifically for React and Next.js App Router. It decouples continuous scroll gestures from React&apos;s fiber reconciliation tree, writing directly to GPU composite matrices with zero Virtual DOM re-renders.
-        </p>
 
-        {/* 3 Core Pillars */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-          <div className="p-4 rounded-xl bg-[#0a0a0c] border border-zinc-800 space-y-1.5">
-            <div className="flex items-center gap-2 text-violet-400 font-mono text-xs font-bold">
-              <Zap className="w-3.5 h-3.5" />
-              <span>Zero Re-Renders</span>
+        <div className="space-y-3">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight text-fg font-display leading-[0.92]">
+            Getting Started
+          </h1>
+          <p className="text-base sm:text-lg text-fg/90 font-body leading-relaxed max-w-3xl">
+            ScrollCraft is a hardware-accelerated declarative scroll engine built specifically for React and Next.js App Router. It decouples continuous scroll gestures from React&apos;s Virtual DOM reconciliation tree, writing directly to GPU composite matrices with zero re-renders.
+          </p>
+        </div>
+
+        {/* 3 Core Guarantees */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+          <div className="border-2 border-line bg-bg shadow-rest flex flex-col justify-between">
+            <div className="border-b-2 border-line bg-line-soft/30 px-3.5 py-2 font-mono text-[11px] font-bold text-accent uppercase tracking-wider flex items-center justify-between">
+              <span>[01] ZERO RE-RENDERS</span>
+              <Zap className="w-3.5 h-3.5 text-accent" />
             </div>
-            <p className="text-zinc-400 text-xs font-sans leading-relaxed">
-              Scroll transformations update directly in the RAF render microtask without triggering component re-renders.
-            </p>
+            <div className="p-4">
+              <p className="text-fg/80 text-xs font-body leading-relaxed">
+                Scroll transformations write directly to ref transform styles in the RAF microtask without triggering React component re-renders.
+              </p>
+            </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#0a0a0c] border border-zinc-800 space-y-1.5">
-            <div className="flex items-center gap-2 text-emerald-400 font-mono text-xs font-bold">
-              <Layers className="w-3.5 h-3.5" />
-              <span>RSC &amp; Slot Native</span>
+          <div className="border-2 border-line bg-bg shadow-rest flex flex-col justify-between">
+            <div className="border-b-2 border-line bg-line-soft/30 px-3.5 py-2 font-mono text-[11px] font-bold text-fg uppercase tracking-wider flex items-center justify-between">
+              <span>[02] RSC &amp; SLOT NATIVE</span>
+              <Layers className="w-3.5 h-3.5 text-fg" />
             </div>
-            <p className="text-zinc-400 text-xs font-sans leading-relaxed">
-              Fully compatible with Next.js 15 Server Components. Use <code className="text-zinc-300 font-mono">asChild</code> to avoid extra wrapper DOM nodes.
-            </p>
+            <div className="p-4">
+              <p className="text-fg/80 text-xs font-body leading-relaxed">
+                Fully compatible with Next.js 15 Server Components. Use <code className="text-accent font-mono font-bold">asChild</code> to avoid dummy wrapper DOM nodes.
+              </p>
+            </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#0a0a0c] border border-zinc-800 space-y-1.5">
-            <div className="flex items-center gap-2 text-purple-400 font-mono text-xs font-bold">
-              <Cpu className="w-3.5 h-3.5" />
-              <span>&lt; 5 KB Brotli</span>
+          <div className="border-2 border-line bg-bg shadow-rest flex flex-col justify-between">
+            <div className="border-b-2 border-line bg-line-soft/30 px-3.5 py-2 font-mono text-[11px] font-bold text-fg uppercase tracking-wider flex items-center justify-between">
+              <span>[03] &lt;5KB BROTLI</span>
+              <Cpu className="w-3.5 h-3.5 text-fg" />
             </div>
-            <p className="text-zinc-400 text-xs font-sans leading-relaxed">
-              Tree-shakeable architecture with zero external runtime dependencies. Built on high-precision physics.
-            </p>
+            <div className="p-4">
+              <p className="text-fg/80 text-xs font-body leading-relaxed">
+                Tree-shakeable architecture with zero external runtime dependencies. Built on high-precision physics.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 1. Installation */}
-      <section id="install-package" className="space-y-4 border-b border-zinc-800 pb-8 scroll-mt-24">
-        <div className="flex items-center gap-2">
-          <Terminal className="w-4 h-4 text-violet-400 shrink-0" />
-          <h2 className="text-lg sm:text-xl font-bold text-white font-mono break-words">Package Installation</h2>
+      {/* STEP 01: INSTALLATION */}
+      <section id="step-01-install" className="space-y-4 border-b-2 border-line pb-8 scroll-mt-24">
+        <div className="flex items-center gap-3">
+          <span className="h-7 w-7 border-2 border-line bg-accent text-black font-mono font-black flex items-center justify-center text-xs">
+            01
+          </span>
+          <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-fg font-display">
+            Step 1: Install Package
+          </h2>
         </div>
+        <p className="text-xs sm:text-sm text-muted font-body">
+          Install the official production package from npm. ScrollCraft is distributed with complete TypeScript typings.
+        </p>
 
-        {/* Package Manager Selector & Copy Box */}
-        <div className="rounded-xl border border-zinc-800 bg-[#09090b] p-3 sm:p-4 space-y-3 shadow-lg">
-          <div className="flex items-center gap-2 border-b border-zinc-800/80 pb-3 overflow-x-auto no-scrollbar">
-            {(['pnpm', 'npm', 'yarn', 'bun'] as const).map((pm) => {
-              const isUpcoming = pm === 'yarn' || pm === 'bun';
-              return (
-                <button
-                  key={pm}
-                  type="button"
-                  onClick={() => setActivePm(pm)}
-                  className={`px-3 py-1 rounded-md text-xs font-mono font-medium border transition-colors flex items-center gap-1.5 cursor-pointer shrink-0 ${
-                    activePm === pm
-                      ? 'bg-zinc-800 text-white font-bold border-zinc-700'
-                      : 'text-zinc-500 hover:text-zinc-300 border-transparent'
-                  }`}
-                >
-                  <span>{pm}</span>
-                  {isUpcoming && (
-                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30 font-sans font-medium">
-                      Coming Soon
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {(activePm === 'yarn' || activePm === 'bun') && (
-            <div className="rounded-lg bg-amber-950/20 border border-amber-500/30 p-2.5 text-xs text-amber-300/90 font-sans flex items-center gap-2">
-              <span className="font-semibold text-amber-400 uppercase font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/30 shrink-0">
-                Notice
+        {/* Installation Strip */}
+        <div className="border-2 border-line bg-bg p-4 sm:p-5 shadow-rest space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-line-soft pb-3">
+            {/* Working Package Managers */}
+            <div className="flex items-center gap-2 font-mono">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted mr-1">PACKAGE:</span>
+              <button
+                type="button"
+                onClick={() => setActivePm('npm')}
+                className={`h-9 px-3.5 border-2 text-xs font-mono font-bold uppercase transition-all cursor-pointer ${
+                  activePm === 'npm'
+                    ? 'bg-accent text-black border-line shadow-rest'
+                    : 'bg-bg text-muted hover:text-fg border-line-soft'
+                }`}
+              >
+                npm
+              </button>
+              <button
+                type="button"
+                onClick={() => setActivePm('pnpm')}
+                className={`h-9 px-3.5 border-2 text-xs font-mono font-bold uppercase transition-all cursor-pointer ${
+                  activePm === 'pnpm'
+                    ? 'bg-accent text-black border-line shadow-rest'
+                    : 'bg-bg text-muted hover:text-fg border-line-soft'
+                }`}
+              >
+                pnpm
+              </button>
+              {/* Disabled options clearly marked */}
+              <span
+                aria-disabled="true"
+                className="h-9 px-3 border-2 border-line-soft/40 bg-bg text-muted/40 text-xs font-mono line-through flex items-center cursor-not-allowed select-none"
+                title="Yarn registry integration in progress"
+              >
+                yarn
               </span>
-              <span className="break-words">
-                {activePm === 'yarn' ? 'Yarn' : 'Bun'} package registry integration is in validation. For v0.2.0 Beta, please use <strong>pnpm</strong> or <strong>npm</strong>.
+              <span
+                aria-disabled="true"
+                className="h-9 px-3 border-2 border-line-soft/40 bg-bg text-muted/40 text-xs font-mono line-through flex items-center cursor-not-allowed select-none"
+                title="Bun registry integration in progress"
+              >
+                bun
               </span>
             </div>
-          )}
 
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 font-mono text-xs sm:text-sm text-zinc-200">
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-              <span className="text-zinc-500 select-none">$</span>
-              <span className="whitespace-nowrap">{PM_COMMANDS[activePm]}</span>
+            {/* Version Badge */}
+            <div className="border-2 border-line bg-bg px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-accent">
+              RELEASE: v0.2.0 BETA
+            </div>
+          </div>
+
+          {/* Terminal Command + 40px Square Copy Button */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono text-xs sm:text-sm">
+            <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1">
+              <span className="text-accent select-none font-bold text-base">$</span>
+              <span className="whitespace-nowrap text-fg font-mono font-bold tracking-tight">
+                {PM_COMMANDS[activePm]}
+              </span>
             </div>
             <button
               onClick={copyInstall}
-              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs transition-colors cursor-pointer shrink-0 self-end sm:self-auto"
+              className="h-10 min-w-[110px] flex items-center justify-center gap-2 px-4 border-2 border-line bg-accent text-black font-mono font-bold text-xs uppercase shadow-rest hover:shadow-hover hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all cursor-pointer shrink-0 self-end sm:self-auto"
               title="Copy installation command"
             >
               {copied ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-emerald-400">Copied!</span>
+                  <Check className="w-4 h-4 text-black stroke-[3]" />
+                  <span>COPIED</span>
                 </>
               ) : (
                 <>
-                  <Copy className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>Copy</span>
+                  <Copy className="w-4 h-4 text-black" />
+                  <span>COPY</span>
                 </>
               )}
             </button>
           </div>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-mono text-zinc-400 pt-1">
-          <span>Peer Requirements: React 18+ or 19+</span>
-          <span className="hidden sm:inline">&bull;</span>
-          <span>Next.js 14+ or 15+ (App Router)</span>
-        </div>
-
-        {/* Release Status Banner */}
-        <div className="rounded-xl bg-gradient-to-r from-emerald-950/30 via-zinc-900/50 to-violet-950/30 border border-emerald-500/30 p-4 space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-            </span>
-            <span className="text-xs font-mono font-bold text-emerald-400">Current Release: v0.2.0 Beta (LIVE)</span>
-            <span className="text-zinc-600 font-mono text-xs">|</span>
-            <span className="text-xs font-mono font-bold text-violet-400">Next Horizon: v0.3.0 (Planned)</span>
-          </div>
-          <p className="text-xs text-zinc-300 font-sans leading-relaxed">
-            Install the active release with <code className="text-emerald-300 font-mono font-semibold">npm install @scrollcraft/core@beta @scrollcraft/react@beta</code>. <strong className="text-white">v0.2.0 Beta</strong> is the single recommended package, featuring the Universal Dual API, 11 production primitives, 9 hooks, and zero React Virtual DOM re-renders. (Note: Early internal cycles <code className="text-zinc-400 font-mono">v0.1.0</code> and <code className="text-zinc-400 font-mono">v0.1.1</code> served strictly as soak baselines and are deprecated).
-          </p>
-        </div>
-
-        {/* Feature Support Matrix Table */}
-        <div id="feature-matrix" className="rounded-xl border border-zinc-800 bg-[#09090b] p-5 space-y-4 shadow-lg scroll-mt-24">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm sm:text-base font-bold text-white font-mono">Feature Support Matrix</h3>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                  v0.2.0 Beta
-                </span>
-              </div>
-              <p className="text-xs text-zinc-400 font-sans mt-0.5">
-                Transparent disclosure of primitive capabilities, polymorphic slot composition, accessibility, and hardware acceleration drivers.
-              </p>
-            </div>
-            <div className="flex items-center gap-3 text-[10px] sm:text-xs font-mono text-zinc-400 shrink-0">
-              <span className="flex items-center gap-1"><span className="text-emerald-400 font-bold">✅</span> Shipped</span>
-              <span className="flex items-center gap-1"><span className="text-amber-400 font-bold">🔜</span> v0.3.0</span>
-              <span className="flex items-center gap-1"><span className="text-zinc-500 font-bold">—</span> N/A</span>
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-mono border-collapse min-w-[580px]">
-              <thead>
-                <tr className="border-b border-zinc-800 text-zinc-400">
-                  <th className="py-2.5 px-3 font-semibold text-white">Primitive</th>
-                  <th className="py-2.5 px-3 font-semibold text-center">asChild (Polymorphic)</th>
-                  <th className="py-2.5 px-3 font-semibold text-center">respectReducedMotion (A11y)</th>
-                  <th className="py-2.5 px-3 font-semibold text-center">Native Driver</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
-                <tr className="hover:bg-zinc-900/40 transition-colors">
-                  <td className="py-2.5 px-3 font-semibold text-violet-300">&lt;Parallax /&gt;</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-bold">✅</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-bold">✅</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-semibold">✅ (driver: &apos;css&apos;)</td>
-                </tr>
-                <tr className="hover:bg-zinc-900/40 transition-colors">
-                  <td className="py-2.5 px-3 font-semibold text-violet-300">&lt;Reveal /&gt;</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-bold">✅</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-bold">✅</td>
-                  <td className="py-2.5 px-3 text-center text-zinc-500">—</td>
-                </tr>
-                <tr className="hover:bg-zinc-900/40 transition-colors">
-                  <td className="py-2.5 px-3 font-semibold text-violet-300">&lt;ScrollTransform /&gt;</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-bold">✅</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-bold">✅</td>
-                  <td className="py-2.5 px-3 text-center text-zinc-500">—</td>
-                </tr>
-                <tr className="hover:bg-zinc-900/40 transition-colors">
-                  <td className="py-2.5 px-3 font-semibold text-violet-300">&lt;ScrollDraw /&gt;</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-bold">✅</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-bold">✅</td>
-                  <td className="py-2.5 px-3 text-center text-zinc-500">—</td>
-                </tr>
-                <tr className="hover:bg-zinc-900/40 transition-colors">
-                  <td className="py-2.5 px-3 font-semibold text-violet-300">&lt;Pin /&gt;</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-bold">✅</td>
-                  <td className="py-2.5 px-3 text-center text-amber-400 font-semibold">🔜</td>
-                  <td className="py-2.5 px-3 text-center text-zinc-400">Partial (disableTransform)</td>
-                </tr>
-                <tr className="hover:bg-zinc-900/40 transition-colors">
-                  <td className="py-2.5 px-3 font-semibold text-violet-300">&lt;HorizontalScroll /&gt;</td>
-                  <td className="py-2.5 px-3 text-center text-zinc-500">—</td>
-                  <td className="py-2.5 px-3 text-center text-amber-400 font-semibold">🔜</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-semibold">✅ (CSS Snap)</td>
-                </tr>
-                <tr className="hover:bg-zinc-900/40 transition-colors">
-                  <td className="py-2.5 px-3 font-semibold text-violet-300">&lt;StackedCards /&gt;</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-bold">✅</td>
-                  <td className="py-2.5 px-3 text-center text-amber-400 font-semibold">🔜</td>
-                  <td className="py-2.5 px-3 text-center text-zinc-500">—</td>
-                </tr>
-                <tr className="hover:bg-zinc-900/40 transition-colors">
-                  <td className="py-2.5 px-3 font-semibold text-violet-300">&lt;Magnetic /&gt;</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-bold">✅</td>
-                  <td className="py-2.5 px-3 text-center text-amber-400 font-semibold">🔜</td>
-                  <td className="py-2.5 px-3 text-center text-zinc-500">—</td>
-                </tr>
-                <tr className="hover:bg-zinc-900/40 transition-colors">
-                  <td className="py-2.5 px-3 font-semibold text-violet-300">&lt;ScrollProgress /&gt;</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-bold">✅</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-bold">✅</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-semibold">✅ (CSS Timeline)</td>
-                </tr>
-                <tr className="hover:bg-zinc-900/40 transition-colors">
-                  <td className="py-2.5 px-3 font-semibold text-violet-300">&lt;VelocityMarquee /&gt;</td>
-                  <td className="py-2.5 px-3 text-center text-zinc-500">—</td>
-                  <td className="py-2.5 px-3 text-center text-amber-400 font-semibold">🔜</td>
-                  <td className="py-2.5 px-3 text-center text-zinc-500">—</td>
-                </tr>
-                <tr className="hover:bg-zinc-900/40 transition-colors">
-                  <td className="py-2.5 px-3 font-semibold text-violet-300">&lt;ScrollSequence /&gt;</td>
-                  <td className="py-2.5 px-3 text-center text-zinc-500">—</td>
-                  <td className="py-2.5 px-3 text-center text-amber-400 font-semibold">🔜</td>
-                  <td className="py-2.5 px-3 text-center text-zinc-500">— (Canvas 2D Ticker)</td>
-                </tr>
-                <tr className="hover:bg-zinc-900/40 transition-colors">
-                  <td className="py-2.5 px-3 font-semibold text-violet-300">&lt;TextReveal /&gt;</td>
-                  <td className="py-2.5 px-3 text-center text-emerald-400 font-bold">✅</td>
-                  <td className="py-2.5 px-3 text-center text-amber-400 font-semibold">🔜</td>
-                  <td className="py-2.5 px-3 text-center text-zinc-500">—</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div className="pt-2 border-t border-zinc-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[11px] text-zinc-400 font-sans">
-            <p>
-              In accordance with mature engineering standards (like React and MDN compatibility tables), transparently disclosing capabilities alongside current boundaries builds enduring developer trust.
-            </p>
-            <span className="font-mono text-violet-400 shrink-0">
-              🔜 = Scheduled for v0.3.0
-            </span>
+          <div className="pt-2 border-t-2 border-line-soft flex flex-wrap items-center gap-3 text-xs font-mono text-muted">
+            <span>PEER REQUIREMENTS: REACT 18+ / 19+</span>
+            <span>&bull;</span>
+            <span>NEXT.JS 14+ / 15+ (APP ROUTER)</span>
           </div>
         </div>
       </section>
 
-      {/* 2. Root Layout Integration */}
-      <section id="provider-setup" className="space-y-4 border-b border-zinc-800 pb-8 scroll-mt-24">
-        <div>
-          <h2 className="text-xl font-bold text-white font-mono mb-1">Root Layout Integration</h2>
-          <p className="text-xs text-zinc-400 font-sans">
-            Mount <code className="text-violet-400 font-mono">&lt;ScrollProvider /&gt;</code> in your root layout. Initializes the global 3-phase ticker and Lenis inertia physics.
-          </p>
+      {/* STEP 02: ROOT LAYOUT INTEGRATION */}
+      <section id="step-02-provider" className="space-y-4 border-b-2 border-line pb-8 scroll-mt-24">
+        <div className="flex items-center gap-3">
+          <span className="h-7 w-7 border-2 border-line bg-accent text-black font-mono font-black flex items-center justify-center text-xs">
+            02
+          </span>
+          <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-fg font-display">
+            Step 2: Mount Root Provider
+          </h2>
         </div>
+        <p className="text-xs sm:text-sm text-muted font-body">
+          Mount <code className="text-accent font-mono font-bold">&lt;ScrollProvider /&gt;</code> in your root layout. This initializes the global 3-phase microtask ticker and smooth inertia normalization.
+        </p>
 
         <CodeViewer code={NEXT_LAYOUT_SETUP} fileName="app/layout.tsx" />
 
-        {/* ScrollProvider Props Table */}
-        <div id="provider-props" className="space-y-3 pt-3 scroll-mt-24">
+        {/* Provider Configuration Options Table */}
+        <div id="provider-props" className="space-y-3 pt-4 scroll-mt-24">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 block font-semibold">
+            <span className="text-xs font-mono uppercase tracking-wider text-muted block font-bold">
               ScrollProvider Configuration Options
             </span>
-            <span className="text-[10px] font-mono text-zinc-500 sm:hidden">Swipe table &rarr;</span>
+            <span className="text-[10px] font-mono text-muted sm:hidden">SWIPE TABLE &rarr;</span>
           </div>
-          <div className="rounded-xl border border-zinc-800 overflow-x-auto bg-[#0a0a0c]">
+
+          <div className="border-2 border-line bg-bg shadow-rest overflow-x-auto">
             <table className="w-full text-left text-xs font-mono min-w-[550px]">
-              <thead className="bg-zinc-900/80 text-zinc-400 border-b border-zinc-800">
+              <thead className="bg-line-soft/30 text-muted uppercase text-[11px] border-b-2 border-line font-bold">
                 <tr>
-                  <th className="px-4 py-2.5 font-semibold">Prop</th>
-                  <th className="px-4 py-2.5 font-semibold">Type</th>
-                  <th className="px-4 py-2.5 font-semibold">Default</th>
-                  <th className="px-4 py-2.5 font-semibold">Description</th>
+                  <th className="px-4 py-3 text-fg font-bold">PROP</th>
+                  <th className="px-4 py-3">TYPE</th>
+                  <th className="px-4 py-3">DEFAULT</th>
+                  <th className="px-4 py-3">DESCRIPTION</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/60 font-sans text-zinc-300">
+              <tbody className="divide-y-2 divide-line-soft font-mono">
                 {PROVIDER_PROPS.map((p) => (
-                  <tr key={p.prop} className="hover:bg-zinc-900/40 transition-colors">
-                    <td className="px-4 py-3 font-mono text-violet-400 font-semibold">{p.prop}</td>
-                    <td className="px-4 py-3 font-mono text-purple-300 text-[11px]">{p.type}</td>
-                    <td className="px-4 py-3 font-mono text-zinc-500 text-[11px]">{p.defaultValue}</td>
-                    <td className="px-4 py-3 text-zinc-300 text-xs">{p.desc}</td>
+                  <tr key={p.prop} className="hover:bg-fg hover:text-black transition-colors group">
+                    <td className="px-4 py-3 text-accent group-hover:text-black font-bold">{p.prop}</td>
+                    <td className="px-4 py-3 text-fg font-mono text-xs">{p.type}</td>
+                    <td className="px-4 py-3 text-muted text-xs">{p.defaultValue}</td>
+                    <td className="px-4 py-3 text-fg group-hover:text-black text-xs font-body">{p.desc}</td>
                   </tr>
                 ))}
               </tbody>
@@ -395,46 +309,130 @@ export const DocGettingStarted: React.FC<DocGettingStartedProps> = ({ sectionId 
         </div>
       </section>
 
-      {/* 3. Quickstart Component Example */}
-      <section id="quick-example" className="space-y-4 border-b border-zinc-800 pb-8 scroll-mt-24">
-        <div>
-          <h2 className="text-xl font-bold text-white font-mono mb-1">Quickstart Component</h2>
-          <p className="text-xs text-zinc-400 font-sans">
-            Add <code className="text-violet-400 font-mono">&apos;use client&apos;</code> to components using primitives or hooks, or pass Server Components as children.
-          </p>
+      {/* STEP 03: FIRST SCROLL SCENE */}
+      <section id="step-03-scene" className="space-y-4 border-b-2 border-line pb-8 scroll-mt-24">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="h-7 w-7 border-2 border-line bg-accent text-black font-mono font-black flex items-center justify-center text-xs">
+              03
+            </span>
+            <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-fg font-display">
+              Step 3: Create Your First Scene
+            </h2>
+          </div>
+
+          {/* Test Lab Direct Link */}
+          <Link
+            href="/test/parallax"
+            className="h-10 px-4 border-2 border-line bg-bg hover:bg-accent text-fg hover:text-black font-mono text-xs font-bold uppercase transition-all shadow-rest hover:shadow-hover hover:-translate-x-0.5 hover:-translate-y-0.5 inline-flex items-center gap-2 self-start sm:self-auto"
+          >
+            <span>TEST IN LAB</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </Link>
         </div>
+        <p className="text-xs sm:text-sm text-muted font-body">
+          Use declarative primitives like <code className="text-accent font-mono font-bold">&lt;Parallax&gt;</code> and <code className="text-accent font-mono font-bold">&lt;Reveal&gt;</code> inside any client component.
+        </p>
 
         <CodeViewer code={QUICK_START_CODE} fileName="components/hero-scene.tsx" />
       </section>
 
-      {/* 4. Core Architecture Invariant */}
-      <section id="core-invariants" className="p-5 rounded-2xl bg-zinc-900/70 border border-zinc-800 text-xs font-mono text-zinc-300 space-y-2 scroll-mt-24">
-        <div className="flex items-center gap-2 text-white font-bold">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span>Core Engineering Invariants</span>
+      {/* FEATURE SUPPORT MATRIX */}
+      <section id="feature-matrix" className="space-y-4 border-b-2 border-line pb-8 scroll-mt-24">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-fg font-display">
+              Feature Support Matrix
+            </h2>
+            <p className="text-xs text-muted font-body mt-1">
+              Transparent disclosure of primitive capabilities, polymorphic slot composition, and hardware drivers.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 text-xs font-mono text-muted shrink-0">
+            <span className="flex items-center gap-1"><span className="text-accent font-bold">✅</span> SHIPPED</span>
+            <span className="flex items-center gap-1"><span className="text-muted font-bold">🔜</span> v0.3.0</span>
+            <span className="flex items-center gap-1"><span className="text-muted/40 font-bold">—</span> N/A</span>
+          </div>
         </div>
-        <ul className="list-disc list-inside space-y-1 text-zinc-400 font-sans leading-relaxed">
-          <li><strong className="text-white">Zero React Re-Renders:</strong> Scroll physics write directly to ref style transforms at hardware frame intervals.</li>
-          <li><strong className="text-white">Deterministic 3-Phase Loop:</strong> Measure phase precedes all style mutator writes, eliminating layout thrashing.</li>
-          <li><strong className="text-white">Full RSC Compatibility:</strong> Compatible with Next.js 15 Server Components and streaming SSR.</li>
-        </ul>
+
+        <div className="border-2 border-line bg-bg shadow-rest overflow-x-auto">
+          <table className="w-full text-left text-xs font-mono border-collapse min-w-[580px]">
+            <thead>
+              <tr className="border-b-2 border-line bg-line-soft/30 text-muted uppercase font-bold text-[11px]">
+                <th className="py-3 px-4 text-fg font-bold">PRIMITIVE</th>
+                <th className="py-3 px-4 text-center">asChild (Slot)</th>
+                <th className="py-3 px-4 text-center">Reduced Motion (A11y)</th>
+                <th className="py-3 px-4 text-center">Native Driver</th>
+                <th className="py-3 px-4 text-center">Interactive Lab</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y-2 divide-line-soft font-mono">
+              {[
+                { tag: '<Parallax />', slot: '✅', a11y: '✅', driver: '✅ (driver: "css")', slug: 'parallax' },
+                { tag: '<Reveal />', slot: '✅', a11y: '✅', driver: '—', slug: 'reveal' },
+                { tag: '<ScrollTransform />', slot: '✅', a11y: '✅', driver: '—', slug: 'scroll-transform' },
+                { tag: '<ScrollDraw />', slot: '✅', a11y: '✅', driver: '—', slug: 'scroll-draw' },
+                { tag: '<Pin />', slot: '✅', a11y: '🔜', driver: 'Partial (disableTransform)', slug: 'pin' },
+                { tag: '<HorizontalScroll />', slot: '—', a11y: '🔜', driver: '✅ (CSS Snap)', slug: 'horizontal-scroll' },
+                { tag: '<StackedCards />', slot: '✅', a11y: '🔜', driver: '—', slug: 'stacked-cards' },
+                { tag: '<Magnetic />', slot: '✅', a11y: '🔜', driver: '—', slug: 'magnetic' },
+                { tag: '<ScrollProgress />', slot: '✅', a11y: '✅', driver: '✅ (CSS Timeline)', slug: 'scroll-progress' },
+                { tag: '<VelocityMarquee />', slot: '—', a11y: '🔜', driver: '—', slug: 'velocity-marquee' },
+                { tag: '<ScrollSequence />', slot: '—', a11y: '🔜', driver: '— (Canvas 2D)', slug: 'scroll-sequence' },
+                { tag: '<TextReveal />', slot: '✅', a11y: '🔜', driver: '—', slug: 'text-reveal' },
+              ].map((row) => (
+                <tr key={row.tag} className="hover:bg-fg hover:text-black transition-colors group">
+                  <td className="py-3 px-4 font-bold text-accent group-hover:text-black">{row.tag}</td>
+                  <td className="py-3 px-4 text-center font-bold">{row.slot}</td>
+                  <td className="py-3 px-4 text-center font-bold">{row.a11y}</td>
+                  <td className="py-3 px-4 text-center text-muted group-hover:text-black">{row.driver}</td>
+                  <td className="py-3 px-4 text-center">
+                    <Link
+                      href={`/test/${row.slug}`}
+                      className="px-2 py-1 border border-line bg-bg group-hover:bg-black group-hover:text-accent text-accent text-[11px] font-mono font-bold uppercase transition-colors inline-flex items-center gap-1"
+                    >
+                      <span>TEST</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
 
-      {/* 5. Architecture & Attributions */}
-      <section id="architecture-attributions" className="p-5 rounded-2xl bg-zinc-900/40 border border-zinc-800/80 text-xs text-zinc-400 space-y-3 font-sans scroll-mt-24">
-        <div className="flex items-center gap-2 text-white font-mono font-bold">
-          <Heart className="w-4 h-4 text-violet-400" />
-          <span>Architecture &amp; Attributions</span>
-        </div>
-        <div className="space-y-2 leading-relaxed">
-          <p>
-            <strong className="text-zinc-200 font-mono">ScrollCraft Motion Engine:</strong> The core multi-phase ticker, zero-rerender DOM compositor, native CSS Scroll-Timeline drivers, and declarative primitives (<code className="text-violet-300">&lt;Parallax&gt;</code>, <code className="text-violet-300">&lt;Pin&gt;</code>, <code className="text-violet-300">&lt;Reveal&gt;</code>, <code className="text-violet-300">&lt;StackedCards&gt;</code>) are custom in-house systems built from scratch for React.
-          </p>
-          <p>
-            <strong className="text-zinc-200 font-mono">Smooth Inertia Normalization:</strong> Our virtual inertia physics take mathematical inspiration from the pioneering work of Studio Freight&apos;s Lenis. We utilize these normalization principles to provide buttery trackpad and wheel interpolation across browsers, wired directly into ScrollCraft&apos;s proprietary zero-rerender animation engine.
-          </p>
-        </div>
-      </section>
+      {/* CORE INVARIANTS & ATTRIBUTIONS */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <section id="core-invariants" className="border-2 border-line bg-bg shadow-rest flex flex-col justify-between">
+          <div className="border-b-2 border-line bg-line-soft/30 px-4 py-2.5 font-mono text-xs font-bold text-fg uppercase tracking-wider flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-accent" />
+            <span>ENGINEERING INVARIANTS</span>
+          </div>
+          <div className="p-5 space-y-2 text-xs font-mono text-fg">
+            <ul className="list-disc list-inside space-y-2 text-fg/90 font-body leading-relaxed">
+              <li><strong className="text-accent font-mono font-bold">Zero React Re-Renders:</strong> Scroll physics write directly to ref style transforms at hardware frame intervals.</li>
+              <li><strong className="text-accent font-mono font-bold">Deterministic 3-Phase Loop:</strong> Measure phase strictly precedes all style writes, eliminating forced synchronous reflows.</li>
+              <li><strong className="text-accent font-mono font-bold">Full RSC Compatibility:</strong> Compatible with Next.js 15 Server Components and streaming SSR.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="architecture-attributions" className="border-2 border-line bg-bg shadow-rest flex flex-col justify-between">
+          <div className="border-b-2 border-line bg-line-soft/30 px-4 py-2.5 font-mono text-xs font-bold text-fg uppercase tracking-wider flex items-center gap-2">
+            <Heart className="w-4 h-4 text-accent" />
+            <span>ARCHITECTURE &amp; ATTRIBUTIONS</span>
+          </div>
+          <div className="p-5 space-y-3 text-xs text-fg/90 font-body leading-relaxed">
+            <p>
+              <strong className="text-accent font-mono font-bold uppercase">ScrollCraft Motion Engine:</strong> The multi-phase ticker, zero-rerender DOM compositor, CSS Scroll-Timeline drivers, and declarative primitives are custom in-house systems built from scratch for React.
+            </p>
+            <p>
+              <strong className="text-accent font-mono font-bold uppercase">Smooth Inertia Normalization:</strong> Our virtual inertia physics take mathematical inspiration from the pioneering work of Studio Freight&apos;s Lenis. We utilize these normalization principles to provide buttery trackpad and wheel interpolation across browsers.
+            </p>
+          </div>
+        </section>
+      </div>
     </div>
   );
 };

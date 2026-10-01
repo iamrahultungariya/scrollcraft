@@ -5,9 +5,9 @@ import { VelocityMarquee } from '@scrollcraft/react';
 
 const BADGES = [
   'ZERO VDOM OVERHEAD',
-  '120 FPS SYNCHRONIZED',
+  'SUBPIXEL FLUID MOMENTUM',
   'NEXT.JS 15 APP ROUTER READY',
-  '4.8 KB GZIPPED CORE',
+  '<5 KB TREE-SHAKEN CORE',
   'ZERO HYDRATION FOUC',
   'HARDWARE GPU TRANSFORM FLUSH',
   'REACT 19 COMPATIBLE',
@@ -17,19 +17,16 @@ const BADGES = [
 
 export function MomentumStripSection() {
   return (
-    <div className="relative w-full py-8 bg-[#0c0c0e] border-b border-[#1c1c1f] overflow-hidden select-none">
+    <div className="relative w-full py-8 bg-ink border-b border-paper/10 overflow-hidden select-none">
       <VelocityMarquee
         baseSpeed={0.8}
         velocityMultiplier={2.6}
-        className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#71717a] py-1"
+        className="font-mono text-[11px] uppercase tracking-[0.2em] text-paper/40 py-1"
       >
-        {BADGES.map((b, i) => (
-          <span
-            key={i}
-            className="inline-flex items-center gap-3.5 mx-5"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6] shrink-0" />
-            <span className="text-[#a1a1aa] font-medium">{b}</span>
+        {BADGES.map((badge, i) => (
+          <span key={i} className="inline-flex items-center gap-4 mx-6">
+            <span className="size-1.5 rounded-full bg-lime shrink-0" />
+            <span className="text-paper/80 font-medium">{badge}</span>
           </span>
         ))}
       </VelocityMarquee>

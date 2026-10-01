@@ -137,11 +137,16 @@ export const TextReveal = React.memo(
                     opacity: baseOpacity,
                     display: 'inline-block',
                     transformOrigin: '50% 100%',
+                    marginRight: i < wordGroups.length - 1 ? '0.3em' : undefined,
                   }}
                 >
                   {word}
                 </span>
-                {i < wordGroups.length - 1 && ' '}
+                {i < wordGroups.length - 1 && (
+                  <span aria-hidden="true" style={{ display: 'inline-block', width: '0.3em' }}>
+                    &nbsp;
+                  </span>
+                )}
               </React.Fragment>
             ))
           : wordGroups.map(({ chars, wordIndex }, i) => (
@@ -151,6 +156,7 @@ export const TextReveal = React.memo(
                   style={{
                     display: 'inline-block',
                     whiteSpace: 'nowrap',
+                    marginRight: i < wordGroups.length - 1 ? '0.3em' : undefined,
                   }}
                 >
                   {chars.map(({ char, index }) => (
@@ -171,7 +177,11 @@ export const TextReveal = React.memo(
                     </span>
                   ))}
                 </span>
-                {i < wordGroups.length - 1 && ' '}
+                {i < wordGroups.length - 1 && (
+                  <span aria-hidden="true" style={{ display: 'inline-block', width: '0.3em' }}>
+                    &nbsp;
+                  </span>
+                )}
               </React.Fragment>
             ))}
       </span>

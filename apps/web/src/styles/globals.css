@@ -2,6 +2,52 @@
 @import "./theme.css";
 @import "./motion.css";
 
+:root {
+  /* colour: 2 neutrals + 1 accent */
+  --bg:        #0C0F0C;
+  --fg:        #F4F1EA;
+  --muted:     #A8ABA0;   /* ≥ 8:1 on --bg, isse dark grey text kabhi nahi */
+  --accent:    #DFFF00;
+  --line:      #F4F1EA;   /* container borders */
+  --line-soft: #2B302A;   /* sirf internal dividers, weight same rahega */
+
+  /* shape */
+  --radius: 0px;
+  --bw: 2px;              /* poori site mein ek hi border weight */
+  --shadow-rest:  4px 4px 0 var(--accent);
+  --shadow-hover: 6px 6px 0 var(--accent);
+  --shadow-press: 0 0 0 var(--accent);
+
+  /* spacing: 8px base */
+  --s1: 4px; --s2: 8px; --s3: 16px; --s4: 24px; --s5: 32px; --s6: 48px; --s7: 80px;
+
+  /* motion */
+  --ease-snap: cubic-bezier(0.16, 1, 0.3, 1);   /* expo-out, entrances */
+  --ease-ui:   cubic-bezier(0.2, 0, 0, 1);      /* hover/press */
+  --t-press: 60ms; --t-hover: 120ms; --t-ui: 200ms; --t-enter: 320ms;
+
+  /* legacy alias bridge */
+  --ink: #0C0F0C;
+  --panel: #161c18;
+  --panel-light: #222923;
+  --lime: #DFFF00;
+  --paper: #F4F1EA;
+}
+
+*, *::before, *::after {
+  border-radius: var(--radius) !important;
+}
+
+::selection {
+  background: var(--accent) !important;
+  color: #000000 !important;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -16,15 +62,15 @@
 
   html,
   body {
-    background-color: #09090b;
-    color: #fafafa;
-    font-family: var(--font-sans, 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body, 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   .font-mono-code {
-    font-family: var(--font-mono, 'Geist Mono', monospace);
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
   }
 
   /* Utility to hide scrollbars on touch / horizontal scrollers */
@@ -34,11 +80,6 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
-  }
-
-  ::selection {
-    background: #18181b;
-    color: #ffffff;
   }
 
   /* Minimalist Obsidian Scrollbar */
@@ -53,11 +94,11 @@
 
   ::-webkit-scrollbar-thumb {
     background: #27272a;
-    border-radius: 9999px;
+    border-radius: 0 !important;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #3f3f46;
+    background: var(--accent);
   }
 }
 
@@ -153,5 +194,126 @@
 noscript [data-scrollcraft-reveal="pending"] {
   opacity: 1 !important;
 }
+
+/* ==========================================================================
+   Brutalist Stage & Architectural Layout System (Lovable Design System)
+   ========================================================================== */
+
+.scrollcraft {
+  font-family: var(--font-body, 'Manrope', sans-serif);
+  background-color: var(--ink);
+  background-image:
+    linear-gradient(90deg, transparent calc(100% - 1px), rgba(245, 246, 238, 0.035) 1px),
+    linear-gradient(rgba(245, 246, 238, 0.025) 1px, transparent 1px);
+  background-size: 25% 100%, 100% 80px;
+}
+
+@media (max-width: 639px) {
+  .scrollcraft {
+    background-size: 50% 100%, 100% 64px;
+  }
+}
+
+.hero-shell {
+  min-height: auto;
+}
+
+.hero-title {
+  display: grid;
+  font-size: clamp(3.2rem, 7.5vw, 7.4rem);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+}
+
+/* ==========================================================================
+   Brutalist Docs Typography (2 Neutrals + 1 Accent)
+   ========================================================================== */
+
+.docs-prose h1 {
+  font: 900 clamp(2.5rem, 5.5vw, 4.5rem)/0.92 var(--font-display, 'Sora', sans-serif);
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  margin-bottom: var(--s4);
+}
+.docs-prose h2 {
+  font: 800 clamp(1.6rem, 2.8vw, 2.4rem)/1.05 var(--font-display, 'Sora', sans-serif);
+  text-transform: uppercase;
+  border-top: var(--bw) solid var(--line);
+  padding-top: var(--s4);
+  margin-top: var(--s6);
+  color: var(--fg);
+  letter-spacing: -0.02em;
+}
+.docs-prose h2::before {
+  content: attr(data-index);
+  font: 700 12px/1 var(--font-mono, monospace);
+  color: var(--accent);
+  display: block;
+  margin-bottom: var(--s2);
+  letter-spacing: 0.1em;
+}
+.docs-prose h3 {
+  font: 700 1.125rem/1.2 var(--font-mono, monospace);
+  text-transform: uppercase;
+  color: var(--fg);
+  letter-spacing: 0.05em;
+  margin-top: var(--s4);
+}
+.docs-prose p, .docs-prose li {
+  font: 400 1.0625rem/1.65 var(--font-body, 'Manrope', sans-serif);
+  color: var(--fg);
+  max-width: 68ch;
+}
+
+.hero-title > span {
+  opacity: 0;
+  transform: translateY(0.35em);
+  animation: title-rise 800ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.hero-title > span:nth-child(2) { animation-delay: 100ms; }
+.hero-title > span:nth-child(3) { animation-delay: 200ms; }
+
+.primitive-stage {
+  position: relative;
+  height: 9rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--paper) 10%, transparent);
+  border-radius: 0.35rem;
+  background: color-mix(in oklab, var(--ink) 72%, transparent);
+}
+
+.primitive-card {
+  transition: background-color 250ms ease, transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.primitive-card:hover {
+  background-color: color-mix(in oklab, var(--panel) 85%, var(--ink));
+  transform: translateY(-4px);
+}
+
+@keyframes title-rise {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-title > span {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  .stage-parallax,
+  .stage-reveal,
+  .stage-pin {
+    transition: none;
+    transform: none;
+  }
+  .primitive-card:hover {
+    transform: none;
+  }
+}
+
 
 

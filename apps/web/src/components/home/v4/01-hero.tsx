@@ -1,264 +1,213 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, type MouseEvent } from 'react';
 import Link from 'next/link';
-import { Parallax, Reveal } from '@scrollcraft/react';
-import { Copy, Check, ArrowRight, FlaskConical } from 'lucide-react';
-import { GithubIcon } from '@/components/ui/social-icons';
+import { ArrowDown, ArrowRight, Check, Copy } from 'lucide-react';
+import { HeroFeatureShowcase } from './hero-feature-showcase';
 
-const SPECS = [
-  { label: 'BUNDLE SIZE', value: '4.8 kB', detail: 'gzipped core' },
-  { label: 'VDOM DIFFS', value: '0', detail: 'bypasses react fiber' },
-  { label: 'DISPLAY SYNC', value: '120 FPS', detail: 'compositor locked' },
-  { label: 'MEMORY MODEL', value: 'WeakMap', detail: 'zero leak lifecycle' },
-];
+export function Eyebrow({ number, children }: { number: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 font-mono text-[0.64rem] font-medium uppercase tracking-[0.2em] text-paper/45">
+      <span className="text-lime">{number}</span>
+      <span>{children}</span>
+      <span className="h-px flex-1 bg-paper/10" />
+    </div>
+  );
+}
 
-export function HeroSection() {
-  const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'pnpm' | 'npm' | 'bun'>('pnpm');
+function MagneticDocsButton({ className }: { className?: string }) {
+  const buttonRef = useRef<HTMLAnchorElement>(null);
 
-  const installCmds = {
-    pnpm: 'pnpm add @scrollcraft/react @scrollcraft/core',
+  function handleMove(event: MouseEvent<HTMLAnchorElement>) {
+    const el = buttonRef.current;
+    if (!el) return;
+    const box = el.getBoundingClientRect();
+    const x = (event.clientX - box.left - box.width / 2) * 0.16;
+    const y = (event.clientY - box.top - box.height / 2) * 0.2;
+    el.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)`;
+  }
+
+  function handleLeave() {
+    const el = buttonRef.current;
+    if (!el) return;
+    el.style.transform = 'translate3d(0, 0, 0)';
+  }
+
+  return (
+    <Link
+      ref={buttonRef}
+      href="/docs"
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      className={`group inline-flex h-12 items-center justify-center gap-2 rounded-md bg-ink px-6 font-display text-xs font-bold uppercase text-lime transition-transform duration-150 hover:bg-ink/90 active:scale-95 ${className || ''}`}
+    >
+      <span>Explore docs</span>
+      <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
+    </Link>
+  );
+}
+
+function InstallCommand({ light = false }: { light?: boolean }) {
+  const [status, setStatus] = useState<'idle' | 'copied' | 'error'>('idle');
+  const [activePm, setActivePm] = useState<'pnpm' | 'npm' | 'bun'>('npm');
+
+  const commands = {
     npm: 'npm i @scrollcraft/react @scrollcraft/core',
+    pnpm: 'pnpm add @scrollcraft/react @scrollcraft/core',
     bun: 'bun add @scrollcraft/react @scrollcraft/core',
   };
 
-  const copyInstall = () => {
-    navigator.clipboard.writeText(installCmds[activeTab]);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const currentCmd = commands[activePm];
+
+  async function copyCommand() {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCmd);
+      } else {
+        const input = document.createElement('textarea');
+        input.value = currentCmd;
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+      }
+      setStatus('copied');
+    } catch {
+      setStatus('error');
+    }
+    window.setTimeout(() => setStatus('idle'), 2000);
+  }
+
+  const label = status === 'copied' ? 'Copied to clipboard' : status === 'error' ? 'Copy failed' : currentCmd;
 
   return (
-    <section className="relative w-full bg-[#09090b] border-b border-[#1c1c1f]">
-      {/* Top Architectural Coordinate Strip */}
-      <div className="border-b border-[#1c1c1f] bg-[#0c0c0e]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-2.5 flex items-center justify-between font-mono text-[11px] text-[#71717a]">
-          <div className="flex items-center gap-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6]" />
-            <span className="text-[#fafafa] font-semibold">SCROLLCRAFT</span>
-            <span className="text-[#27272a]">//</span>
-            <span className="uppercase tracking-[0.14em]">Hardware-Accelerated React Motion Engine</span>
+    <div
+      className={`flex h-12 min-w-0 items-center justify-between rounded-md border px-3 font-mono text-xs shadow-none transition-all sm:px-4 sm:text-sm ${
+        light
+          ? 'border-ink/20 bg-ink text-paper'
+          : 'border-paper/15 bg-panel text-paper/85'
+      }`}
+    >
+      <div className="flex items-center gap-2 min-w-0 overflow-hidden pr-2">
+        <div className="flex items-center gap-1 border-r border-ink/30 pr-2">
+          {(['npm', 'pnpm', 'bun'] as const).map((pm) => (
+            <button
+              key={pm}
+              type="button"
+              onClick={() => setActivePm(pm)}
+              className={`rounded px-1.5 py-0.5 text-[10px] uppercase font-mono tracking-wider transition-colors cursor-pointer ${
+                activePm === pm
+                  ? 'bg-lime text-ink font-bold'
+                  : 'text-paper/50 hover:text-paper'
+              }`}
+            >
+              {pm}
+            </button>
+          ))}
+        </div>
+        <span className="text-lime select-none font-bold">$</span>
+        <span className="truncate select-all text-xs font-mono">{label}</span>
+      </div>
+
+      <button
+        type="button"
+        onClick={copyCommand}
+        aria-label={status === 'copied' ? 'Install command copied' : 'Copy install command'}
+        className="shrink-0 p-1.5 rounded hover:bg-paper/10 text-paper/60 hover:text-paper transition-colors cursor-pointer"
+        title="Copy command"
+      >
+        {status === 'copied' ? (
+          <Check className="size-4 text-lime" />
+        ) : (
+          <Copy className="size-4 opacity-60 hover:opacity-100 transition-opacity" />
+        )}
+      </button>
+    </div>
+  );
+}
+
+export function HeroSection() {
+  return (
+    <section className="hero-shell relative w-full border-b border-paper/10 bg-ink">
+      {/* First Viewport Hero Grid */}
+      <div className="mx-auto grid max-w-[1280px] gap-8 px-5 pb-8 pt-10 sm:px-10 sm:pt-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16 lg:pb-16">
+        
+        {/* Left Column: Stacked Kinetic Typography */}
+        <div className="relative z-10">
+          <Eyebrow number="01">Zero-VDOM Engine</Eyebrow>
+
+          <h1 className="hero-title mt-7 font-display font-extrabold uppercase text-paper">
+            <span>Scroll</span>
+            <span>is the</span>
+            <span className="text-lime">engine.</span>
+          </h1>
+
+          <p className="mt-6 max-w-[44ch] text-sm leading-relaxed text-paper/70 sm:text-base font-body">
+            ScrollCraft decouples scroll animations from React Fiber. Instead of triggering full component re-renders on high-frequency scroll events, spatial matrices are calculated in a 4-phase game loop and applied directly to DOM hardware layers.
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-4 text-xs font-mono text-paper/50">
+            <span className="inline-flex items-center gap-2">
+              <span className="size-1.5 rounded-full bg-lime" />
+              REACT 19 + NEXT.JS 15
+            </span>
+            <span>//</span>
+            <span>HARDWARE COMPOSITOR DRIVEN</span>
+            <span>//</span>
+            <span>WEAKMAP MEMORY SAFETY</span>
           </div>
-          <div className="hidden sm:flex items-center gap-4">
-            <span>[v0.2.0-BETA]</span>
-            <span className="text-[#27272a]">//</span>
-            <span>REACT 19 + NEXT.JS 15</span>
+        </div>
+
+        {/* Right Column: Real Feature Showcase Stage */}
+        <div className="relative lg:pt-4">
+          <HeroFeatureShowcase />
+        </div>
+
+      </div>
+
+      {/* High-Impact Signal-Lime Conversion Banner */}
+      <div className="bg-lime text-ink">
+        <div className="mx-auto grid max-w-[1280px] gap-5 px-5 py-6 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:px-10 lg:grid-cols-[280px_1fr_220px]">
+          {/* Sizing Specifications */}
+          <div className="flex items-end justify-between gap-8 border-b border-ink/20 pb-4 sm:block sm:border-b-0 sm:border-r sm:pb-0 sm:pr-8">
+            <div>
+              <span className="font-mono text-[0.6rem] uppercase tracking-widest text-ink/70">
+                Core Engine
+              </span>
+              <div className="font-display text-2xl font-extrabold tracking-tight">
+                &lt;5 KB
+              </div>
+              <span className="text-[10px] font-mono text-ink/60">Tree-shakable zero-dep core</span>
+            </div>
+            <div className="text-right sm:mt-2 sm:text-left">
+              <span className="font-mono text-[0.6rem] uppercase tracking-widest text-ink/70">
+                Full Suite
+              </span>
+              <div className="font-display text-sm font-bold tracking-tight">
+                24 KB
+              </div>
+              <span className="text-[10px] font-mono text-ink/60">Primitives, hooks & physics</span>
+            </div>
           </div>
+
+          {/* Terminal Command */}
+          <InstallCommand light />
+
+          {/* Magnetic CTA Button */}
+          <MagneticDocsButton />
         </div>
       </div>
 
-      {/* Main Hero Container */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-16 pb-20 lg:pt-24 lg:pb-28">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-          
-          {/* Left Column: Editorial Statement & Actions (7 Cols) */}
-          <div className="lg:col-span-7 flex flex-col items-start">
-            {/* Tag Badge */}
-            <Reveal duration={0.4}>
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-[#121214] border border-[#27272a] mb-6">
-                <span className="text-[10px] font-mono text-[#3b82f6] uppercase tracking-[0.18em] font-semibold">
-                  Zero-VDOM Architecture
-                </span>
-                <span className="text-[#27272a]">•</span>
-                <span className="text-[10px] font-mono text-[#71717a]">Direct GPU Compositing</span>
-              </div>
-            </Reveal>
-
-            {/* Giant Headline */}
-            <Reveal duration={0.5} delay={0.06}>
-              <h1 className="text-4xl sm:text-6xl lg:text-[4.5rem] font-bold tracking-[-0.04em] text-[#fafafa] leading-[1.04] font-sans">
-                Physics-driven scroll.<br />
-                <span className="text-[#a1a1aa]">Engineered for React.</span>
-              </h1>
-            </Reveal>
-
-            {/* Subtitle */}
-            <Reveal duration={0.5} delay={0.12}>
-              <p className="mt-6 text-base sm:text-lg text-[#a1a1aa] max-w-xl leading-[1.7] font-sans">
-                Composable primitives and reactive hooks that compute numeric spatial matrices and flush directly to hardware style declarations. Buttery 120 FPS motion with zero Virtual DOM reconciliation.
-              </p>
-            </Reveal>
-
-            {/* Terminal Box */}
-            <Reveal duration={0.5} delay={0.18}>
-              <div className="mt-8 w-full max-w-lg rounded-lg border border-[#27272a] bg-[#121214] overflow-hidden shadow-sm">
-                <div className="flex items-center justify-between px-3 py-2 border-b border-[#1c1c1f] bg-[#0d0d0f]">
-                  <div className="flex items-center gap-1">
-                    {(['pnpm', 'npm', 'bun'] as const).map((tab) => (
-                      <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`px-2.5 py-0.5 rounded text-[11px] font-mono transition-colors cursor-pointer ${
-                          activeTab === tab
-                            ? 'bg-[#18181b] text-[#fafafa] font-medium border border-[#27272a]'
-                            : 'text-[#71717a] hover:text-[#a1a1aa]'
-                        }`}
-                      >
-                        {tab}
-                      </button>
-                    ))}
-                  </div>
-                  <span className="text-[10px] font-mono text-[#71717a] uppercase tracking-wider">
-                    PACKAGE MANAGER
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between px-4 py-3 font-mono text-xs sm:text-sm">
-                  <div className="flex items-center gap-2 overflow-x-auto select-all pr-2">
-                    <span className="text-[#52525b] select-none">$</span>
-                    <span className="text-[#fafafa] whitespace-nowrap">{installCmds[activeTab]}</span>
-                  </div>
-                  <button
-                    onClick={copyInstall}
-                    className="p-1.5 rounded hover:bg-[#18181b] text-[#71717a] hover:text-[#fafafa] transition-colors cursor-pointer shrink-0"
-                    title="Copy command"
-                  >
-                    {copied ? <Check className="w-3.5 h-3.5 text-[#3b82f6]" /> : <Copy className="w-3.5 h-3.5" />}
-                  </button>
-                </div>
-              </div>
-            </Reveal>
-
-            {/* Action Buttons */}
-            <Reveal duration={0.5} delay={0.24}>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Link
-                  href="/docs"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded bg-[#fafafa] text-[#09090b] text-xs sm:text-sm font-semibold hover:bg-[#e4e4e7] transition-colors shadow-sm"
-                >
-                  Explore Documentation
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-
-                <Link
-                  href="/test"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded border border-[#27272a] bg-[#121214] text-[#fafafa] text-xs sm:text-sm font-medium hover:border-[#3f3f46] hover:bg-[#18181b] transition-colors"
-                >
-                  <FlaskConical className="w-3.5 h-3.5 text-[#3b82f6]" />
-                  Interactive Test Lab
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#18181b] border border-[#27272a] text-[#71717a] font-mono">
-                    25
-                  </span>
-                </Link>
-
-                <a
-                  href="https://github.com/ScrollCraft/scrollcraft"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded border border-[#27272a] text-[#71717a] hover:text-[#fafafa] hover:border-[#3f3f46] text-xs sm:text-sm transition-colors"
-                >
-                  <GithubIcon className="w-4 h-4" />
-                  <span>GitHub</span>
-                  <span className="text-[10px] font-mono text-[#71717a]">2.1k</span>
-                </a>
-              </div>
-            </Reveal>
-          </div>
-
-          {/* Right Column: Physical Hardware Compositor Stage (5 Cols) */}
-          <div className="lg:col-span-5 w-full">
-            <Reveal duration={0.6} delay={0.15}>
-              <div className="relative w-full rounded-xl border border-[#27272a] bg-[#121214] p-6 shadow-2xl overflow-hidden">
-                {/* Stage Header */}
-                <div className="flex items-center justify-between pb-4 border-b border-[#1c1c1f] font-mono text-[11px]">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#10b981]" />
-                    <span className="text-[#fafafa] font-semibold">STAGE // COMPOSITOR_VIEW</span>
-                  </div>
-                  <span className="text-[#71717a]">FPS: 120 LOCKED</span>
-                </div>
-
-                {/* Spatial Parallax Preview Canvas */}
-                <div className="relative h-[290px] my-5 rounded-lg border border-[#1c1c1f] bg-[#09090b] overflow-hidden flex flex-col justify-between p-4">
-                  {/* Subtle Grid Lines */}
-                  <div
-                    className="absolute inset-0 opacity-[0.08] pointer-events-none"
-                    style={{
-                      backgroundImage: 'linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)',
-                      backgroundSize: '24px 24px',
-                    }}
-                  />
-
-                  {/* Corner Crosshairs */}
-                  <span className="absolute top-2 left-2 text-[10px] font-mono text-[#3f3f46] select-none">+</span>
-                  <span className="absolute top-2 right-2 text-[10px] font-mono text-[#3f3f46] select-none">+</span>
-                  <span className="absolute bottom-2 left-2 text-[10px] font-mono text-[#3f3f46] select-none">+</span>
-                  <span className="absolute bottom-2 right-2 text-[10px] font-mono text-[#3f3f46] select-none">+</span>
-
-                  {/* Background Depth Plane with Parallax */}
-                  <Parallax speed={-0.2} className="relative z-0 pointer-events-none">
-                    <div className="w-full h-16 rounded border border-[#1c1c1f] bg-[#101012] p-3 flex items-center justify-between font-mono text-[10px] text-[#71717a]">
-                      <span>DEPTH LAYER -0.20x</span>
-                      <span>Z-INDEX: 00</span>
-                    </div>
-                  </Parallax>
-
-                  {/* Active Foreground Plane with Parallax */}
-                  <Parallax speed={0.25} className="relative z-10 my-auto">
-                    <div className="p-4 rounded-lg border border-[#27272a] bg-[#18181b] shadow-xl">
-                      <div className="flex items-center justify-between pb-2 border-b border-[#27272a] text-[11px] font-mono">
-                        <span className="text-[#3b82f6] font-semibold">LAYER 01 // FOREGROUND</span>
-                        <span className="text-[#10b981] font-semibold">translate3d(0, y, 0)</span>
-                      </div>
-                      <div className="mt-3 flex items-center justify-between font-mono text-xs">
-                        <span className="text-[#a1a1aa]">Reconciliation:</span>
-                        <span className="text-[#fafafa] font-bold">0 VDOM Dispatches</span>
-                      </div>
-                      <div className="mt-1.5 flex items-center justify-between font-mono text-xs">
-                        <span className="text-[#a1a1aa]">Render Pipeline:</span>
-                        <span className="text-[#fafafa]">Direct Style Flush</span>
-                      </div>
-                    </div>
-                  </Parallax>
-
-                  {/* Sub-plane with Counter Velocity */}
-                  <Parallax speed={-0.1} className="relative z-0 pointer-events-none">
-                    <div className="flex items-center justify-between text-[10px] font-mono text-[#71717a] px-1">
-                      <span>[COORDINATE MATRIX: 3D TRANSFORM]</span>
-                      <span>TICKER: ACTIVE</span>
-                    </div>
-                  </Parallax>
-                </div>
-
-                {/* Stage Telemetry Specs */}
-                <div className="pt-3 border-t border-[#1c1c1f] grid grid-cols-2 gap-3 text-xs font-mono">
-                  <div>
-                    <div className="text-[10px] text-[#71717a]">RE-RENDER COUNTER</div>
-                    <div className="text-sm font-bold text-[#10b981] mt-0.5">0 Diff Passes</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-[#71717a]">LIFECYCLE DRIVER</div>
-                    <div className="text-sm font-bold text-[#fafafa] mt-0.5">Ticker Loop Phase 4</div>
-                  </div>
-                </div>
-              </div>
-            </Reveal>
-          </div>
-
-        </div>
-      </div>
-
-      {/* Architectural Metric Strip */}
-      <div className="border-t border-[#1c1c1f] bg-[#0c0c0e]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 divide-x divide-transparent sm:divide-[#1c1c1f]">
-            {SPECS.map((spec, idx) => (
-              <div key={spec.label} className={idx > 0 ? 'sm:pl-8' : ''}>
-                <div className="text-[10px] font-mono text-[#71717a] uppercase tracking-[0.16em]">
-                  {spec.label}
-                </div>
-                <div className="text-2xl font-bold text-[#fafafa] font-sans mt-1 tracking-tight">
-                  {spec.value}
-                </div>
-                <div className="text-xs text-[#71717a] font-mono mt-0.5">
-                  {spec.detail}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Bottom See-It-In-Motion Prompt */}
+      <a
+        href="#primitives"
+        className="mx-auto flex max-w-[1280px] items-center justify-between px-5 py-4 font-mono text-[0.6rem] uppercase tracking-[0.2em] text-paper/40 hover:text-paper transition-colors sm:px-10"
+      >
+        <span>Inspect architecture & primitives</span>
+        <ArrowDown className="size-3.5 animate-bounce text-lime" aria-hidden="true" />
+      </a>
     </section>
   );
 }

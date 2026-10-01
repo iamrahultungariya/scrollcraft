@@ -12,20 +12,20 @@ import {
 const TextRevealSection = dynamic(
   () => import('@/components/home/v4/02-text-reveal-section').then((m) => m.TextRevealSection)
 );
+const PrimitivesShowcase = dynamic(
+  () => import('@/components/home/v4/02-primitives-showcase').then((m) => m.PrimitivesShowcase)
+);
 const StackedCardsSection = dynamic(
   () => import('@/components/home/v4/03-stacked-cards-section').then((m) => m.StackedCardsSection)
 );
 const ScrollDrawSection = dynamic(
   () => import('@/components/home/v4/04-scroll-draw-section').then((m) => m.ScrollDrawSection)
 );
-const CorePrinciplesSection = dynamic(
-  () => import('@/components/home/v4/05-core-principles').then((m) => m.CorePrinciplesSection)
-);
-const PrimitivesShowcase = dynamic(
-  () => import('@/components/home/v4/02-primitives-showcase').then((m) => m.PrimitivesShowcase)
-);
 const HooksDeveloperSection = dynamic(
   () => import('@/components/home/v4/04-hooks-developer').then((m) => m.HooksDeveloperSection)
+);
+const CorePrinciplesSection = dynamic(
+  () => import('@/components/home/v4/05-core-principles').then((m) => m.CorePrinciplesSection)
 );
 const MomentumStripSection = dynamic(
   () => import('@/components/home/v4/06-momentum-strip').then((m) => m.MomentumStripSection)
@@ -41,46 +41,48 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="relative w-full min-h-screen bg-[#09090b] text-[#fafafa] overflow-x-clip selection:bg-[#18181b] selection:text-white font-sans antialiased">
+    <div className="scrollcraft relative w-full min-h-screen bg-ink text-paper overflow-x-clip selection:bg-lime selection:text-ink font-body antialiased">
       {/* Keyboard Accessibility Skip Link */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#18181b] focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3b82f6] font-medium text-xs shadow-lg transition-all"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-lime focus:text-ink focus:font-bold focus:rounded-md focus:outline-none font-mono text-xs shadow-lg transition-all"
       >
         Skip to main content
       </a>
 
+      {/* Brutalist Header & Top Progress */}
       <Navbar />
       
       <main id="main-content" className="flex flex-col w-full items-center justify-start">
-        {/* Section 1: Hero */}
+        {/* Section 1: Hero & Kinetic Stage */}
         <HeroSection />
 
         {/* Section 2: Kinetic Typography Scrub (<TextReveal /> Dogfood) */}
         <TextRevealSection />
 
-        {/* Section 3: Physical Stacked Cards Runway (<StackedCards /> Dogfood) */}
-        <StackedCardsSection />
-
-        {/* Section 4: Real-Time Vector Architectural Blueprint (<ScrollDraw /> Dogfood) */}
-        <ScrollDrawSection />
-
-        {/* Section 5: Core Engineering Principles & Specifications */}
-        <CorePrinciplesSection />
-
-        {/* Section 6: Declarative Primitives Showcase */}
+        {/* Section 3: Three Core Primitives Showcase (<Parallax />, <Reveal />, <Pin />) */}
         <PrimitivesShowcase />
 
-        {/* Section 7: Headless Reactive Hooks Studio */}
+        {/* Section 4: Physical Stacked Cards Runway (<StackedCards /> Dogfood) */}
+        <StackedCardsSection />
+
+        {/* Section 5: Real-Time Vector Architectural Circuit (<ScrollDraw /> Dogfood) */}
+        <ScrollDrawSection />
+
+        {/* Section 6: Headless Reactive Hooks Studio */}
         <HooksDeveloperSection />
+
+        {/* Section 7: Core Engineering Principles & Specifications */}
+        <CorePrinciplesSection />
 
         {/* Section 8: Scroll Momentum Velocity Marquee Ticker */}
         <MomentumStripSection />
 
-        {/* Section 9: Final Production CTA & Test Lab */}
+        {/* Section 9: Production Sizing & Onboarding Banner */}
         <FinalCTASection />
       </main>
 
+      {/* Brutalist Footer */}
       <Footer />
     </div>
   );

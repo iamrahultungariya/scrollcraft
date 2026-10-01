@@ -30,20 +30,20 @@ export function HeadlessParallaxDemoStage({ knobs }: { knobs: Record<string, any
   return (
     <div className="w-full min-h-[180vh] flex flex-col items-center justify-start pt-32">
       <div className="text-center max-w-md mx-auto mb-16 space-y-2">
-        <span className="text-xs font-mono text-violet-400 uppercase tracking-widest">
-          Headless Direct Ref Binding
+        <span className="text-xs font-mono text-accent uppercase tracking-widest font-black">
+          [HEADLESS DIRECT REF BINDING]
         </span>
-        <h3 className="text-3xl font-extrabold text-white">useParallax Hook</h3>
-        <p className="text-xs text-zinc-400">Zero wrapper elements. Attached directly to ref.</p>
+        <h3 className="text-3xl font-black uppercase text-fg">useParallax Hook</h3>
+        <p className="text-xs text-muted font-mono">Zero wrapper elements. Attached directly to ref.</p>
       </div>
 
       <div
         ref={ref as any}
-        className="w-80 h-80 rounded-3xl border border-violet-500/40 bg-gradient-to-br from-violet-950/80 via-zinc-900 to-black p-8 shadow-2xl backdrop-blur-2xl flex flex-col justify-between"
+        className="w-80 h-80 border-2 border-line bg-bg p-8 shadow-hover flex flex-col justify-between"
       >
-        <span className="text-xs font-mono text-violet-400 font-bold uppercase">speed: {speed}x</span>
-        <h4 className="text-2xl font-black text-white">Headless Depth</h4>
-        <span className="text-xs font-mono text-emerald-400">0 Virtual DOM Re-renders</span>
+        <span className="text-xs font-mono text-accent font-black uppercase">SPEED: {speed}X</span>
+        <h4 className="text-2xl font-black uppercase text-fg">Headless Depth</h4>
+        <span className="text-xs font-mono text-muted font-bold uppercase">0 Virtual DOM Re-renders</span>
       </div>
     </div>
   );
@@ -60,19 +60,19 @@ export function HeadlessRevealDemoStage({ knobs }: { knobs: Record<string, any> 
   return (
     <div className="w-full min-h-[180vh] flex flex-col items-center justify-start pt-32">
       <div className="text-center max-w-md mx-auto mb-16 space-y-2">
-        <span className="text-xs font-mono text-violet-400 uppercase tracking-widest">
-          Scroll Down to Trigger Ref Reveal
+        <span className="text-xs font-mono text-accent uppercase tracking-widest font-black">
+          [SCROLL DOWN TO TRIGGER REF REVEAL]
         </span>
-        <h3 className="text-3xl font-extrabold text-white">useReveal Hook</h3>
+        <h3 className="text-3xl font-black uppercase text-fg">useReveal Hook</h3>
       </div>
 
       <div
         ref={ref as any}
-        className="w-88 rounded-3xl border border-zinc-800 bg-zinc-900/90 p-8 shadow-2xl backdrop-blur-xl text-center space-y-4"
+        className="w-88 border-2 border-line bg-bg p-8 shadow-rest text-center space-y-4"
       >
-        <span className="text-xs font-mono text-emerald-400 font-bold uppercase">Ref Bound Reveal</span>
-        <h4 className="text-2xl font-bold text-white">Batch-Optimized Observer</h4>
-        <p className="text-xs text-zinc-400">
+        <span className="text-xs font-mono text-accent font-black uppercase">[REF BOUND REVEAL]</span>
+        <h4 className="text-2xl font-black uppercase text-fg">Batch-Optimized Observer</h4>
+        <p className="text-xs text-muted font-mono">
           Enters with 3D tilt and optical blur clearance when intersecting viewport.
         </p>
       </div>
@@ -100,28 +100,28 @@ export function HeadlessPinDemoStage({ knobs }: { knobs: Record<string, any> }) 
       if (badgeRef.current) {
         badgeRef.current.textContent = 'PIN ACTIVE';
         badgeRef.current.className =
-          'text-xs font-mono font-bold px-2.5 py-1 rounded-full border bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
+          'text-xs font-mono font-black px-2.5 py-1 border-2 border-accent bg-bg text-accent uppercase';
       }
     },
     onLeave: () => {
       if (badgeRef.current) {
         badgeRef.current.textContent = 'UNPINNED (PAST)';
         badgeRef.current.className =
-          'text-xs font-mono font-bold px-2.5 py-1 rounded-full border bg-zinc-800 text-zinc-400 border-zinc-700';
+          'text-xs font-mono font-bold px-2.5 py-1 border-2 border-line-soft bg-bg text-muted uppercase';
       }
     },
     onEnterBack: () => {
       if (badgeRef.current) {
         badgeRef.current.textContent = 'PIN ACTIVE';
         badgeRef.current.className =
-          'text-xs font-mono font-bold px-2.5 py-1 rounded-full border bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
+          'text-xs font-mono font-black px-2.5 py-1 border-2 border-accent bg-bg text-accent uppercase';
       }
     },
     onLeaveBack: () => {
       if (badgeRef.current) {
         badgeRef.current.textContent = 'UNPINNED';
         badgeRef.current.className =
-          'text-xs font-mono font-bold px-2.5 py-1 rounded-full border bg-zinc-800 text-zinc-400 border-zinc-700';
+          'text-xs font-mono font-bold px-2.5 py-1 border-2 border-line-soft bg-bg text-muted uppercase';
       }
     },
   });
@@ -129,34 +129,34 @@ export function HeadlessPinDemoStage({ knobs }: { knobs: Record<string, any> }) 
   return (
     <div className="w-full min-h-[220vh] pt-24 pb-32">
       <div className="text-center max-w-md mx-auto mb-16 space-y-2">
-        <span className="text-xs font-mono text-violet-400 uppercase tracking-widest">
-          Headless Pinning (Direct DOM Observables)
+        <span className="text-xs font-mono text-accent uppercase tracking-widest font-black">
+          [HEADLESS PINNING // DIRECT DOM OBSERVABLES]
         </span>
-        <h3 className="text-3xl font-extrabold text-white">usePin Hook</h3>
+        <h3 className="text-3xl font-black uppercase text-fg">usePin Hook</h3>
       </div>
 
       <div
         ref={ref as any}
-        className="max-w-md mx-auto rounded-3xl border border-violet-500/40 bg-zinc-900/95 p-8 shadow-2xl backdrop-blur-2xl space-y-4"
+        className="max-w-md mx-auto border-2 border-line bg-bg p-8 shadow-hover space-y-4"
       >
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono text-violet-400 font-bold">top: {top}px</span>
+          <span className="text-xs font-mono text-accent font-black uppercase">TOP: {top}PX</span>
           <span
             ref={badgeRef}
-            className="text-xs font-mono font-bold px-2.5 py-1 rounded-full border bg-zinc-800 text-zinc-400 border-zinc-700"
+            className="text-xs font-mono font-bold px-2.5 py-1 border-2 border-line-soft bg-bg text-muted uppercase"
           >
             UNPINNED
           </span>
         </div>
 
-        <h4 className="text-2xl font-black text-white">Headless Sticky Pin</h4>
-        <p className="text-xs text-zinc-400">
+        <h4 className="text-2xl font-black uppercase text-fg">Headless Sticky Pin</h4>
+        <p className="text-xs text-muted font-mono">
           Dual API supports pure headless ref or ref-forwarding with observable progress values and 0 re-renders.
         </p>
 
-        <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 font-mono text-xs text-zinc-300">
+        <div className="p-4 border-2 border-line-soft bg-zinc-950 font-mono text-xs text-fg">
           Normalized Pin Progress:{' '}
-          <span ref={progressRef} className="text-violet-400 font-bold">
+          <span ref={progressRef} className="text-accent font-black">
             0.0%
           </span>
         </div>
@@ -184,21 +184,21 @@ export function HeadlessProgressDemoStage({ knobs }: { knobs: Record<string, any
   return (
     <div className="w-full min-h-[180vh] flex flex-col items-center justify-start pt-32">
       <div className="text-center max-w-md mx-auto mb-16 space-y-2">
-        <span className="text-xs font-mono text-violet-400 uppercase tracking-widest">
-          Target Scoped Math (0 Re-renders)
+        <span className="text-xs font-mono text-accent uppercase tracking-widest font-black">
+          [TARGET SCOPED MATH // 0 RE-RENDERS]
         </span>
-        <h3 className="text-3xl font-extrabold text-white">useScrollProgress Hook</h3>
+        <h3 className="text-3xl font-black uppercase text-fg">useScrollProgress Hook</h3>
       </div>
 
       <div
         ref={targetRef as any}
-        className="w-88 rounded-3xl border border-zinc-800 bg-zinc-900/90 p-8 shadow-2xl text-center space-y-4"
+        className="w-88 border-2 border-line bg-bg p-8 shadow-hover text-center space-y-4"
       >
-        <span className="text-xs font-mono text-violet-400 uppercase">Target Progression</span>
-        <div ref={percentRef} className="text-6xl font-black text-white font-mono">
+        <span className="text-xs font-mono text-muted uppercase font-bold">[TARGET PROGRESSION]</span>
+        <div ref={percentRef} className="text-6xl font-black text-accent font-mono">
           0%
         </div>
-        <p className="text-xs text-zinc-400">Calculated across offset: ['top bottom', 'bottom top']</p>
+        <p className="text-xs text-muted font-mono">Calculated across offset: [&apos;top bottom&apos;, &apos;bottom top&apos;]</p>
       </div>
     </div>
   );
@@ -217,19 +217,19 @@ export function HeadlessTransformDemoStage({ knobs }: { knobs: Record<string, an
   return (
     <div className="w-full min-h-[180vh] flex flex-col items-center justify-start pt-32">
       <div className="text-center max-w-md mx-auto mb-16 space-y-2">
-        <span className="text-xs font-mono text-violet-400 uppercase tracking-widest">
-          Compositor Ref Driver
+        <span className="text-xs font-mono text-accent uppercase tracking-widest font-black">
+          [COMPOSITOR REF DRIVER]
         </span>
-        <h3 className="text-3xl font-extrabold text-white">useScrollTransform Hook</h3>
+        <h3 className="text-3xl font-black uppercase text-fg">useScrollTransform Hook</h3>
       </div>
 
       <div
         ref={ref as any}
-        className="sticky top-40 w-80 h-80 rounded-3xl border border-violet-500/40 bg-zinc-900/90 p-8 shadow-2xl flex flex-col justify-between"
+        className="sticky top-40 w-80 h-80 border-2 border-line bg-bg p-8 shadow-hover flex flex-col justify-between"
       >
-        <span className="text-xs font-mono text-violet-400 font-bold">Preset: {preset}</span>
-        <h4 className="text-2xl font-black text-white">Direct GPU Writes</h4>
-        <span className="text-xs font-mono text-emerald-400">0 Re-renders on Scroll</span>
+        <span className="text-xs font-mono text-accent font-black uppercase">PRESET: {preset}</span>
+        <h4 className="text-2xl font-black uppercase text-fg">Direct GPU Writes</h4>
+        <span className="text-xs font-mono text-muted font-bold uppercase">0 Re-renders on Scroll</span>
       </div>
     </div>
   );
@@ -245,21 +245,21 @@ export function HeadlessDrawDemoStage({ knobs }: { knobs: Record<string, any> })
   return (
     <div className="w-full min-h-[180vh] flex flex-col items-center justify-start pt-32">
       <div className="text-center max-w-md mx-auto mb-16 space-y-2">
-        <span className="text-xs font-mono text-violet-400 uppercase tracking-widest">
-          Headless SVG Drawing
+        <span className="text-xs font-mono text-accent uppercase tracking-widest font-black">
+          [HEADLESS SVG DRAWING]
         </span>
-        <h3 className="text-3xl font-extrabold text-white">useScrollDraw Hook</h3>
+        <h3 className="text-3xl font-black uppercase text-fg">useScrollDraw Hook</h3>
       </div>
 
-      <div className="w-88 h-88 rounded-3xl border border-zinc-800 bg-zinc-900/90 p-8 shadow-2xl flex items-center justify-center">
+      <div className="w-88 h-88 border-2 border-line bg-bg p-8 shadow-hover flex items-center justify-center">
         <svg viewBox="0 0 100 100" className="w-56 h-56 overflow-visible" fill="none">
-          <circle cx="50" cy="50" r="40" stroke="#27272a" strokeWidth="6" />
+          <circle cx="50" cy="50" r="40" stroke="var(--line-soft)" strokeWidth="6" />
           <path
             ref={pathRef as any}
             d="M 10 50 A 40 40 0 0 0 90 50 A 40 40 0 0 0 10 50"
-            stroke="#8b5cf6"
+            stroke="var(--accent)"
             strokeWidth="6"
-            strokeLinecap="round"
+            strokeLinecap="square"
           />
         </svg>
       </div>
@@ -279,15 +279,15 @@ export function HeadlessMagneticDemoStage({ knobs }: { knobs: Record<string, any
   return (
     <div className="w-full min-h-[60vh] flex flex-col items-center justify-center gap-8">
       <div className="text-center space-y-2">
-        <span className="text-xs font-mono text-violet-400 uppercase tracking-widest">
-          Headless Spring Magnetism
+        <span className="text-xs font-mono text-accent uppercase tracking-widest font-black">
+          [HEADLESS SPRING MAGNETISM]
         </span>
-        <h3 className="text-3xl font-extrabold text-white">useMagnetic Hook</h3>
+        <h3 className="text-3xl font-black uppercase text-fg">useMagnetic Hook</h3>
       </div>
 
       <button
         ref={btnRef}
-        className="px-10 py-5 rounded-full border border-violet-500/40 bg-zinc-900 text-white font-bold text-lg shadow-2xl cursor-pointer hover:border-violet-400 transition-colors"
+        className="px-10 py-5 border-2 border-line bg-bg text-fg hover:bg-accent hover:text-black font-black font-mono text-lg shadow-rest cursor-pointer transition-colors uppercase"
       >
         Headless Magnetic Button
       </button>
@@ -313,20 +313,20 @@ export function TimelineChoreographyDemoStage({ knobs }: { knobs: Record<string,
   return (
     <div className="w-full min-h-[220vh] flex flex-col items-center justify-start pt-32">
       <div className="text-center max-w-md mx-auto mb-16 space-y-2">
-        <span className="text-xs font-mono text-violet-400 uppercase tracking-widest">
-          Choreographed Multi-Keyframe
+        <span className="text-xs font-mono text-accent uppercase tracking-widest font-black">
+          [CHOREOGRAPHED MULTI-KEYFRAME]
         </span>
-        <h3 className="text-3xl font-extrabold text-white">useScrollTimeline Hook</h3>
-        <p className="text-xs text-zinc-400">0% (Scale 0.8) → 50% (Scale 1.1) → 100% (Scale 0.9)</p>
+        <h3 className="text-3xl font-black uppercase text-fg">useScrollTimeline Hook</h3>
+        <p className="text-xs text-muted font-mono">0% (Scale 0.8) → 50% (Scale 1.1) → 100% (Scale 0.9)</p>
       </div>
 
       <div
         ref={cardRef as any}
-        className="sticky top-40 w-88 h-88 rounded-3xl border border-violet-500/40 bg-zinc-900/90 p-8 shadow-2xl flex flex-col justify-between"
+        className="sticky top-40 w-88 h-88 border-2 border-line bg-bg p-8 shadow-hover flex flex-col justify-between"
       >
-        <span className="text-xs font-mono text-violet-400 font-bold uppercase">Keyframe Sequencer</span>
-        <h4 className="text-2xl font-black text-white">Multi-Stage Choreography</h4>
-        <span className="text-xs font-mono text-emerald-400">0 Virtual DOM Re-renders</span>
+        <span className="text-xs font-mono text-accent font-black uppercase">KEYFRAME SEQUENCER</span>
+        <h4 className="text-2xl font-black uppercase text-fg">Multi-Stage Choreography</h4>
+        <span className="text-xs font-mono text-muted font-bold uppercase">0 Virtual DOM Re-renders</span>
       </div>
     </div>
   );
@@ -349,18 +349,18 @@ export function AutoHideHeaderDemoStage({ knobs }: { knobs: Record<string, any> 
       {/* Auto Hiding Bar */}
       <div
         ref={navRef}
-        className="fixed top-16 left-1/2 -translate-x-1/2 w-11/12 max-w-xl rounded-2xl border border-zinc-800 bg-zinc-900/95 backdrop-blur-xl px-6 py-4 flex items-center justify-between shadow-2xl z-40 transition-transform duration-300"
+        className="fixed top-20 left-1/2 -translate-x-1/2 w-11/12 max-w-xl border-2 border-line bg-bg px-6 py-4 flex items-center justify-between shadow-rest z-40 transition-transform duration-300"
       >
         <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-violet-400 animate-pulse" />
-          <span className="font-bold text-white text-sm">Auto-Hiding Floating Bar</span>
+          <span className="h-2 w-2 bg-accent animate-pulse" />
+          <span className="font-black text-fg uppercase text-sm font-mono">Auto-Hiding Floating Bar</span>
         </div>
         <div className="flex items-center gap-3 font-mono text-xs">
-          <span className="text-zinc-400">DIR:</span>
-          <span className="text-violet-400 font-bold uppercase">{direction}</span>
+          <span className="text-muted">DIR:</span>
+          <span className="text-accent font-black uppercase">{direction}</span>
           <span
-            className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-              isAtTop ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-zinc-800 text-zinc-400'
+            className={`px-2 py-0.5 border-2 text-[10px] font-bold uppercase ${
+              isAtTop ? 'border-accent text-accent bg-bg' : 'border-line-soft text-muted bg-bg'
             }`}
           >
             {isAtTop ? 'AT TOP (GUARD)' : 'SCROLLED'}
@@ -369,9 +369,9 @@ export function AutoHideHeaderDemoStage({ knobs }: { knobs: Record<string, any> 
       </div>
 
       <div className="max-w-md mx-auto text-center mt-32 space-y-4">
-        <h4 className="text-2xl font-bold text-white">iOS Rubber-Band Guard & Hysteresis</h4>
-        <p className="text-xs text-zinc-400 leading-relaxed">
-          Scroll down past {thresholdDown}px to hide the floating bar. Scroll up past {thresholdUp}px to reveal it. When at the top of the page, the iOS rubber-band guard locks direction to 'up' to prevent false hide glitches.
+        <h4 className="text-2xl font-black uppercase text-fg">iOS Rubber-Band Guard &amp; Hysteresis</h4>
+        <p className="text-xs text-muted leading-relaxed font-mono">
+          Scroll down past {thresholdDown}px to hide the floating bar. Scroll up past {thresholdUp}px to reveal it. When at the top of the page, the iOS rubber-band guard locks direction to &apos;up&apos; to prevent false hide glitches.
         </p>
       </div>
     </div>
@@ -404,8 +404,8 @@ export function HighPrecisionTickerDemoStage({ knobs }: { knobs: Record<string, 
     if (!ctx) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = '#8b5cf6';
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#DFFF00';
+    ctx.lineWidth = 2;
     ctx.beginPath();
     const time = now * 0.003;
     for (let x = 0; x < canvas.width; x++) {
@@ -419,17 +419,17 @@ export function HighPrecisionTickerDemoStage({ knobs }: { knobs: Record<string, 
   return (
     <div className="w-full min-h-[120vh] flex flex-col items-center justify-center gap-8">
       <div className="text-center space-y-2">
-        <span className="text-xs font-mono text-violet-400 uppercase tracking-widest">
-          ScrollCraft 4-Stage Game Loop (0 Re-renders)
+        <span className="text-xs font-mono text-accent uppercase tracking-widest font-black">
+          [SCROLLCRAFT 4-STAGE GAME LOOP // 0 RE-RENDERS]
         </span>
-        <h3 className="text-3xl font-extrabold text-white">useTicker (Phase: render)</h3>
+        <h3 className="text-3xl font-black uppercase text-fg">useTicker (Phase: render)</h3>
       </div>
 
-      <div className="rounded-3xl border border-zinc-800 bg-zinc-900/90 p-8 shadow-2xl text-center space-y-4">
-        <canvas ref={canvasRef} width={340} height={120} className="rounded-2xl bg-black/60 border border-zinc-800" />
-        <div className="font-mono text-xs text-zinc-300">
+      <div className="border-2 border-line bg-bg p-8 shadow-rest text-center space-y-4">
+        <canvas ref={canvasRef} width={340} height={120} className="border-2 border-line-soft bg-zinc-950" />
+        <div className="font-mono text-xs text-muted font-bold uppercase">
           Ticker Loop Framerate:{' '}
-          <span ref={fpsRef} className="text-emerald-400 font-bold text-sm">
+          <span ref={fpsRef} className="text-accent font-black text-sm">
             60 FPS
           </span>
         </div>
@@ -448,32 +448,32 @@ export function ZeroRerenderAuditDemoStage({ knobs }: { knobs: Record<string, an
   return (
     <div className="w-full min-h-[160vh] flex flex-col items-center justify-start pt-32">
       <div className="text-center max-w-md mx-auto mb-16 space-y-2">
-        <span className="text-xs font-mono text-emerald-400 uppercase tracking-widest font-bold">
-          Zero-Rerender Architecture Audit
+        <span className="text-xs font-mono text-accent uppercase tracking-widest font-black">
+          [ZERO-RERENDER ARCHITECTURE AUDIT]
         </span>
-        <h3 className="text-3xl font-extrabold text-white">useRenderTracker Hook</h3>
+        <h3 className="text-3xl font-black uppercase text-fg">useRenderTracker Hook</h3>
       </div>
 
-      <div className="w-96 rounded-3xl border border-emerald-500/40 bg-zinc-900/95 p-8 shadow-2xl text-center space-y-6">
+      <div className="w-96 border-2 border-line bg-bg p-8 shadow-rest text-center space-y-6">
         <div className="flex items-center justify-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-emerald-400" />
-          <span className="text-xs font-mono text-emerald-400 font-bold uppercase">
+          <ShieldCheck className="w-5 h-5 text-accent" />
+          <span className="text-xs font-mono text-accent font-black uppercase">
             Virtual DOM Integrity
           </span>
         </div>
 
         <div className="grid grid-cols-2 gap-4 font-mono">
-          <div className="p-4 rounded-2xl bg-black/60 border border-zinc-800">
-            <span className="text-[10px] text-zinc-500 block">INITIAL MOUNT</span>
-            <span className="text-2xl font-black text-white">{audit.renderCount}</span>
+          <div className="p-4 border-2 border-line-soft bg-zinc-950">
+            <span className="text-[10px] text-muted block uppercase">INITIAL MOUNT</span>
+            <span className="text-2xl font-black text-fg">{audit.renderCount}</span>
           </div>
-          <div className="p-4 rounded-2xl bg-black/60 border border-zinc-800">
-            <span className="text-[10px] text-zinc-500 block">DURING SCROLL</span>
-            <span className="text-2xl font-black text-emerald-400">{audit.rendersWhileScrolling}</span>
+          <div className="p-4 border-2 border-line-soft bg-zinc-950">
+            <span className="text-[10px] text-muted block uppercase">DURING SCROLL</span>
+            <span className="text-2xl font-black text-accent">{audit.rendersWhileScrolling}</span>
           </div>
         </div>
 
-        <p className="text-xs text-zinc-400 leading-relaxed">
+        <p className="text-xs text-muted leading-relaxed font-mono">
           ScrollCraft components mutate transforms directly on GPU layers. React never diffs or re-renders the component during scroll gestures.
         </p>
       </div>
@@ -551,21 +551,18 @@ export function RouteRestorationDemoStage({ knobs }: { knobs: Record<string, any
       name: 'Checkpoint Alpha — Hero & Introduction',
       y: 450,
       desc: 'Top section of document. Tests short-range scroll restoration.',
-      accent: 'border-violet-500/40 text-violet-400 bg-violet-950/40',
     },
     {
       id: 'beta',
       name: 'Checkpoint Beta — Interactive Canvas Lab',
       y: 1100,
       desc: 'Mid-document rich canvas state. Common reading depth for articles.',
-      accent: 'border-sky-500/40 text-sky-400 bg-sky-950/40',
     },
     {
       id: 'gamma',
       name: 'Checkpoint Gamma — Architecture & Spec Registry',
       y: 1750,
       desc: 'Deep document milestone. Demonstrates restoration survival across deep layout shifts.',
-      accent: 'border-emerald-500/40 text-emerald-400 bg-emerald-950/40',
     },
   ];
 
@@ -573,32 +570,32 @@ export function RouteRestorationDemoStage({ knobs }: { knobs: Record<string, any
     <div className="w-full min-h-[260vh] pt-16 pb-32">
       {/* Sticky Interactive Command Center */}
       <div className="sticky top-20 z-30 max-w-2xl mx-auto px-4 mb-16">
-        <div className="rounded-3xl border border-zinc-700/80 bg-zinc-950/95 p-6 shadow-2xl backdrop-blur-2xl space-y-5">
-          <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <div className="border-2 border-line bg-bg p-6 shadow-rest space-y-5">
+          <div className="flex items-center justify-between border-b-2 border-line-soft pb-3">
             <div className="flex items-center gap-2">
-              <Bookmark className="w-4 h-4 text-violet-400" />
-              <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+              <Bookmark className="w-4 h-4 text-accent" />
+              <span className="text-xs font-mono font-black text-fg uppercase tracking-wider">
                 Route Restoration Controller
               </span>
             </div>
             <div className="flex items-center gap-3 font-mono text-xs">
-              <span className="text-zinc-500">LIVE Y:</span>
-              <span ref={scrollYDisplayRef} className="text-violet-400 font-bold">
+              <span className="text-muted">LIVE Y:</span>
+              <span ref={scrollYDisplayRef} className="text-accent font-bold">
                 0px
               </span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-3.5 rounded-2xl bg-zinc-900/90 border border-zinc-800 text-xs font-mono">
-              <span className="text-zinc-500 block mb-1">SAVED IN SESSION STORAGE:</span>
-              <span className="text-emerald-400 font-black text-lg">
+            <div className="p-3.5 border-2 border-line-soft bg-zinc-950 text-xs font-mono">
+              <span className="text-muted block mb-1 uppercase font-bold">SAVED IN STORAGE:</span>
+              <span className="text-accent font-black text-lg">
                 {activeSaved !== null ? `${activeSaved}px` : 'No Bookmark Saved'}
               </span>
             </div>
-            <div className="p-3.5 rounded-2xl bg-zinc-900/90 border border-zinc-800 text-xs font-mono">
-              <span className="text-zinc-500 block mb-1">STATUS:</span>
-              <span ref={statusRef} className="text-zinc-300 font-bold text-xs">
+            <div className="p-3.5 border-2 border-line-soft bg-zinc-950 text-xs font-mono">
+              <span className="text-muted block mb-1 uppercase font-bold">STATUS:</span>
+              <span ref={statusRef} className="text-fg font-bold text-xs">
                 {activeSaved !== null ? 'Bookmark ready in sessionStorage' : 'Click "Save Bookmark" below'}
               </span>
             </div>
@@ -608,32 +605,32 @@ export function RouteRestorationDemoStage({ knobs }: { knobs: Record<string, any
           <div className="flex flex-wrap gap-2.5 pt-1">
             <button
               onClick={handleSave}
-              className="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-xs font-bold text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-lg shadow-violet-600/20"
+              className="px-4 py-2 border-2 border-line bg-bg hover:bg-accent hover:text-black text-fg text-xs font-mono font-bold uppercase transition-colors cursor-pointer flex items-center gap-1.5 shadow-rest"
             >
               <Bookmark className="w-3.5 h-3.5" />
-              Save Current Y Bookmark
+              Save Current Y
             </button>
             <button
               onClick={handleSmoothGlideToSaved}
               disabled={activeSaved === null}
-              className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 disabled:opacity-40 disabled:hover:bg-sky-600 text-xs font-bold text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-lg shadow-sky-600/20"
+              className="px-4 py-2 border-2 border-line bg-bg hover:bg-accent hover:text-black disabled:opacity-40 disabled:hover:bg-bg disabled:hover:text-fg text-xs font-mono font-bold uppercase text-fg transition-colors cursor-pointer flex items-center gap-1.5 shadow-rest"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              Smooth Glide to Bookmark
+              Smooth Glide
             </button>
             <button
               onClick={handleInstantRestore}
               disabled={activeSaved === null}
-              className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 disabled:opacity-40 text-xs font-bold text-zinc-200 transition-all cursor-pointer"
+              className="px-4 py-2 border-2 border-line-soft bg-zinc-950 hover:bg-line-soft/40 disabled:opacity-40 text-xs font-mono font-bold uppercase text-fg transition-colors cursor-pointer"
             >
-              Instant Restore (PopState)
+              Instant Restore
             </button>
             <button
               onClick={handleSmoothResetTop}
-              className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-bold text-zinc-300 transition-all cursor-pointer flex items-center gap-1.5"
+              className="px-4 py-2 border-2 border-line-soft bg-bg hover:bg-accent hover:text-black text-xs font-mono font-bold uppercase text-fg transition-colors cursor-pointer flex items-center gap-1.5"
             >
               <ArrowUp className="w-3.5 h-3.5" />
-              Smooth Top
+              Top (0px)
             </button>
           </div>
         </div>
@@ -644,31 +641,31 @@ export function RouteRestorationDemoStage({ knobs }: { knobs: Record<string, any
         {checkpoints.map((cp, idx) => (
           <div
             key={cp.id}
-            className={`rounded-3xl border ${cp.accent} p-8 shadow-2xl backdrop-blur-xl relative space-y-4`}
+            className="border-2 border-line bg-bg p-8 shadow-rest relative space-y-4"
           >
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div className="flex items-center justify-between border-b-2 border-line-soft pb-4">
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
-                <span className="text-xs font-mono font-bold uppercase tracking-wider">
-                  Checkpoint 0{idx + 1}
+                <MapPin className="w-4 h-4 text-accent" />
+                <span className="text-xs font-mono font-black uppercase tracking-wider text-accent">
+                  CHECKPOINT 0{idx + 1}
                 </span>
               </div>
-              <span className="text-xs font-mono px-3 py-1 rounded-full bg-black/60 border border-white/10 font-bold">
-                Target Y: {cp.y}px
+              <span className="text-xs font-mono px-3 py-1 border-2 border-line-soft bg-zinc-950 text-fg font-bold uppercase">
+                TARGET Y: {cp.y}PX
               </span>
             </div>
 
             <div>
-              <h4 className="text-2xl font-black text-white">{cp.name}</h4>
-              <p className="text-xs text-zinc-300 mt-2 leading-relaxed">{cp.desc}</p>
+              <h4 className="text-2xl font-black uppercase text-fg">{cp.name}</h4>
+              <p className="text-xs text-muted mt-2 leading-relaxed font-mono">{cp.desc}</p>
             </div>
 
-            <div className="flex items-center gap-3 pt-3 border-t border-white/10">
+            <div className="flex items-center gap-3 pt-3 border-t-2 border-line-soft">
               <button
                 onClick={() => {
                   scrollTo(cp.y, { duration: 1.0 });
                 }}
-                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-mono font-bold text-white transition-colors cursor-pointer"
+                className="px-4 py-2 border-2 border-line bg-bg hover:bg-accent hover:text-black text-xs font-mono font-bold text-fg uppercase transition-colors cursor-pointer"
               >
                 Scroll to {cp.y}px →
               </button>
@@ -677,9 +674,9 @@ export function RouteRestorationDemoStage({ knobs }: { knobs: Record<string, any
                   scrollTo(cp.y, { duration: 0.8 });
                   setTimeout(() => savePosition(), 900);
                 }}
-                className="px-4 py-2 rounded-xl bg-violet-600/30 hover:bg-violet-600/50 border border-violet-500/40 text-xs font-mono font-bold text-violet-300 transition-colors cursor-pointer"
+                className="px-4 py-2 border-2 border-accent bg-bg hover:bg-accent hover:text-black text-xs font-mono font-bold text-accent uppercase transition-colors cursor-pointer"
               >
-                Jump & Save Bookmark
+                Jump &amp; Save Bookmark
               </button>
             </div>
           </div>
@@ -717,35 +714,35 @@ export function EngineMetricsDemoStage({ knobs }: { knobs: Record<string, any> }
   return (
     <div className="w-full min-h-[180vh] flex flex-col items-center justify-start pt-32">
       <div className="text-center max-w-md mx-auto mb-16 space-y-2">
-        <span className="text-xs font-mono text-violet-400 uppercase tracking-widest">
-          Direct DOM Engine Telemetry (0 Re-renders)
+        <span className="text-xs font-mono text-accent uppercase tracking-widest font-black">
+          [DIRECT DOM ENGINE TELEMETRY // 0 RE-RENDERS]
         </span>
-        <h3 className="text-3xl font-extrabold text-white">Engine Telemetry & Tiers</h3>
+        <h3 className="text-3xl font-black uppercase text-fg">Engine Telemetry &amp; Tiers</h3>
       </div>
 
-      <div className="max-w-md w-full rounded-3xl border border-zinc-800 bg-zinc-900/90 p-8 shadow-2xl space-y-6">
+      <div className="max-w-md w-full border-2 border-line bg-bg p-8 shadow-rest space-y-6">
         <div className="grid grid-cols-2 gap-3 font-mono text-xs">
-          <div className="p-4 rounded-2xl bg-black/60 border border-zinc-800">
-            <span className="text-zinc-500 block text-[10px]">SCROLL Y</span>
-            <span ref={scrollRef} className="text-white font-bold text-lg">
+          <div className="p-4 border-2 border-line-soft bg-zinc-950">
+            <span className="text-muted block text-[10px] uppercase font-bold">SCROLL Y</span>
+            <span ref={scrollRef} className="text-fg font-black text-lg">
               0px
             </span>
           </div>
-          <div className="p-4 rounded-2xl bg-black/60 border border-zinc-800">
-            <span className="text-zinc-500 block text-[10px]">PROGRESS</span>
-            <span ref={progressRef} className="text-violet-400 font-bold text-lg">
+          <div className="p-4 border-2 border-line-soft bg-zinc-950">
+            <span className="text-muted block text-[10px] uppercase font-bold">PROGRESS</span>
+            <span ref={progressRef} className="text-accent font-black text-lg">
               0.0%
             </span>
           </div>
-          <div className="p-4 rounded-2xl bg-black/60 border border-zinc-800">
-            <span className="text-zinc-500 block text-[10px]">VELOCITY</span>
-            <span ref={velocityRef} className="text-emerald-400 font-bold text-lg">
+          <div className="p-4 border-2 border-line-soft bg-zinc-950">
+            <span className="text-muted block text-[10px] uppercase font-bold">VELOCITY</span>
+            <span ref={velocityRef} className="text-fg font-black text-lg">
               0.00
             </span>
           </div>
-          <div className="p-4 rounded-2xl bg-black/60 border border-zinc-800">
-            <span className="text-zinc-500 block text-[10px]">HARDWARE TIER</span>
-            <span className="text-amber-400 font-bold uppercase text-lg">{tier}</span>
+          <div className="p-4 border-2 border-line-soft bg-zinc-950">
+            <span className="text-muted block text-[10px] uppercase font-bold">HARDWARE TIER</span>
+            <span className="text-accent font-black uppercase text-lg">{tier}</span>
           </div>
         </div>
       </div>
