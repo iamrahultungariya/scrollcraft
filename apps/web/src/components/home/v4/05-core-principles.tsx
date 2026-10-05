@@ -32,7 +32,7 @@ const PRINCIPLES = [
     icon: <RefreshCw className="size-4 text-lime" />,
     guarantee: 'Elimination of forced reflow cascades',
     details:
-      'Browsers stall when getBoundingClientRect() and style.transform mutations alternate within the same frame. ScrollCraft enforces a 4-phase game loop that batches all viewport queries into Phase 1 before executing style writes in Phase 4.',
+      'Browsers stall when getBoundingClientRect() and style.transform mutations alternate within the same frame. ScrollCraft enforces a 3-phase microtask loop that batches all viewport queries into Phase 1 (Measure) before executing style writes in Phase 3 (Render).',
     metrics: ['Separated read/write passes', 'ResizeObserver pool caching', 'Idle sleep mode during dormancy'],
   },
   {

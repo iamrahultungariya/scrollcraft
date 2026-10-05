@@ -11,7 +11,6 @@ const NAV_LINKS = [
   { href: '/docs', label: 'DOCS' },
   { href: '/showcase', label: 'SHOWCASE' },
   { href: '/test', label: 'TEST LAB', badge: '25' },
-  { href: '/roadmap', label: 'ROADMAP' },
 ];
 
 export function Navbar() {

@@ -30,6 +30,9 @@ export const StackedCards = React.memo(
       scaleStep = 0.05,
       minScale = 0.8,
       cardDistance = 400,
+      exitRunway = 120,
+      opacityStep = 0.15,
+      minOpacity = 0.2,
       height,
       asChild = false,
       children,
@@ -48,12 +51,23 @@ export const StackedCards = React.memo(
         ? cards
         : React.Children.toArray(children);
 
+    const estimatedCardHeight = 360;
+    const exitOffscreenBuffer =
+      top + (cardItems.length > 0 ? (cardItems.length - 1) * offset : 0) + estimatedCardHeight;
+    const computedHeight =
+      cardItems.length > 0
+        ? cardItems.length * estimatedCardHeight +
+          (cardItems.length - 1) * cardDistance +
+          exitRunway +
+          exitOffscreenBuffer
+        : 800;
+
     const resolvedHeight =
       height !== undefined
         ? typeof height === 'number'
           ? `${height}px`
           : height
-        : `${Math.max(cardItems.length * (cardDistance + 350) + 800, 1600)}px`;
+        : `${Math.max(computedHeight, 800)}px`;
 
     useEffect(() => {
       const container = internalRef.current;
@@ -67,6 +81,9 @@ export const StackedCards = React.memo(
         scaleStep,
         minScale,
         cardDistance,
+        exitRunway,
+        opacityStep,
+        minOpacity,
       });
 
       const taskId = `stacked-cards-${Math.random().toString(36).slice(2, 8)}`;
@@ -117,7 +134,7 @@ export const StackedCards = React.memo(
         solver.destroy();
         cardRefs.current = [];
       };
-    }, [cardItems.length, offset, top, scaleStep, minScale, cardDistance, engine]);
+    }, [cardItems.length, offset, top, scaleStep, minScale, cardDistance, exitRunway, opacityStep, minOpacity, engine]);
 
     const mergedRef = composeRefs(forwardedRef, internalRef);
 

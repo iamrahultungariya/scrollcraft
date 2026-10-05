@@ -17,6 +17,44 @@ export interface MagneticOptions {
   scale?: number;
 }
 
+class MagneticPointerTracker {
+  private static listeners: Set<(e: MouseEvent) => void> = new Set();
+  private static isBound = false;
+
+  private static onMouseMove = (e: MouseEvent) => {
+    for (const listener of MagneticPointerTracker.listeners) {
+      listener(e);
+    }
+  };
+
+  private static onMouseLeave = (e: MouseEvent) => {
+    if (e.relatedTarget === null || e.type === 'mouseleave') {
+      for (const listener of MagneticPointerTracker.listeners) {
+        listener(e);
+      }
+    }
+  };
+
+  public static add(listener: (e: MouseEvent) => void) {
+    if (typeof window === 'undefined') return;
+    this.listeners.add(listener);
+    if (!this.isBound) {
+      window.addEventListener('mousemove', this.onMouseMove, { passive: true });
+      document.addEventListener('mouseleave', this.onMouseLeave, { passive: true });
+      this.isBound = true;
+    }
+  }
+
+  public static remove(listener: (e: MouseEvent) => void) {
+    this.listeners.delete(listener);
+    if (this.listeners.size === 0 && this.isBound && typeof window !== 'undefined') {
+      window.removeEventListener('mousemove', this.onMouseMove);
+      document.removeEventListener('mouseleave', this.onMouseLeave);
+      this.isBound = false;
+    }
+  }
+}
+
 export class MagneticSolver {
   private element: HTMLElement;
   private options: Required<MagneticOptions>;
@@ -36,6 +74,7 @@ export class MagneticSolver {
   private isTicking: boolean = false;
   private cachedAbsoluteRect: { left: number; top: number; width: number; height: number } | null = null;
   private unobserveResize: (() => void) | null = null;
+  private pointerListener: ((e: MouseEvent) => void) | null = null;
 
   constructor(element: HTMLElement, options?: MagneticOptions) {
     this.element = element;
@@ -59,26 +98,35 @@ export class MagneticSolver {
   }
 
   private measureRect = () => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !this.element) return;
     const rect = this.element.getBoundingClientRect();
     const scrollX = window.scrollX || window.pageXOffset;
     const scrollY = window.scrollY || window.pageYOffset;
+
+    // Compensate for current spring translation to anchor against rest coordinates
+    const curX = this.stateX.position || 0;
+    const curY = this.stateY.position || 0;
+
     this.cachedAbsoluteRect = {
-      left: rect.left + scrollX,
-      top: rect.top + scrollY,
+      left: rect.left + scrollX - curX,
+      top: rect.top + scrollY - curY,
       width: rect.width,
       height: rect.height,
     };
   };
 
-  private onMouseEnter = () => {
-    this.isHovering = true;
-    this.targetScale = this.options.scale;
-    this.measureRect();
-    this.ensureTicker();
-  };
+  private onPointerMove = (e: MouseEvent) => {
+    if (e.type === 'mouseleave' || (e.clientX === undefined && e.clientY === undefined)) {
+      if (this.isHovering) {
+        this.isHovering = false;
+        this.targetX = 0;
+        this.targetY = 0;
+        this.targetScale = 1;
+        this.ensureTicker();
+      }
+      return;
+    }
 
-  private onMouseMove = (e: MouseEvent) => {
     if (!this.cachedAbsoluteRect) this.measureRect();
     const absRect = this.cachedAbsoluteRect;
     if (!absRect) return;
@@ -97,23 +145,18 @@ export class MagneticSolver {
     const distance = Math.hypot(deltaX, deltaY);
 
     if (distance < this.options.radius) {
+      this.isHovering = true;
+      this.targetScale = this.options.scale;
       this.targetX = deltaX * this.options.strength;
       this.targetY = deltaY * this.options.strength;
-    } else {
+      this.ensureTicker();
+    } else if (this.isHovering) {
+      this.isHovering = false;
       this.targetX = 0;
       this.targetY = 0;
+      this.targetScale = 1;
+      this.ensureTicker();
     }
-    
-    this.ensureTicker();
-  };
-
-  private onMouseLeave = () => {
-    this.isHovering = false;
-    this.targetX = 0;
-    this.targetY = 0;
-    this.targetScale = 1;
-    this.cachedAbsoluteRect = null;
-    this.ensureTicker();
   };
 
   private bindEvents() {
@@ -124,18 +167,18 @@ export class MagneticSolver {
       return;
     }
 
-    this.element.addEventListener('mouseenter', this.onMouseEnter);
-    this.element.addEventListener('mousemove', this.onMouseMove);
-    this.element.addEventListener('mouseleave', this.onMouseLeave);
+    this.pointerListener = (e: MouseEvent) => this.onPointerMove(e);
+    MagneticPointerTracker.add(this.pointerListener);
     
     this.unobserveResize = GlobalResizeManager.observe(this.element, () => this.measureRect());
   }
 
   public destroy() {
     if (typeof window === 'undefined') return;
-    this.element.removeEventListener('mouseenter', this.onMouseEnter);
-    this.element.removeEventListener('mousemove', this.onMouseMove);
-    this.element.removeEventListener('mouseleave', this.onMouseLeave);
+    if (this.pointerListener) {
+      MagneticPointerTracker.remove(this.pointerListener);
+      this.pointerListener = null;
+    }
     this.unobserveResize?.();
     this.unobserveResize = null;
     ticker.remove(this.taskId);

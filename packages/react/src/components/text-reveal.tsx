@@ -15,18 +15,29 @@ export const TextReveal = React.memo(
       className = '',
       by = 'chars',
       asChild = false,
+      mode = 'kinetic',
       range,
       blur,
       scale,
       rotateX,
       rotateY,
       slide,
-      baseOpacity = 0,
+      baseOpacity,
       triggerStart,
       triggerEnd,
+      start,
+      end,
+      playOnMount,
       style,
       ...domProps
     } = props;
+
+    const effectiveBaseOpacity =
+      baseOpacity !== undefined
+        ? baseOpacity
+        : mode === 'kinetic'
+        ? 0
+        : 0.2;
 
     const [rangeStart = 0, rangeEnd = 1] = range ?? [];
     const internalRef = useRef<HTMLParagraphElement>(null);
@@ -84,16 +95,23 @@ export const TextReveal = React.memo(
       container.classList.remove('sc-reveal-css-fallback');
 
       const solver = new TextRevealSolver(container, targets, {
+        mode,
         range: [rangeStart, rangeEnd],
         blur,
         scale,
         rotateX,
         rotateY,
         slide,
-        baseOpacity,
+        baseOpacity: effectiveBaseOpacity,
         triggerStart,
         triggerEnd,
+        start,
+        end,
+        playOnMount,
       });
+
+      // Synchronously measure layout on mount to eliminate initial race conditions
+      solver.measure();
 
       const taskId = `text-reveal-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -119,7 +137,7 @@ export const TextReveal = React.memo(
         solver.destroy();
         targetsRef.current = [];
       };
-    }, [engine, rangeStart, rangeEnd, blur, scale, rotateX, rotateY, slide, baseOpacity, triggerStart, triggerEnd, totalTargets]);
+    }, [engine, rangeStart, rangeEnd, blur, scale, rotateX, rotateY, slide, effectiveBaseOpacity, mode, triggerStart, triggerEnd, start, end, playOnMount, totalTargets]);
 
     const mergedRef = composeRefs(forwardedRef, internalRef);
 
@@ -134,7 +152,7 @@ export const TextReveal = React.memo(
                   }}
                   className="sc-word inline-block"
                   style={{
-                    opacity: baseOpacity,
+                    opacity: effectiveBaseOpacity,
                     display: 'inline-block',
                     transformOrigin: '50% 100%',
                     marginRight: i < wordGroups.length - 1 ? '0.3em' : undefined,
@@ -167,7 +185,7 @@ export const TextReveal = React.memo(
                       }}
                       className="sc-char inline-block"
                       style={{
-                        opacity: baseOpacity,
+                        opacity: effectiveBaseOpacity,
                         display: 'inline-block',
                         whiteSpace: char === ' ' ? 'pre' : 'normal',
                         transformOrigin: '50% 100%',

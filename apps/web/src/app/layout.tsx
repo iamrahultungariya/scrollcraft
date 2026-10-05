@@ -97,7 +97,7 @@ export default function RootLayout({
             wheelMultiplier: 1.0,
           }}
           respectReducedMotion={true}
-          autoResetOnRouteChange={true}
+          autoResetOnRouteChange={false}
         >
           <RouteScrollSync />
           <div className="relative flex-1 flex flex-col min-h-0 pb-16 md:pb-0">

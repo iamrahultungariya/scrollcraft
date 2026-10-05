@@ -103,22 +103,22 @@ export const TestHeaderHUD: React.FC<TestHeaderHUDProps> = ({
 
   return (
     <div
-      className={`sticky top-16 z-40 w-full border-b-2 border-line bg-bg px-4 sm:px-6 py-2.5 text-xs font-mono select-none shadow-rest ${className}`}
+      className={`sticky top-16 z-40 w-full border-b border-line-soft bg-bg px-4 sm:px-6 py-2 text-xs font-mono select-none ${className}`}
     >
       <div className="max-w-[1536px] mx-auto flex flex-wrap items-center justify-between gap-4">
         {/* Left: Identifier & Live Status */}
         <div className="flex items-center gap-3">
-          <span className="w-2 h-2 bg-accent inline-block shrink-0" />
+          <span className="w-1.5 h-1.5 bg-accent inline-block shrink-0" />
           <div className="flex items-center gap-2">
-            <span className="font-bold text-fg tracking-wide uppercase">{title}</span>
-            <span className="text-[10px] uppercase font-bold px-2 py-0.5 border border-line bg-accent text-black">
+            <span className="font-bold text-fg tracking-wide uppercase text-[11px] sm:text-xs">{title}</span>
+            <span className="text-[10px] uppercase font-mono text-muted border border-line-soft px-1.5 py-0.5">
               {badge}
             </span>
           </div>
         </div>
 
         {/* Center: Live Real-Time Telemetry Gauges (Direct DOM Writes) */}
-        <div className="flex items-center gap-3 sm:gap-6 text-fg overflow-x-auto no-scrollbar max-w-full py-0.5">
+        <div className="flex items-center gap-3 sm:gap-6 text-fg overflow-x-auto no-scrollbar max-w-full py-0.5 text-[11px]">
           {/* FPS Gauge */}
           <div className="flex items-center gap-1.5 shrink-0" title="Hardware frame rate via ScrollCraft ticker">
             <Activity className="w-3.5 h-3.5 text-accent" />
@@ -137,7 +137,7 @@ export const TestHeaderHUD: React.FC<TestHeaderHUDProps> = ({
             <span className="text-muted"><span className="hidden sm:inline">SCROLL </span>RE-RENDERS:</span>
             <span
               ref={auditRef}
-              className="font-bold px-1.5 py-0.2 border border-line bg-bg text-accent"
+              className="font-bold text-accent"
             >
               0
             </span>
@@ -170,13 +170,13 @@ export const TestHeaderHUD: React.FC<TestHeaderHUDProps> = ({
           <div className="hidden md:flex items-center gap-1.5">
             <Cpu className="w-3.5 h-3.5 text-muted" />
             <span className="text-muted">TIER:</span>
-            <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 border border-line bg-bg text-accent">
+            <span className="text-accent font-bold">
               {tier}
             </span>
           </div>
 
           {reducedMotion && (
-            <span className="text-[10px] text-black bg-accent px-2 py-0.5 border border-line font-bold uppercase">
+            <span className="text-[10px] text-accent border border-line-soft px-1.5 py-0.5 uppercase font-bold">
               REDUCED MOTION
             </span>
           )}
@@ -191,7 +191,7 @@ export const TestHeaderHUD: React.FC<TestHeaderHUDProps> = ({
                 window.scrollTo({ top: 0, behavior: 'instant' as any });
               }
             }}
-            className="h-8 px-2.5 border-2 border-line bg-bg hover:bg-accent text-fg hover:text-black transition-all cursor-pointer text-[11px] font-mono font-bold uppercase shadow-rest hover:shadow-hover hover:-translate-x-0.5 hover:-translate-y-0.5 flex items-center gap-1.5"
+            className="h-7 px-2 border border-line-soft hover:border-line bg-bg hover:bg-accent text-muted hover:text-black transition-colors cursor-pointer text-[11px] font-mono font-bold uppercase flex items-center gap-1.5"
             title="Reset scroll to top (0px)"
           >
             <RotateCcw className="w-3 h-3" />

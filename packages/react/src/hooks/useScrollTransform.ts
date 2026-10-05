@@ -27,11 +27,11 @@ import { ScrollTransformOptions } from '../types';
 import { useDualRef, captureNode } from '../utils/ref';
 
 const PRESET_PROPERTIES: Record<string, TransformProperties> = {
-  'zoom-in': { scale: [0.75, 1], opacity: [0.4, 1] },
-  'fade-up': { y: [50, 0], opacity: [0.4, 1] },
-  'scale-down': { scale: [1.3, 1], opacity: [0.6, 1] },
-  'blur-in': { blur: [12, 0], opacity: [0.5, 1] },
-  '3d-flip': { rotateX: [60, 0], opacity: [0.45, 1], scale: [0.85, 1] },
+  'zoom-in': { scale: [0.75, 1], opacity: [0, 1] },
+  'fade-up': { y: [50, 0], opacity: [0, 1] },
+  'scale-down': { scale: [1.3, 1], opacity: [0, 1] },
+  'blur-in': { blur: [12, 0], opacity: [0, 1] },
+  '3d-flip': { rotateX: [60, 0], opacity: [0, 1], scale: [0.85, 1] },
 };
 
 function parsePropertyValue(val: number | string): number {
@@ -82,6 +82,7 @@ export function useScrollTransform<T extends HTMLElement = HTMLDivElement>(
     end: options.end,
     scrub: options.scrub,
     snap: options.snap,
+    heroAware: options.heroAware,
   });
 
   const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
@@ -111,7 +112,7 @@ export function useScrollTransform<T extends HTMLElement = HTMLDivElement>(
     const measureGeometry = () => {
       if (isMounted) {
         solver.measure();
-        frustumShield.updateBounds(taskId, solver.startY, solver.endY);
+        frustumShield.updateBounds(taskId, solver.viewportStartY, solver.viewportEndY);
         settledFrames = 0;
         if (!frustumShield.isCulled(taskId)) {
           ticker.resumeTask(taskId);
@@ -137,11 +138,10 @@ export function useScrollTransform<T extends HTMLElement = HTMLDivElement>(
     const unregisterFrustum = frustumShield.register({
       id: taskId,
       element,
-      startY: solver.startY,
-      endY: solver.endY,
+      startY: solver.viewportStartY,
+      endY: solver.viewportEndY,
       margin: 200,
       onEnter: () => {
-        solver.measure();
         ticker.resumeTask(taskId);
       },
       onExit: (boundary) => {
@@ -187,6 +187,9 @@ export function useScrollTransform<T extends HTMLElement = HTMLDivElement>(
 
     solver.measure();
     frustumShield.updateBounds(taskId, solver.startY, solver.endY);
+    const initialScroll = engine?.getMetrics().scroll ?? (typeof window !== 'undefined' ? (window.scrollY || window.pageYOffset || 0) : 0);
+    solver.update(initialScroll, 0, 0.016, reducedMotion);
+    solver.render();
 
     return () => {
       isMounted = false;

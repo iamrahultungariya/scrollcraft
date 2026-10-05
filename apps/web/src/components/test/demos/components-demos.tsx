@@ -406,12 +406,13 @@ export function TextRevealDemoStage({ knobs }: { knobs: Record<string, any> }) {
         </div>
 
         <TextReveal
-          key={`${by}-${blur}-${rotateX}`}
+          key={`${by}-${blur}-${rotateX}-${knobs.playOnMount}`}
           by={by}
           blur={blur}
           scale={0.92}
           rotateX={rotateX}
-          baseOpacity={0.15}
+          baseOpacity={knobs.baseOpacity ?? 0}
+          playOnMount={knobs.playOnMount}
           className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-fg leading-tight"
         >
           Declarative scroll physics with zero React re-renders. Every single character illuminates and flips in 3D perspective space in lockstep with your gesture.

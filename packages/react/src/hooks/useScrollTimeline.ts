@@ -103,37 +103,33 @@ export function useScrollTimeline<T extends HTMLElement = HTMLDivElement>(
   refOrOptionsOrProgress?: React.RefObject<T | null> | ScrollTimelineOptions | number,
   maybeOptionsOrTimeline?: ScrollTimelineOptions | PropertyTimeline
 ): Record<string, number> | React.RefObject<T | null> | void {
-  // Mode 1: Legacy Pure Evaluator Signature: (progress: number, timeline: PropertyTimeline)
-  if (typeof refOrOptionsOrProgress === 'number') {
-    const progress = refOrOptionsOrProgress;
-    const timeline = (maybeOptionsOrTimeline as PropertyTimeline) ?? {};
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useMemo(() => {
-      return TimelineSolver.evaluateTimeline(timeline, progress);
-    }, [progress, timeline]);
-  }
+  const isPureEvaluator = typeof refOrOptionsOrProgress === 'number';
+  const isRefPassed = !isPureEvaluator && isRefObject<T | null>(refOrOptionsOrProgress);
 
-  // Mode 2 & 3: Direct DOM Sequencer Mode (Dual API)
-  const isRefPassed = isRefObject<T | null>(refOrOptionsOrProgress);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const fallbackRef = useRef<T | null>(null);
-
   const targetRef = isRefPassed
     ? (refOrOptionsOrProgress as React.RefObject<T | null>)
     : fallbackRef;
 
-  const options = (isRefPassed
+  const options = (!isPureEvaluator && (isRefPassed
     ? (maybeOptionsOrTimeline as ScrollTimelineOptions)
-    : (refOrOptionsOrProgress as ScrollTimelineOptions)) ?? {};
+    : (refOrOptionsOrProgress as ScrollTimelineOptions))) || {};
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { subscribe } = useScrollCraft();
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const onUpdateRef = useRef(options.onUpdate);
   onUpdateRef.current = options.onUpdate;
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // Pure evaluator computation (called unconditionally, memoized)
+  const pureEvaluated = useMemo(() => {
+    if (!isPureEvaluator) return null;
+    const progress = refOrOptionsOrProgress as number;
+    const timeline = (maybeOptionsOrTimeline as PropertyTimeline) ?? {};
+    return TimelineSolver.evaluateTimeline(timeline, progress);
+  }, [isPureEvaluator, refOrOptionsOrProgress, maybeOptionsOrTimeline]);
+
   useEffect(() => {
+    if (isPureEvaluator) return;
+
     return watchRefAttachment(targetRef, (node) => {
       const timeline: PropertyTimeline = options.timeline
         ?? (options.keyframes ? buildTimelineFromKeyframes(options.keyframes) : {});
@@ -192,12 +188,17 @@ export function useScrollTimeline<T extends HTMLElement = HTMLDivElement>(
       };
     });
   }, [
+    isPureEvaluator,
     targetRef,
     options.progress,
     options.keyframes,
     options.timeline,
     subscribe,
   ]);
+
+  if (isPureEvaluator) {
+    return pureEvaluated ?? {};
+  }
 
   if (!isRefPassed) {
     return targetRef;

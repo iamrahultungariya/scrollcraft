@@ -3,51 +3,39 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, Sparkles, Compass, Sliders } from 'lucide-react';
+import { Home, BookOpen, Sparkles, Compass } from 'lucide-react';
 
 interface NavItem {
   label: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   isActive: (pathname: string) => boolean;
-  color: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
   {
-    label: 'Home',
+    label: 'HOME',
     href: '/',
     icon: Home,
     isActive: (p) => p === '/',
-    color: '#8b5cf6',
   },
   {
-    label: 'Docs',
+    label: 'DOCS',
     href: '/docs',
     icon: BookOpen,
     isActive: (p) => p.startsWith('/docs'),
-    color: '#a855f7',
   },
   {
-    label: 'Showcase',
+    label: 'SHOWCASE',
     href: '/showcase',
     icon: Sparkles,
     isActive: (p) => p.startsWith('/showcase'),
-    color: '#ec4899',
   },
   {
-    label: 'Test Lab',
+    label: 'TEST LAB',
     href: '/test',
     icon: Compass,
-    isActive: (p) => p.startsWith('/test') && !p.startsWith('/test/robust'),
-    color: '#06b6d4',
-  },
-  {
-    label: 'Robust',
-    href: '/test/robust',
-    icon: Sliders,
-    isActive: (p) => p.startsWith('/test/robust') || p.startsWith('/robust'),
-    color: '#10b981',
+    isActive: (p) => p.startsWith('/test'),
   },
 ];
 
@@ -57,9 +45,9 @@ export function MobileBottomNav() {
   return (
     <nav
       aria-label="Mobile Navigation"
-      className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-zinc-950/90 backdrop-blur-xl border-t border-white/10 shadow-[0_-10px_30px_rgba(0,0,0,0.8)] pb-[calc(env(safe-area-inset-bottom,0px)+0.4rem)] pt-1.5 px-2 select-none"
+      className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-bg border-t border-line-soft pb-[calc(env(safe-area-inset-bottom,0px)+0.4rem)] pt-1 px-3 select-none font-mono"
     >
-      <div className="max-w-md mx-auto grid grid-cols-5 gap-1 items-center">
+      <div className="max-w-md mx-auto grid grid-cols-4 gap-1 items-center">
         {NAV_ITEMS.map((item) => {
           const active = item.isActive(pathname);
           const Icon = item.icon;
@@ -68,48 +56,19 @@ export function MobileBottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all duration-[250ms] relative group ${
+              className={`flex flex-col items-center justify-center py-2 px-1 border transition-colors cursor-pointer ${
                 active
-                  ? 'text-white'
-                  : 'text-zinc-400 hover:text-zinc-200 active:scale-95'
+                  ? 'border-accent bg-accent text-black font-bold'
+                  : 'border-transparent text-muted hover:text-fg hover:border-line-soft'
               }`}
             >
-              {/* Active Ambient Glow */}
-              {active && (
-                <span
-                  className="absolute inset-x-2 top-0.5 h-full rounded-xl opacity-20 blur-md pointer-events-none"
-                  style={{ backgroundColor: item.color }}
-                  aria-hidden="true"
-                />
-              )}
-
               {/* Icon Container */}
-              <div
-                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
-                  active
-                    ? 'scale-110 shadow-sm'
-                    : 'group-hover:scale-105'
-                }`}
-                style={
-                  active
-                    ? {
-                        backgroundColor: `${item.color}25`,
-                        color: item.color,
-                        border: `1px solid ${item.color}40`,
-                      }
-                    : undefined
-                }
-              >
+              <div className="flex items-center justify-center">
                 <Icon className="w-4 h-4" />
               </div>
 
               {/* Text Label */}
-              <span
-                className={`text-[10px] font-mono tracking-tight mt-1 transition-colors ${
-                  active ? 'font-bold' : 'font-medium text-zinc-500'
-                }`}
-                style={active ? { color: item.color } : undefined}
-              >
+              <span className="text-[10px] uppercase tracking-wider mt-1 truncate">
                 {item.label}
               </span>
             </Link>

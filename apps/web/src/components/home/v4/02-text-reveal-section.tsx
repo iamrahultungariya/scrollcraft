@@ -57,7 +57,6 @@ export function TextRevealSection() {
               {/* Real TextReveal Primitive Dogfooding */}
               <TextReveal
                 by="words"
-                baseOpacity={0.15}
                 className="font-display text-2xl font-bold uppercase leading-[1.3] tracking-tight text-paper sm:text-4xl lg:text-[2.5rem]"
               >
                 ScrollCraft operates directly at the hardware GPU compositor layer. Zero reconciliation. Zero garbage collection spikes. Just pure subpixel physics locked to your display refresh rate.

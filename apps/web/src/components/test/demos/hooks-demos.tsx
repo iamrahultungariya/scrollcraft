@@ -502,6 +502,15 @@ export function RouteRestorationDemoStage({ knobs }: { knobs: Record<string, any
 
   const scrollYDisplayRef = useRef<HTMLSpanElement>(null);
   const statusRef = useRef<HTMLSpanElement>(null);
+  const jumpTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (jumpTimerRef.current) {
+        clearTimeout(jumpTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const unsub = subscribe((metrics) => {
@@ -672,7 +681,8 @@ export function RouteRestorationDemoStage({ knobs }: { knobs: Record<string, any
               <button
                 onClick={() => {
                   scrollTo(cp.y, { duration: 0.8 });
-                  setTimeout(() => savePosition(), 900);
+                  if (jumpTimerRef.current) clearTimeout(jumpTimerRef.current);
+                  jumpTimerRef.current = setTimeout(() => savePosition(), 900);
                 }}
                 className="px-4 py-2 border-2 border-accent bg-bg hover:bg-accent hover:text-black text-xs font-mono font-bold text-accent uppercase transition-colors cursor-pointer"
               >

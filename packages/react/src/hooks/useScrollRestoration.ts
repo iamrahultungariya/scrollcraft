@@ -78,7 +78,15 @@ export function useScrollRestoration(options: ScrollRestorationOptions = {}): Sc
   } = options;
 
   const { engine, scrollTo } = useScrollCraft();
-  const currentKey = resolveCurrentKey(explicitRouteKey);
+  const [activeKey, setActiveKey] = useState<string>(() => resolveCurrentKey(explicitRouteKey));
+
+  useEffect(() => {
+    if (explicitRouteKey) {
+      setActiveKey(explicitRouteKey);
+    }
+  }, [explicitRouteKey]);
+
+  const currentKey = explicitRouteKey || activeKey;
   const currentKeyRef = useRef(currentKey);
   currentKeyRef.current = currentKey;
 
@@ -198,12 +206,15 @@ export function useScrollRestoration(options: ScrollRestorationOptions = {}): Sc
     }
   }, [executeRestore, getScrollTarget, resetToTop, scrollToTopOnPush]);
 
-  // Global popstate and lifecycle listeners
+  // Global popstate, history pushState/replaceState, and lifecycle listeners
   useEffect(() => {
     if (!enabled || typeof window === 'undefined') return;
 
     const handlePopState = () => {
       isPopStateRef.current = true;
+      if (!explicitRouteKey) {
+        setActiveKey(resolveCurrentKey());
+      }
     };
 
     const handlePageHide = () => {
@@ -214,16 +225,43 @@ export function useScrollRestoration(options: ScrollRestorationOptions = {}): Sc
     window.addEventListener('pagehide', handlePageHide);
     window.addEventListener('beforeunload', handlePageHide);
 
+    // Patch pushState and replaceState so client SPA navigations trigger scroll restoration even when routeKey prop is omitted
+    const originalPushState = window.history.pushState;
+    const originalReplaceState = window.history.replaceState;
+
+    window.history.pushState = function (...args) {
+      if (typeof window !== 'undefined') {
+        const leavingKey = currentKeyRef.current;
+        if (leavingKey) {
+          const scrollY = window.scrollY || window.pageYOffset || 0;
+          historyStore.save(leavingKey, scrollY);
+        }
+      }
+      originalPushState.apply(this, args);
+      if (!explicitRouteKey) {
+        setActiveKey(resolveCurrentKey());
+      }
+    };
+
+    window.history.replaceState = function (...args) {
+      originalReplaceState.apply(this, args);
+      if (!explicitRouteKey) {
+        setActiveKey(resolveCurrentKey());
+      }
+    };
+
     return () => {
       window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('pagehide', handlePageHide);
       window.removeEventListener('beforeunload', handlePageHide);
+      window.history.pushState = originalPushState;
+      window.history.replaceState = originalReplaceState;
       if (retryRafRef.current !== null && typeof window.cancelAnimationFrame === 'function') {
         window.cancelAnimationFrame(retryRafRef.current);
         retryRafRef.current = null;
       }
     };
-  }, [enabled, savePosition]);
+  }, [enabled, explicitRouteKey, savePosition]);
 
   // Route transition effect
   useEffect(() => {

@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { DOCS_CATEGORIES } from './docs-data';
-import { ChevronRight, ChevronsUpDown, Copy, Check } from 'lucide-react';
+import { ChevronRight, ChevronsUpDown, Check, Terminal } from 'lucide-react';
 
 interface DocsSidebarProps {
   activeSection: string;
@@ -17,6 +17,15 @@ export const DocsSidebar: React.FC<DocsSidebarProps> = ({
   searchQuery,
 }) => {
   const [copiedPrompt, setCopiedPrompt] = useState(false);
+  const copyTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
+    };
+  }, []);
 
   // Initialize open state: active category is open by default, plus getting-started and primitives
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>(() => {
@@ -78,17 +87,18 @@ Documentation: https://scrollcraft.dev/docs`;
 
     navigator.clipboard.writeText(promptContent);
     setCopiedPrompt(true);
-    setTimeout(() => setCopiedPrompt(false), 1500);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopiedPrompt(false), 1500);
   };
 
   return (
-    <aside className="w-full shrink-0 flex flex-col gap-6 select-none pb-12 text-xs font-mono">
+    <nav className="w-full shrink-0 flex flex-col gap-5 select-none pb-12 text-xs font-mono" aria-label="Documentation Sidebar">
       {/* Category Toggle Quick Action */}
-      <div className="flex items-center justify-between px-1 text-[11px] font-mono text-muted font-bold">
-        <span className="tracking-wider uppercase">SECTIONS</span>
+      <div className="flex items-center justify-between px-1 text-[11px] font-mono text-muted/80 font-bold border-b border-line-soft/60 pb-2">
+        <span className="tracking-wider uppercase text-[10px] text-muted">DOCUMENTATION MAP</span>
         <button
           onClick={toggleAll}
-          className="flex items-center gap-1 text-muted hover:text-accent transition-colors cursor-pointer py-1 px-1.5 border border-line-soft bg-bg font-mono text-[10px] uppercase font-bold"
+          className="flex items-center gap-1 text-muted hover:text-accent transition-colors cursor-pointer py-0.5 px-1.5 border border-line-soft/80 bg-bg font-mono text-[10px] uppercase font-semibold"
           title="Toggle all categories"
         >
           <ChevronsUpDown className="w-3 h-3" />
@@ -97,7 +107,7 @@ Documentation: https://scrollcraft.dev/docs`;
       </div>
 
       {/* Grouped Categories with Accordion */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         {DOCS_CATEGORIES.map((category) => {
           const matchingItems = category.items.filter((item) =>
             item.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -113,31 +123,31 @@ Documentation: https://scrollcraft.dev/docs`;
               {/* Category Header Button */}
               <button
                 onClick={() => toggleCategory(category.id)}
-                className={`w-full flex items-center justify-between px-2.5 py-2 text-left transition-all cursor-pointer group border-2 ${
+                className={`w-full flex items-center justify-between px-1.5 py-1 text-left transition-colors cursor-pointer group ${
                   hasActiveItem
-                    ? 'border-line bg-line-soft/30 text-fg font-bold'
-                    : 'border-transparent text-muted hover:text-fg hover:border-line-soft'
+                    ? 'text-fg font-bold'
+                    : 'text-muted/90 hover:text-fg'
                 }`}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 min-w-0">
                   <span
-                    className={`transition-transform duration-120 text-muted group-hover:text-fg ${
+                    className={`transition-transform duration-150 text-muted/70 group-hover:text-fg shrink-0 ${
                       isOpen ? 'rotate-90' : ''
                     }`}
                   >
                     <ChevronRight className="w-3.5 h-3.5" />
                   </span>
-                  <span className="text-[11px] font-mono uppercase tracking-wider font-bold">
+                  <span className="text-[11px] font-mono uppercase tracking-wider font-bold truncate">
                     {category.title}
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 shrink-0">
                   {category.badge && (
-                    <span className="text-[9px] font-mono px-1.5 py-0.2 border border-line bg-bg text-accent font-bold uppercase">
+                    <span className="text-[9px] font-mono px-1 py-0.2 border border-accent/40 bg-accent/10 text-accent font-bold uppercase">
                       {category.badge}
                     </span>
                   )}
-                  <span className="text-[10px] font-mono text-muted group-hover:text-fg px-1.5 py-0.5 bg-bg border border-line-soft font-bold">
+                  <span className="text-[10px] font-mono text-muted/60 px-1 py-0.2">
                     {category.items.length}
                   </span>
                 </div>
@@ -145,25 +155,25 @@ Documentation: https://scrollcraft.dev/docs`;
 
               {/* Items List (Collapsible) */}
               {isOpen && (
-                <ul className="flex flex-col gap-1 ml-3 pl-2.5 border-l-2 border-line-soft mt-1.5 mb-2">
+                <ul className="flex flex-col gap-0.5 ml-2 pl-2 border-l border-line-soft/80 mt-1">
                   {matchingItems.map((item) => {
                     const isActive = activeSection === item.id;
                     return (
                       <li key={item.id}>
                         <button
                           onClick={() => onSelectSection(item.id)}
-                          className={`w-full flex items-center justify-between px-2.5 py-1.5 text-xs font-mono transition-all text-left cursor-pointer border-2 ${
+                          className={`w-full flex items-center justify-between px-2.5 py-1.5 text-xs font-mono transition-all text-left cursor-pointer border-l-2 ${
                             isActive
-                              ? 'bg-accent text-black border-accent font-bold shadow-rest'
-                              : 'text-fg/80 hover:bg-fg hover:text-black border-transparent hover:border-line'
+                              ? 'border-accent bg-accent/10 text-accent font-bold'
+                              : 'border-transparent text-muted/90 hover:text-fg hover:bg-white/[0.04]'
                           }`}
                         >
                           <span className="truncate">{item.title}</span>
                           {item.badge && (
                             <span
-                              className={`text-[9px] font-mono px-1.5 py-0.2 border shrink-0 ml-1.5 uppercase font-bold ${
+                              className={`text-[9px] font-mono px-1 py-0.2 border shrink-0 ml-1.5 uppercase font-bold ${
                                 isActive
-                                  ? 'bg-black text-accent border-black'
+                                  ? 'bg-accent text-black border-accent'
                                   : 'bg-bg text-muted border-line-soft'
                               }`}
                             >
@@ -181,30 +191,30 @@ Documentation: https://scrollcraft.dev/docs`;
         })}
       </div>
 
-      {/* Retention Mechanic: COPY AS PROMPT / llms.txt */}
-      <div className="pt-4 border-t-2 border-line-soft mt-2">
+      {/* Developer Context / llms.txt */}
+      <div className="pt-4 border-t border-line-soft/80 mt-2 space-y-2">
         <button
           type="button"
           onClick={copyPrompt}
-          className="w-full h-10 px-3 border-2 border-line bg-bg hover:bg-accent text-fg hover:text-black font-mono text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-rest hover:shadow-hover hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all cursor-pointer"
+          className="w-full h-9 px-3 border border-line-soft bg-bg hover:border-accent hover:text-accent text-muted font-mono text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-rest active:translate-y-px"
           title="Copy ScrollCraft context prompt for AI code assistants"
         >
           {copiedPrompt ? (
             <>
-              <Check className="w-4 h-4 stroke-[3]" />
-              <span>PROMPT COPIED!</span>
+              <Check className="w-3.5 h-3.5 text-accent stroke-[3]" />
+              <span className="text-accent">PROMPT COPIED!</span>
             </>
           ) : (
             <>
-              <Copy className="w-3.5 h-3.5" />
+              <Terminal className="w-3.5 h-3.5" />
               <span>COPY AS PROMPT</span>
             </>
           )}
         </button>
-        <span className="text-[10px] font-mono text-muted text-center block mt-1.5">
+        <span className="text-[10px] font-mono text-muted/60 text-center block">
           Exports full API reference for LLMs
         </span>
       </div>
-    </aside>
+    </nav>
   );
 };

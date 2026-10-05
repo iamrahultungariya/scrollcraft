@@ -9,6 +9,8 @@ export interface DrawSolverOptions {
   end?: string;
   scrub?: boolean | number;
   direction?: 'forward' | 'reverse' | 'bidirectional';
+  /** Automatically anchors starting progress at scrollY=0 to 0.0 when element starts above the fold. Default: true */
+  heroAware?: boolean;
 }
 
 export class DrawSolver {
@@ -32,12 +34,15 @@ export class DrawSolver {
   private isVisible: boolean = false;
   private wasVisible: boolean = false;
   private hasDrawn: boolean = false;
+  private heroAware: boolean = true;
+  private effectiveDistance: number = 0;
   private initialStrokeDasharray: string;
   private initialStrokeDashoffset: string;
 
   constructor(element: SVGGeometryElement, options: DrawSolverOptions) {
     this.element = element;
     this.id = options.id || (`draw-${Math.random().toString(36).slice(2, 8)}`);
+    this.heroAware = options.heroAware !== false;
     this.options = {
       direction: 'forward',
       scrub: true,
@@ -47,8 +52,8 @@ export class DrawSolver {
     };
     this.startTriggerCompiled = compileTrigger(this.options.start);
     this.endTriggerCompiled = compileTrigger(this.options.end);
-    this.initialStrokeDasharray = element.style.strokeDasharray || '';
-    this.initialStrokeDashoffset = element.style.strokeDashoffset || '';
+    this.initialStrokeDasharray = element.style?.strokeDasharray || '';
+    this.initialStrokeDashoffset = element.style?.strokeDashoffset || '';
   }
 
   public measure(): void {
@@ -65,6 +70,12 @@ export class DrawSolver {
         this.endY = this.startY + parseFloat(this.options.end.replace('+=', ''));
     }
 
+    if (this.heroAware && this.startY < 0) {
+      this.effectiveDistance = Math.max(wh * 0.45, this.endY);
+    } else {
+      this.effectiveDistance = this.endY - this.startY;
+    }
+
     triggerRegistry.register({
       id: this.id,
       type: 'draw',
@@ -78,25 +89,62 @@ export class DrawSolver {
     });
 
     if (this.element.getTotalLength) {
-      this.totalLength = this.element.getTotalLength();
-      
-      // Initialize offset correctly based on direction
-      if (!this.hasDrawn) {
-        this.element.style.strokeDasharray = `${this.totalLength} ${this.totalLength}`;
-        if (this.options.direction === 'reverse') {
-          this.element.style.strokeDashoffset = `-${this.totalLength}`;
-        } else {
-          this.element.style.strokeDashoffset = `${this.totalLength}`;
+      try {
+        const len = this.element.getTotalLength();
+        if (len > 0) {
+          this.totalLength = len;
+          
+          // Initialize offset correctly based on direction
+          if (!this.hasDrawn) {
+            if (this.options.direction === 'reverse') {
+              this.element.style.strokeDasharray = `${this.totalLength} ${this.totalLength}`;
+              this.element.style.strokeDashoffset = `-${this.totalLength}`;
+            } else if (this.options.direction === 'bidirectional') {
+              this.element.style.strokeDasharray = `0 ${this.totalLength}`;
+              this.element.style.strokeDashoffset = `${(this.totalLength * 0.5).toFixed(2)}`;
+            } else {
+              this.element.style.strokeDasharray = `${this.totalLength} ${this.totalLength}`;
+              this.element.style.strokeDashoffset = `${this.totalLength}`;
+            }
+          }
         }
+      } catch {
+        this.totalLength = 0;
       }
     }
   }
 
   public update(scrollY: number, _velocity: number, dt: number, isReducedMotion: boolean = false): void {
+    if (this.totalLength === 0 && this.element.getTotalLength) {
+      try {
+        const len = this.element.getTotalLength();
+        if (len > 0) {
+          this.totalLength = len;
+          if (this.options.direction === 'reverse') {
+            this.element.style.strokeDasharray = `${this.totalLength} ${this.totalLength}`;
+            this.element.style.strokeDashoffset = `-${this.totalLength}`;
+          } else if (this.options.direction === 'bidirectional') {
+            this.element.style.strokeDasharray = `0 ${this.totalLength}`;
+            this.element.style.strokeDashoffset = `${(this.totalLength * 0.5).toFixed(2)}`;
+          } else {
+            this.element.style.strokeDasharray = `${this.totalLength} ${this.totalLength}`;
+            this.element.style.strokeDashoffset = `${this.totalLength}`;
+          }
+        }
+      } catch {
+        // Layout not ready yet
+      }
+    }
+
     if (this.startY === this.endY || this.totalLength === 0) return;
     
     // Calculate raw progress
-    let rawProgress = (scrollY - this.startY) / (this.endY - this.startY);
+    let rawProgress: number;
+    if (this.heroAware && this.startY < 0) {
+      rawProgress = this.effectiveDistance > 0 ? scrollY / this.effectiveDistance : 1;
+    } else {
+      rawProgress = (scrollY - this.startY) / (this.endY - this.startY);
+    }
     rawProgress = clamp(rawProgress, 0, 1);
     
     if (isReducedMotion) {
@@ -146,22 +194,18 @@ export class DrawSolver {
     // Only flush styles if visible or just exited visibility or first time
     if (!this.isVisible && !this.wasVisible && this.progress === 0 && this.hasDrawn) return;
     
-    let offset = 0;
-    
     if (this.options.direction === 'reverse') {
-      offset = -this.totalLength * (1 - this.progress);
+      const offset = -this.totalLength * (1 - this.progress);
+      this.element.style.strokeDashoffset = `${offset.toFixed(2)}`;
     } else if (this.options.direction === 'bidirectional') {
-      // Start from center
-      this.element.style.strokeDasharray = `${this.totalLength} ${this.totalLength}`;
-      offset = this.totalLength * (1 - this.progress);
-      // For bidirectional, you typically draw from middle or both ends, 
-      // but simpler to just do standard draw. We'll map bidirectional to standard for now 
-      // since strokeDashoffset is 1D.
+      // Symmetrical center-outward draw
+      const activeLength = this.totalLength * this.progress;
+      this.element.style.strokeDasharray = `${activeLength.toFixed(2)} ${this.totalLength.toFixed(2)}`;
+      this.element.style.strokeDashoffset = `${((1 - this.progress) * this.totalLength * 0.5).toFixed(2)}`;
     } else {
-      offset = this.totalLength * (1 - this.progress);
+      const offset = this.totalLength * (1 - this.progress);
+      this.element.style.strokeDashoffset = `${offset.toFixed(2)}`;
     }
-    
-    this.element.style.strokeDashoffset = `${offset}`;
     
     this.hasDrawn = true;
     this.wasVisible = this.isVisible;
@@ -169,7 +213,9 @@ export class DrawSolver {
 
   public destroy(): void {
     triggerRegistry.unregister(this.id);
-    this.element.style.strokeDasharray = this.initialStrokeDasharray;
-    this.element.style.strokeDashoffset = this.initialStrokeDashoffset;
+    if (this.element.style) {
+      this.element.style.strokeDasharray = this.initialStrokeDasharray;
+      this.element.style.strokeDashoffset = this.initialStrokeDashoffset;
+    }
   }
 }

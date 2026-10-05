@@ -145,7 +145,7 @@ export function HeroSection() {
           </h1>
 
           <p className="mt-6 max-w-[44ch] text-sm leading-relaxed text-paper/70 sm:text-base font-body">
-            ScrollCraft decouples scroll animations from React Fiber. Instead of triggering full component re-renders on high-frequency scroll events, spatial matrices are calculated in a 4-phase game loop and applied directly to DOM hardware layers.
+            ScrollCraft decouples scroll animations from React Fiber. Instead of triggering full component re-renders on high-frequency scroll events, spatial matrices are calculated in a 3-phase microtask loop and applied directly to DOM hardware layers.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-4 text-xs font-mono text-paper/50">

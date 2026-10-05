@@ -13,8 +13,6 @@ import {
   VelocityMarquee,
   ScrollProgress,
   useScrollCraft,
-  useScrollProgress,
-  useScrollDirection,
 } from '@scrollcraft/react';
 import {
   Sparkles,
@@ -70,10 +68,27 @@ function RenderIcon({ name, className = 'w-5 h-5' }: { name: string; className?:
 /* ────────────────────────── Top HUD & Controller ────────────────────────── */
 function RobustHeaderHUD() {
   const { mode, setMode, allConfigs } = useGlassTheme();
-  const { progress, scrollY } = useScrollProgress({ reactive: true });
-  const { direction } = useScrollDirection();
+  const { subscribe } = useScrollCraft();
+  const posRef = useRef<HTMLSpanElement>(null);
+  const dirRef = useRef<HTMLSpanElement>(null);
+  const progRef = useRef<HTMLSpanElement>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    return subscribe((metrics) => {
+      if (posRef.current) {
+        posRef.current.textContent = `${Math.round(metrics.scroll)}px`;
+      }
+      if (dirRef.current) {
+        const d = metrics.direction > 0 ? 'DOWN' : metrics.direction < 0 ? 'UP' : 'IDLE';
+        dirRef.current.textContent = d;
+      }
+      if (progRef.current) {
+        progRef.current.textContent = `${Math.round(metrics.progress * 100)}%`;
+      }
+    });
+  }, [subscribe]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -114,17 +129,17 @@ function RobustHeaderHUD() {
         <div className="hidden lg:flex items-center gap-5 text-xs font-mono text-muted">
           <div className="flex items-center gap-1.5">
             <span className="text-muted">POS:</span>
-            <span className="text-accent font-bold">{Math.round(scrollY)}px</span>
+            <span ref={posRef} className="text-accent font-bold">0px</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-muted">DIR:</span>
-            <span className="text-fg font-bold uppercase">
-              {direction.toUpperCase()}
+            <span ref={dirRef} className="text-fg font-bold uppercase">
+              IDLE
             </span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-muted">PROGRESS:</span>
-            <span className="text-accent font-bold">{Math.round(progress * 100)}%</span>
+            <span ref={progRef} className="text-accent font-bold">0%</span>
           </div>
         </div>
 
@@ -206,12 +221,12 @@ function SectionCharAnimation() {
       {/* Primary Kinetic Character Animation */}
       <div className="my-4 sm:my-6">
         <TextReveal
+          mode="kinetic"
           by="chars"
           range={[0, 0.85]}
           blur={12}
           rotateX={30}
           slide={24}
-          baseOpacity={0.05}
           className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-black tracking-tight text-fg leading-[1.05] uppercase select-none break-words"
         >
           SCROLLCRAFT UNLOCKS NATIVE COMPOSITOR PERFORMANCE
@@ -221,10 +236,10 @@ function SectionCharAnimation() {
       {/* Secondary Character Paragraph Animation */}
       <div className="max-w-3xl my-6">
         <TextReveal
+          mode="reading"
           by="words"
           range={[0.15, 0.95]}
           slide={12}
-          baseOpacity={0.12}
           className="text-lg sm:text-xl text-fg font-normal leading-relaxed select-none"
         >
           Each character node is split into lightweight inline spans with zero layout shifts. As you scroll through the viewport, the solver calculates hermite ease coordinates in the RAF Ticker and writes hardware transforms directly to the compositor.
@@ -515,6 +530,7 @@ function SectionStackedCards() {
           scaleStep={0.04}
           minScale={0.86}
           cardDistance={380}
+          exitRunway={250}
         >
           {STACKED_CARDS_DATA.map((card) => (
             <GlassCard
@@ -751,8 +767,20 @@ function SectionVelocityMarquee() {
 
 /* ────────────────────────── Footer: Scroll Progress ────────────────────────── */
 function SectionFooterProgress() {
-  const { progress, scrollY } = useScrollProgress({ reactive: true });
-  const { scrollTo } = useScrollCraft();
+  const { scrollTo, subscribe } = useScrollCraft();
+  const progRef = useRef<HTMLSpanElement>(null);
+  const scrollRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    return subscribe((metrics) => {
+      if (progRef.current) {
+        progRef.current.textContent = `${Math.round(metrics.progress * 100)}%`;
+      }
+      if (scrollRef.current) {
+        scrollRef.current.textContent = `${Math.round(metrics.scroll)}px scrolled`;
+      }
+    });
+  }, [subscribe]);
 
   return (
     <footer className="relative w-full border-t-2 border-line bg-bg pt-16 pb-32 sm:pb-20 px-4 sm:px-6">
@@ -783,11 +811,11 @@ function SectionFooterProgress() {
               <span className="text-[10px] font-mono text-muted uppercase tracking-wider mb-1 font-bold">
                 PAGE PROGRESS
               </span>
-              <span className="text-4xl font-black font-mono text-accent">
-                {Math.round(progress * 100)}%
+              <span ref={progRef} className="text-4xl font-black font-mono text-accent">
+                0%
               </span>
-              <span className="text-[11px] font-mono text-muted mt-1">
-                {Math.round(scrollY)}px scrolled
+              <span ref={scrollRef} className="text-[11px] font-mono text-muted mt-1">
+                0px scrolled
               </span>
             </div>
 
@@ -835,7 +863,7 @@ export default function RobustShowcasePage() {
   }, []);
 
   return (
-    <GlassThemeProvider initialMode="raw">
+    <GlassThemeProvider initialMode="flat">
       <div className="min-h-screen bg-bg text-fg selection:bg-accent selection:text-black">
         {/* Global Hardware-Accelerated Progress Indicator (Top Edge) */}
         <div className="fixed top-0 inset-x-0 z-[60] h-[3px] pointer-events-none" style={{ isolation: 'isolate', transform: 'translate3d(0, 0, 0)', backfaceVisibility: 'hidden' }}>

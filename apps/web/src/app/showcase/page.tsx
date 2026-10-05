@@ -22,11 +22,11 @@ export default function ShowcasePage() {
       </main>
 
       {/* Pure Brutalist Footer */}
-      <footer className="w-full border-t-2 border-line py-8 sm:py-10 bg-bg text-xs font-mono text-muted">
+      <footer className="w-full border-t border-line-soft py-8 sm:py-10 bg-bg text-xs font-mono text-muted">
         <div className="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-fg font-bold uppercase">
             <span>SCROLL CRAFT</span>
-            <span className="w-2 h-2 bg-accent inline-block" />
+            <span className="w-1.5 h-1.5 bg-accent inline-block" />
             <span className="text-muted font-normal text-[11px]">&copy; {new Date().getFullYear()} MIT LICENSED</span>
           </div>
 
@@ -35,7 +35,6 @@ export default function ShowcasePage() {
             <Link href="/docs" className="hover:text-accent transition-colors">DOCS</Link>
             <Link href="/showcase" className="text-accent underline underline-offset-4">SHOWCASE</Link>
             <Link href="/test" className="hover:text-accent transition-colors">TEST LAB</Link>
-            <Link href="/roadmap" className="hover:text-accent transition-colors">ROADMAP</Link>
             <a
               href="https://github.com/ScrollCraft/scrollcraft"
               target="_blank"

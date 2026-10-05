@@ -102,17 +102,21 @@ export const TestStageDispatcher: React.FC<StageDispatcherProps> = ({ slug, knob
     case 'robust':
       return (
         <div className="py-16 text-center space-y-6">
-          <div className="max-w-md mx-auto p-8 rounded-3xl border border-emerald-500/30 bg-[#09090d] space-y-4">
-            <span className="text-xs font-mono text-emerald-400 font-bold uppercase">8-Layer Hardening Laboratory</span>
-            <h4 className="text-xl font-bold text-white">Full Interactive Test Suite Available</h4>
-            <p className="text-xs text-zinc-400">
-              Explore the dedicated full-screen interactive test laboratory with real-time adversarial fuzzing, 50ms chaos loops, and 200-solver memory soak.
+          <div className="max-w-md mx-auto p-6 sm:p-8 border border-line-soft bg-bg/50 space-y-4 font-mono text-left">
+            <span className="text-xs text-accent font-bold uppercase tracking-wider block">
+              [STRESS LAB] ADVERSARIAL HARDENING BENCHMARK
+            </span>
+            <h4 className="text-xl sm:text-2xl font-black uppercase text-fg font-display">
+              Fullscreen Stress Laboratory
+            </h4>
+            <p className="text-xs text-muted font-body leading-relaxed">
+              Explore the dedicated in-browser stress testing laboratory verifying mathematical fuzzing (500+ vectors), 50ms chaos loops, and 200-solver memory soak.
             </p>
             <a
               href="/test/robust"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold transition-all"
+              className="h-9 px-4 border border-line bg-accent text-black font-mono font-bold text-xs uppercase hover:opacity-90 transition-opacity inline-flex items-center gap-2"
             >
-              <span>Launch Fullscreen Robustness Lab &rarr;</span>
+              <span>Launch Robustness Lab &rarr;</span>
             </a>
           </div>
         </div>

@@ -91,22 +91,22 @@ export function ParallaxHeroScene() {
     <div className="relative min-h-[160vh] w-full flex items-center justify-center overflow-hidden">
       {/* Background Plane (Deep Depth) */}
       <Parallax speed={-0.3} className="absolute inset-0 -z-10">
-        <div className="w-full h-full bg-gradient-to-b from-violet-950/20 via-zinc-900/40 to-transparent blur-3xl opacity-60" />
+        <div className="w-full h-full bg-line-soft/20 border border-line-soft" />
       </Parallax>
 
       {/* Midground Element */}
       <Parallax speed={0.15} min={-80} max={80}>
-        <div className="w-72 h-72 rounded-3xl border border-violet-500/20 bg-zinc-900/80 backdrop-blur-xl p-6 shadow-2xl flex flex-col justify-between">
-          <span className="text-xs font-mono uppercase tracking-widest text-violet-400">Mid-Layer 0.15x</span>
-          <p className="text-sm text-zinc-300">Translates smoothly relative to scroll velocity.</p>
+        <div className="w-72 h-72 border border-line-soft bg-bg p-6 flex flex-col justify-between font-mono">
+          <span className="text-xs uppercase tracking-widest text-accent font-bold">Mid-Layer 0.15x</span>
+          <p className="text-xs text-muted font-body">Translates smoothly relative to scroll velocity.</p>
         </div>
       </Parallax>
 
       {/* Foreground Hero Element (Fast Depth) */}
       <Parallax speed={0.45} min={-140} max={140} className="mt-20">
-        <div className="w-80 rounded-3xl border border-white/20 bg-gradient-to-br from-violet-600/30 to-zinc-900/90 p-8 shadow-2xl backdrop-blur-2xl">
-          <span className="text-xs font-mono text-emerald-400 font-semibold">Foreground 0.45x</span>
-          <h3 className="text-xl font-bold text-white mt-2">Zero-Rerender Depth</h3>
+        <div className="w-80 border border-line bg-bg p-8 font-mono">
+          <span className="text-xs text-accent font-bold uppercase">Foreground 0.45x</span>
+          <h3 className="text-xl font-bold uppercase text-fg mt-2 font-display">Zero-Rerender Depth</h3>
         </div>
       </Parallax>
     </div>
@@ -185,13 +185,13 @@ export function StaggeredFeatureMatrix() {
           distance={48}
           duration={0.7}
           blur={8}
-          scale={0.92}
-          rotateX={12}
-          className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 backdrop-blur-xl"
+          scale={0.95}
+          rotateX={8}
+          className="border border-line-soft bg-bg p-6 font-mono"
         >
-          <span className="text-xs font-mono text-violet-400">0{idx + 1} / FEATURE</span>
-          <h4 className="text-lg font-bold text-white mt-2">{item.title}</h4>
-          <p className="text-sm text-zinc-400 mt-1">{item.desc}</p>
+          <span className="text-xs text-accent font-bold uppercase">0{idx + 1} / FEATURE</span>
+          <h4 className="text-lg font-bold text-fg uppercase mt-2 font-display">{item.title}</h4>
+          <p className="text-xs text-muted mt-1 font-body leading-relaxed">{item.desc}</p>
         </Reveal>
       ))}
     </div>
@@ -258,18 +258,18 @@ export function PinMilestoneDemo() {
             onLeave={() => setActiveState('Unlocked (onLeave)')}
             onEnterBack={() => setActiveState('Re-pinned (onEnterBack)')}
             onLeaveBack={() => setActiveState('Idle (onLeaveBack)')}
-            className="w-full rounded-3xl border border-violet-500/30 bg-zinc-900/95 p-8 shadow-2xl backdrop-blur-2xl"
+            className="w-full border border-line bg-bg p-6 sm:p-8 font-mono"
           >
             <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-ping" />
-              <span className="text-xs font-mono font-bold uppercase text-emerald-400">Sticky Lock Active</span>
+              <span className="h-2 w-2 bg-accent inline-block" />
+              <span className="text-xs font-mono font-bold uppercase text-accent">Sticky Lock Active</span>
             </div>
-            <h3 className="text-2xl font-bold text-white mt-4">GSAP 4-State Pinning</h3>
-            <p className="text-sm text-zinc-400 mt-2">
+            <h3 className="text-xl sm:text-2xl font-black uppercase text-fg mt-4 font-display">GSAP 4-State Pinning</h3>
+            <p className="text-xs text-muted mt-2 font-body leading-relaxed">
               This card locks at top: 90px while the right column milestones scroll through the 240vh runway.
             </p>
-            <div className="mt-6 p-4 rounded-xl bg-black/60 border border-zinc-800 font-mono text-xs text-violet-300">
-              Lifecycle: <span className="text-white font-bold">{activeState}</span>
+            <div className="mt-6 p-3 border border-line-soft bg-bg font-mono text-xs text-muted">
+              Lifecycle: <span className="text-fg font-bold">{activeState}</span>
             </div>
           </Pin>
         </div>
@@ -277,10 +277,10 @@ export function PinMilestoneDemo() {
         {/* Right Side: Scrolling Milestones */}
         <div className="space-y-32 py-16">
           {[1, 2, 3, 4].map((step) => (
-            <div key={step} className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8 backdrop-blur-md">
-              <span className="text-xs font-mono text-violet-400">STAGE 0{step}</span>
-              <h4 className="text-xl font-bold text-white mt-2">Milestone Phase {step}</h4>
-              <p className="text-sm text-zinc-400 mt-2">
+            <div key={step} className="border border-line-soft bg-bg p-6 font-mono space-y-2">
+              <span className="text-xs text-accent font-bold uppercase">STAGE 0{step}</span>
+              <h4 className="text-lg font-bold uppercase text-fg font-display">Milestone Phase {step}</h4>
+              <p className="text-xs text-muted font-body leading-relaxed">
                 As this card passes the pinned left viewport, the pin solver coordinates without layout jitter.
               </p>
             </div>
@@ -414,18 +414,18 @@ export function ScrollTransform3DStage() {
       <ScrollTransform
         preset="3d-flip"
         scrub={true}
-        className="w-80 h-96 rounded-3xl border border-violet-500/40 bg-gradient-to-br from-violet-900/40 via-zinc-900 to-black p-8 shadow-2xl backdrop-blur-2xl flex flex-col justify-between"
+        className="w-80 h-96 border border-line bg-bg p-6 sm:p-8 font-mono flex flex-col justify-between"
       >
         <div>
-          <span className="text-xs font-mono uppercase text-violet-400 tracking-wider">3D GPU Flip</span>
-          <h3 className="text-2xl font-bold text-white mt-2">Matrix Morphing</h3>
-          <p className="text-sm text-zinc-400 mt-2">
+          <span className="text-xs uppercase text-accent font-bold tracking-wider">3D GPU Flip</span>
+          <h3 className="text-xl sm:text-2xl font-black uppercase text-fg mt-2 font-display">Matrix Morphing</h3>
+          <p className="text-xs text-muted mt-2 font-body leading-relaxed">
             Transforms dynamically across scroll progress using direct hardware compositor writes.
           </p>
         </div>
-        <div className="flex items-center justify-between border-t border-zinc-800 pt-4 font-mono text-xs text-zinc-500">
+        <div className="flex items-center justify-between border-t border-line-soft pt-4 font-mono text-xs text-muted">
           <span>Preset: 3d-flip</span>
-          <span className="text-emerald-400">0 Re-renders</span>
+          <span className="text-accent font-bold">0 Re-renders</span>
         </div>
       </ScrollTransform>
     </div>
@@ -884,13 +884,15 @@ export function ProductRevealSequence() {
       { name: 'blur', type: 'number', default: '8', description: 'Initial optical blur in pixels.' },
       { name: 'scale', type: 'number', default: '0.9', description: 'Initial scale factor.' },
       { name: 'rotateX', type: 'number', default: '35', description: 'Initial 3D X-axis tilt in degrees.' },
-      { name: 'baseOpacity', type: 'number', default: '0', description: 'Initial base opacity for unrevealed characters.' },
+      { name: 'baseOpacity', type: 'number', default: '0', description: 'Initial base opacity for unrevealed characters (0 = invisible before reveal).' },
       { name: 'slide', type: 'number', default: '20', description: 'Initial vertical slide offset in pixels.' },
+      { name: 'playOnMount', type: 'boolean', default: 'false', description: 'Automatically play entrance animation on mount without requiring scroll (ideal for hero sections).' },
     ],
     knobs: [
       { id: 'by', label: 'Split By', type: 'select', default: 'chars', options: ['chars', 'words'] },
       { id: 'blur', label: 'Blur (px)', type: 'number', default: 8, min: 0, max: 20, step: 1 },
       { id: 'rotateX', label: 'RotateX (deg)', type: 'number', default: 35, min: 0, max: 60, step: 5 },
+      { id: 'playOnMount', label: 'Play On Mount (Hero Auto)', type: 'boolean', default: false },
     ],
     code: `import React from 'react';
 import { TextReveal } from '@scrollcraft/react';
@@ -977,10 +979,10 @@ export function MagneticButtonShowcase() {
         innerTargetRef={innerIconRef}
         innerStrength={0.65}
       >
-        <button className="relative group px-10 py-5 rounded-full border border-violet-500/40 bg-zinc-900/90 text-white font-semibold text-lg shadow-2xl backdrop-blur-xl flex items-center gap-4 hover:border-violet-400 transition-colors">
+        <button className="h-10 px-6 border border-line bg-bg hover:bg-accent hover:text-black text-fg font-mono text-xs font-bold uppercase transition-colors flex items-center gap-3 cursor-pointer">
           <span>Explore Test Lab</span>
-          <span ref={innerIconRef} className="p-2 rounded-full bg-violet-600/30 text-violet-300">
-            <Sparkles className="w-5 h-5" />
+          <span ref={innerIconRef}>
+            <Sparkles className="w-4 h-4 text-accent group-hover:text-black" />
           </span>
         </button>
       </Magnetic>
@@ -1084,9 +1086,9 @@ export function HeadlessParallaxExample() {
 
   return (
     <div className="min-h-[160vh] w-full flex items-center justify-center">
-      <div ref={cardRef} className="w-72 h-72 rounded-3xl border border-violet-500/30 bg-zinc-900/80 p-6 shadow-2xl backdrop-blur-xl">
-        <span className="text-xs font-mono text-violet-400">Headless useParallax</span>
-        <h4 className="text-xl font-bold text-white mt-2">Zero Markup Bloat</h4>
+      <div ref={cardRef} className="w-72 h-72 border border-line-soft bg-bg p-6 font-mono flex flex-col justify-between">
+        <span className="text-xs uppercase text-accent font-bold">Headless useParallax</span>
+        <h4 className="text-xl font-bold uppercase text-fg font-display">Zero Markup Bloat</h4>
       </div>
     </div>
   );
@@ -1178,16 +1180,16 @@ export function HeadlessPinDemo() {
 
   return (
     <div className="min-h-[220vh] w-full py-16">
-      <div ref={ref} className="max-w-md mx-auto rounded-3xl border border-violet-500/30 bg-zinc-900/90 p-8 shadow-2xl backdrop-blur-xl">
+      <div ref={ref} className="max-w-md mx-auto border border-line bg-bg p-6 sm:p-8 font-mono">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono text-violet-400">usePin Hook</span>
-          <span className={\`text-xs font-mono font-bold px-2 py-0.5 rounded \${isPinned ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-zinc-800 text-zinc-400'}\`}>
+          <span className="text-xs uppercase text-accent font-bold">usePin Hook</span>
+          <span className={\`text-[10px] font-mono font-bold px-2 py-0.5 border \${isPinned ? 'border-accent bg-accent text-black' : 'border-line-soft bg-bg text-muted'}\`}>
             {isPinned ? 'PINNED' : 'UNPINNED'}
           </span>
         </div>
-        <h4 className="text-xl font-bold text-white mt-4">Headless Sticky Pin</h4>
-        <div className="mt-4 font-mono text-xs text-zinc-400">
-          Pin Progress: <span className="text-violet-300 font-bold">{(progress * 100).toFixed(1)}%</span>
+        <h4 className="text-xl font-bold uppercase text-fg mt-4 font-display">Headless Sticky Pin</h4>
+        <div className="mt-4 font-mono text-xs text-muted">
+          Pin Progress: <span className="text-accent font-bold">{(progress * 100).toFixed(1)}%</span>
         </div>
       </div>
     </div>
@@ -1483,13 +1485,13 @@ export function AutoHideHeaderDemo() {
     <div className="w-full min-h-[180vh] relative pt-24">
       <div
         ref={navRef}
-        className="fixed top-4 left-1/2 -translate-x-1/2 w-11/12 max-w-xl rounded-2xl border border-zinc-800 bg-zinc-900/90 backdrop-blur-xl px-6 py-4 flex items-center justify-between shadow-2xl z-40 transition-transform duration-300"
+        className="fixed top-4 left-1/2 -translate-x-1/2 w-11/12 max-w-xl border border-line bg-bg px-6 py-3.5 flex items-center justify-between z-40 transition-transform duration-300 font-mono"
       >
-        <span className="font-bold text-white">Auto-Hiding Floating Nav</span>
+        <span className="font-bold uppercase text-xs text-fg">Auto-Hiding Nav</span>
         <div className="flex items-center gap-2 font-mono text-xs">
-          <span className="text-zinc-400">Dir:</span>
-          <span className="text-violet-400 font-bold uppercase">{direction}</span>
-          <span className={\`px-2 py-0.5 rounded \${isAtTop ? 'bg-emerald-500/20 text-emerald-400' : 'bg-zinc-800 text-zinc-400'}\`}>
+          <span className="text-muted">DIR:</span>
+          <span className="text-accent font-bold uppercase">{direction}</span>
+          <span className={\`px-2 py-0.5 border text-[10px] font-bold \${isAtTop ? 'border-accent bg-accent text-black' : 'border-line-soft bg-bg text-muted'}\`}>
             {isAtTop ? 'AT TOP' : 'SCROLLED'}
           </span>
         </div>
@@ -1773,27 +1775,26 @@ const tier = useScrollCraftTier();`,
     slug: 'robust',
     category: 'components',
     title: 'Robust Testing Lab',
-    shortDescription: 'Live 8-layer verification suite: adversarial math fuzzing, chaos lifecycle, and zero-leak soak.',
+    shortDescription: 'Live resilience verification suite: adversarial math fuzzing, chaos lifecycle, and zero-leak soak.',
     fullDescription:
-      '21-card interactive testing lab using all ScrollCraft primitives and hooks. Validates adversarial math fuzzing, chaos unmount bursts, instant coordinate synchronization, clock recovery, memory leak soak, and FrustumShield culling.',
-    tags: ['8-Layer Protocol', 'Fuzzing', 'Chaos Testing', 'Memory Soak', 'Primitives', 'Hooks'],
+      'Interactive testing lab using all ScrollCraft primitives and hooks. Validates adversarial math fuzzing, chaos unmount bursts, instant coordinate synchronization, clock recovery, memory leak soak, and FrustumShield culling.',
+    tags: ['Resilience', 'Fuzzing', 'Chaos Testing', 'Memory Soak', 'Primitives', 'Hooks'],
     driver: 'Audit Utility',
     runwayHeight: '180vh',
     features: [
-      'Layer 1: Adversarial mathematical fuzzing (NaN, Infinity, dt spikes)',
-      'Layer 2: Chaos rapid 50ms unmount burst under StrictMode',
-      'Layer 3: Compositor parity and instant 1,000px coordinate synchronization',
-      'Layer 4: Clock jitter and 5,000ms tab suspension recovery',
-      'Layer 5: Memory soak test with zero residual task leak invariant',
-      'Layer 6: FrustumShield offscreen culling saving 90% GPU composition',
-      'Layer 7: 400-span TextReveal settled-gating workload reduction',
-      'Layer 8: Adaptive quality dynamic blur and layer throttling',
+      'Adversarial mathematical fuzzing (NaN, Infinity, dt spikes)',
+      'Chaos rapid 50ms unmount burst under StrictMode',
+      'Compositor parity and instant 1,000px coordinate synchronization',
+      'Clock jitter and 5,000ms tab suspension recovery',
+      'Memory soak test with zero residual task leak invariant',
+      'FrustumShield offscreen culling saving 90% GPU composition',
+      '400-span TextReveal settled-gating workload reduction',
     ],
     gotchas: [
       'For the dedicated full-screen laboratory with live interactive runners, visit /test/robust directly.',
     ],
     props: [],
-    code: `// Visit /test/robust for the full interactive 8-layer test laboratory.`,
+    code: `// Visit /test/robust for the full interactive stress laboratory.`,
     usageCode: `// Run all automated unit and resilience tests via CLI:
 pnpm test`,
   },

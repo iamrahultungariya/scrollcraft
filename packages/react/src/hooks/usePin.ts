@@ -109,6 +109,20 @@ export function usePin<T extends HTMLElement = HTMLDivElement>(
     if (!hasClippingAncestor) {
       node.style.position = 'sticky';
       node.style.top = `${top}px`;
+
+      if (
+        typeof process !== 'undefined' &&
+        process.env?.NODE_ENV !== 'production' &&
+        !pinSpacing &&
+        parent &&
+        parent.clientHeight > 0 &&
+        node.clientHeight > 0 &&
+        parent.clientHeight <= node.clientHeight + 10
+      ) {
+        console.warn(
+          `[ScrollCraft] <Pin> element parent <${parent.tagName.toLowerCase()}> has clientHeight (${parent.clientHeight}px) matching the pinned element (${node.clientHeight}px). Sticky pinning requires scroll runway: specify <Pin height="..."> or wrap with <PinContainer height="..."> or set pinSpacing={true}.`
+        );
+      }
     } else {
       node.style.position = 'relative';
     }

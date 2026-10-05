@@ -21,6 +21,7 @@ import {
   ScrollValue,
   GlobalResizeManager,
   clamp,
+  compileTrigger,
 } from '@scrollcraft/core';
 import { useScrollCraft, useScrollState } from '../context';
 import { ScrollProgressOptions } from '../types';
@@ -34,23 +35,6 @@ export interface UseScrollProgressReturn<T extends HTMLElement = HTMLElement> {
   scrollYValue: ScrollValue<number>;
   progress: number;
   scrollY: number;
-}
-
-function parseEdge(edge: string, size: number): number {
-  switch (edge) {
-    case 'top':
-    case 'left':
-      return 0;
-    case 'center':
-      return size / 2;
-    case 'bottom':
-    case 'right':
-      return size;
-    default: {
-      const num = parseFloat(edge);
-      return isNaN(num) ? 0 : num;
-    }
-  }
 }
 
 export function useScrollProgress<T extends HTMLElement = HTMLElement>(
@@ -73,6 +57,7 @@ export function useScrollProgress<T extends HTMLElement = HTMLElement>(
     offset = ['top bottom', 'bottom top'],
     orientation = 'vertical',
     reactive = false,
+    heroAware = true,
     onProgress,
     progressValue: customProgressValue,
   } = options;
@@ -126,23 +111,25 @@ export function useScrollProgress<T extends HTMLElement = HTMLElement>(
           ? (window.scrollY || window.pageYOffset)
           : (window.scrollX || window.pageXOffset);
 
-        const elemPos = isVert ? rect.top + currentScroll : rect.left + currentScroll;
-        const elemSize = isVert ? rect.height : rect.width;
+        const targetRect = {
+          top: isVert ? rect.top : rect.left,
+          height: isVert ? rect.height : rect.width,
+        };
         const vpSize = isVert ? window.innerHeight : window.innerWidth;
 
         const [startSpec = 'top bottom', endSpec = 'bottom top'] = offset;
-        const [startElemEdge, startVpEdge] = startSpec.split(' ');
-        const [endElemEdge, endVpEdge] = endSpec.split(' ');
 
-        const startElemOffset = parseEdge(startElemEdge, elemSize);
-        const startVpOffset = parseEdge(startVpEdge, vpSize);
-        startScroll = (elemPos + startElemOffset) - startVpOffset;
+        startScroll = compileTrigger(startSpec).evaluate(targetRect, vpSize, currentScroll);
+        endScroll = compileTrigger(endSpec).evaluate(targetRect, vpSize, currentScroll);
 
-        const endElemOffset = parseEdge(endElemEdge, elemSize);
-        const endVpOffset = parseEdge(endVpEdge, vpSize);
-        endScroll = (elemPos + endElemOffset) - endVpOffset;
-
-        if (endScroll <= startScroll) {
+        // Hero section anti-jump: anchor start to 0 when element starts within initial viewport
+        if (heroAware && startScroll < 0) {
+          const originalSpan = endScroll - startScroll;
+          startScroll = 0;
+          if (endScroll <= startScroll) {
+            endScroll = startScroll + Math.max(targetRect.height, originalSpan, 1);
+          }
+        } else if (endScroll <= startScroll) {
           endScroll = startScroll + 1;
         }
       };
@@ -181,6 +168,7 @@ export function useScrollProgress<T extends HTMLElement = HTMLElement>(
     offset,
     orientation,
     reactive,
+    heroAware,
     subscribe,
     engine,
   ]);

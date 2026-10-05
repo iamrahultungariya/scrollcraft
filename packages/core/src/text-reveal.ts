@@ -11,6 +11,12 @@ import { adaptiveQualityGovernor } from './adaptive-quality';
 import { PerformanceTier } from './types';
 
 export interface TextRevealOptions {
+  /**
+   * Typographic reveal mode:
+   * - 'kinetic' (default): Pure entrance animation. Unrevealed text is strictly 0% opacity.
+   * - 'reading': Apple/Linear read-through prompter. Unread text is crisp muted gray (default 0.2).
+   */
+  mode?: 'kinetic' | 'reading';
   /** Offset start and end progress (0 to 1) relative to container viewport intersection */
   range?: [number, number];
   /** Atmospheric blur reveal in px (e.g. 8 or true for 8px). Default: 0 (disabled) */
@@ -25,10 +31,16 @@ export interface TextRevealOptions {
   slide?: number;
   /** Initial base opacity for unrevealed characters (0 to 1). Default: 0 */
   baseOpacity?: number;
-  /** Viewport trigger start fraction from top of viewport (e.g. 0.80 = 80% of window height). Default: 0.80 */
+  /** Viewport trigger start fraction from top of viewport (e.g. 0.85 = 85% of window height). Default: 0.85 */
   triggerStart?: number;
-  /** Viewport trigger end fraction from top of viewport (e.g. 0.25 = 25% of window height). Default: 0.25 */
+  /** Viewport trigger end fraction from top of viewport (e.g. 0.15 = 15% of window height). Default: 0.15 */
   triggerEnd?: number;
+  /** String trigger start (e.g. 'top 85%') */
+  start?: string;
+  /** String trigger end (e.g. 'top 15%') */
+  end?: string;
+  /** Automatically play entrance animation on mount without requiring scroll (ideal for hero sections) */
+  playOnMount?: boolean | { delay?: number; duration?: number; stagger?: number };
 }
 
 export class TextRevealSolver {
@@ -37,10 +49,17 @@ export class TextRevealSolver {
   private options: TextRevealOptions;
   private range: [number, number];
   private containerTop = 0;
+  private containerHeight = 0;
   private stickyContainer: HTMLElement | null = null;
   private stickyStartScroll: number = 0;
   private stickyRunwayDistance: number = 0;
   private cachedWindowHeight: number = 800;
+
+  // Auto-play on mount state
+  private isPlayOnMountActive: boolean = false;
+  private autoPlayProgress: number = 0;
+  private autoPlayRafId: number | null = null;
+  private autoPlayTimerId: ReturnType<typeof setTimeout> | null = null;
 
   // Initial styles preserved for pristine cleanup on destroy
   private initialOpacities: string[] = [];
@@ -81,7 +100,12 @@ export class TextRevealSolver {
     this.chars = chars;
     this.options = options;
     this.range = options.range || [0, 1];
-    this.baseOpacity = options.baseOpacity !== undefined ? options.baseOpacity : 0;
+    const mode = options.mode ?? 'kinetic';
+    if (mode === 'kinetic') {
+      this.baseOpacity = options.baseOpacity !== undefined ? options.baseOpacity : 0;
+    } else {
+      this.baseOpacity = options.baseOpacity !== undefined ? options.baseOpacity : 0.2;
+    }
     this.baseOpacityStr = this.baseOpacity === 0 ? '0' : String(this.baseOpacity);
 
     // Capture initial inline styles for exact restoration on destroy
@@ -92,10 +116,10 @@ export class TextRevealSolver {
     this.initialWillChanges = new Array(len);
     for (let i = 0; i < len; i++) {
       const c = chars[i];
-      this.initialOpacities[i] = c.style?.opacity || '';
-      this.initialFilters[i] = c.style?.filter || '';
-      this.initialTransforms[i] = c.style?.transform || '';
-      this.initialWillChanges[i] = c.style?.willChange || '';
+      this.initialOpacities[i] = c?.style?.opacity || '';
+      this.initialFilters[i] = c?.style?.filter || '';
+      this.initialTransforms[i] = c?.style?.transform || '';
+      this.initialWillChanges[i] = c?.style?.willChange || '';
     }
 
     // State Transition: Immediately signal active hydration to cancel CSS fallback keyframes
@@ -124,6 +148,70 @@ export class TextRevealSolver {
     }
 
     this.initStaggerTimings();
+
+    this.applyInitialStyles();
+
+    // Synchronous layout capture so containerTop is never 0 on mount
+    if (typeof window !== 'undefined' && this.container) {
+      this.measure();
+    }
+
+    if (options.playOnMount) {
+      this.initPlayOnMount();
+    }
+  }
+
+  private applyInitialStyles(): void {
+    const len = this.chars.length;
+    for (let i = 0; i < len; i++) {
+      const char = this.chars[i];
+      if (!char || !char.style) continue;
+      char.style.opacity = this.baseOpacityStr;
+      // Invariant: Unstarted text NEVER carries a static blur filter!
+      // Blur is strictly a dynamic optical effect during the active wave (0 < p < 1).
+      if (char.style.filter !== '') {
+        char.style.filter = '';
+      }
+      if (this.hasKineticTransforms) {
+        let tStr = '';
+        if (this.entrySlide) tStr += `translate3d(0,${this.entrySlide.toFixed(1)}px,0) `;
+        if (this.entryScale !== 1) tStr += `scale(${this.entryScale.toFixed(3)}) `;
+        if (this.entryRotateX) tStr += `rotateX(${this.entryRotateX.toFixed(1)}deg) `;
+        if (this.entryRotateY) tStr += `rotateY(${this.entryRotateY.toFixed(1)}deg) `;
+        tStr = tStr.trim();
+        if (tStr) char.style.transform = tStr;
+      }
+    }
+  }
+
+  private initPlayOnMount(): void {
+    if (!this.options.playOnMount || typeof window === 'undefined') return;
+    this.isPlayOnMountActive = true;
+    this.autoPlayProgress = 0;
+
+    const config = typeof this.options.playOnMount === 'object' ? this.options.playOnMount : {};
+    const delay = (config.delay ?? 0.1) * 1000;
+    const duration = (config.duration ?? 0.9) * 1000;
+
+    this.autoPlayTimerId = setTimeout(() => {
+      let startTime: number | null = null;
+      const step = (now: number) => {
+        if (!this.isPlayOnMountActive) return;
+        if (startTime === null) startTime = now;
+        const elapsed = now - startTime;
+        const p = clamp(elapsed / duration, 0, 1);
+        this.autoPlayProgress = p;
+        this.update(window.scrollY || 0, window.innerHeight || 800);
+        this.render();
+
+        if (p < 1) {
+          this.autoPlayRafId = requestAnimationFrame(step);
+        } else {
+          this.isSettled = true;
+        }
+      };
+      this.autoPlayRafId = requestAnimationFrame(step);
+    }, delay);
   }
 
   /**
@@ -167,9 +255,10 @@ export class TextRevealSolver {
 
     if (typeof window === 'undefined' || !this.container) return;
     this.cachedWindowHeight = window.innerHeight;
-    const scrollTop = window.scrollY || window.pageYOffset;
+    const scrollTop = window.scrollY || window.pageYOffset || 0;
     const rect = this.container.getBoundingClientRect();
     this.containerTop = rect.top + scrollTop;
+    this.containerHeight = this.container.offsetHeight || rect.height || 0;
 
     // Detect sticky parent container
     let el: HTMLElement | null = this.container;
@@ -229,19 +318,30 @@ export class TextRevealSolver {
 
     let progress = 0;
 
-    if (this.stickyContainer && this.stickyRunwayDistance > 100) {
+    if (this.isPlayOnMountActive) {
+      progress = this.autoPlayProgress;
+    } else if (this.stickyContainer && this.stickyRunwayDistance > 100) {
       const runwayProgress = (_scrollY - this.stickyStartScroll) / this.stickyRunwayDistance;
       progress = clamp(runwayProgress, 0, 1);
     } else {
-      const triggerStart = this.options.triggerStart ?? 0.80;
-      const triggerEnd = this.options.triggerEnd ?? 0.25;
+      const triggerStart = this.options.triggerStart ?? 0.85;
+      const triggerEnd = this.options.triggerEnd ?? 0.15;
 
       const start = vh * triggerStart;
       const end = vh * triggerEnd;
 
-      const viewportTop = this.containerTop - _scrollY;
-      const rawProgress = mapRange(start, end, 0, 1, viewportTop);
-      progress = clamp(rawProgress, 0, 1);
+      // Hero / Initial Viewport Auto-Detection:
+      // If element starts inside viewport on load (containerTop < start),
+      // scroll progress strictly starts at scrollY = 0 so no words are pre-revealed!
+      if (this.containerTop < start) {
+        const scrollDistance = Math.max(vh * 0.45, (this.containerTop - end) + this.containerHeight);
+        const rawProgress = scrollDistance > 0 ? _scrollY / scrollDistance : 1;
+        progress = clamp(rawProgress, 0, 1);
+      } else {
+        const viewportTop = this.containerTop - _scrollY;
+        const rawProgress = mapRange(start, end, 0, 1, viewportTop);
+        progress = clamp(rawProgress, 0, 1);
+      }
     }
 
     if (this.range[0] !== 0 || this.range[1] !== 1) {
@@ -353,18 +453,11 @@ export class TextRevealSolver {
         if (char.style.opacity !== opStr) char.style.opacity = opStr;
       }
 
-      // 2. Atmospheric Blur
-      if (hasBlur) {
-        if (p >= 1) {
-          if (char.style.filter !== '') char.style.filter = '';
-        } else if (p <= 0) {
-          const blurStr = `blur(${this.effectiveMaxBlur.toFixed(1)}px)`;
-          if (char.style.filter !== blurStr) char.style.filter = blurStr;
-        } else {
-          const currentBlur = lerp(this.effectiveMaxBlur, 0, p);
-          const blurStr = currentBlur > 0.4 ? `blur(${currentBlur.toFixed(1)}px)` : '';
-          if (char.style.filter !== blurStr) char.style.filter = blurStr;
-        }
+      // 2. Atmospheric Blur (strictly active during entrance wave 0 < p < 1)
+      if (hasBlur && p > 0 && p < 1) {
+        const currentBlur = lerp(this.effectiveMaxBlur, 0, p);
+        const blurStr = currentBlur > 0.4 ? `blur(${currentBlur.toFixed(1)}px)` : '';
+        if (char.style.filter !== blurStr) char.style.filter = blurStr;
       } else if (char.style.filter !== '') {
         char.style.filter = '';
       }
@@ -423,6 +516,16 @@ export class TextRevealSolver {
   }
 
   public destroy(): void {
+    this.isPlayOnMountActive = false;
+    if (this.autoPlayRafId !== null && typeof cancelAnimationFrame !== 'undefined') {
+      cancelAnimationFrame(this.autoPlayRafId);
+      this.autoPlayRafId = null;
+    }
+    if (this.autoPlayTimerId !== null) {
+      clearTimeout(this.autoPlayTimerId);
+      this.autoPlayTimerId = null;
+    }
+
     if (this.container && typeof this.container.removeAttribute === 'function') {
       this.container.removeAttribute('data-sc-reveal');
     }

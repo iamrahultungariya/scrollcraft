@@ -74,15 +74,14 @@ const GLASS_CONFIGS: Record<GlassMode, { label: string; blurPx: number; descript
     },
   },
   flat: {
-    label: 'Flat (Hardcoded)',
+    label: 'Flat Obsidian (Pure)',
     blurPx: 0,
-    description: 'Pure opaque obsidian surface with zero backdrop filtering.',
+    description: 'Pure opaque obsidian surface with zero backdrop filtering and zero GPU blur overhead.',
     style: {
       backdropFilter: 'none',
       WebkitBackdropFilter: 'none',
-      backgroundColor: '#121217',
-      borderColor: 'rgba(255, 255, 255, 0.08)',
-      boxShadow: '0 4px 20px -4px rgba(0, 0, 0, 0.5)',
+      backgroundColor: '#0C0F0C',
+      borderColor: 'var(--line-soft)',
     },
   },
 };
@@ -98,7 +97,7 @@ const GlassContext = createContext<GlassContextValue | null>(null);
 
 export function GlassThemeProvider({
   children,
-  initialMode = 'raw',
+  initialMode = 'flat',
 }: {
   children: React.ReactNode;
   initialMode?: GlassMode;
@@ -128,12 +127,12 @@ export function useGlassTheme(): GlassContextValue {
   const ctx = useContext(GlassContext);
   if (!ctx) {
     // Fallback if rendered outside provider
-    const fallback = GLASS_CONFIGS.raw;
+    const fallback = GLASS_CONFIGS.flat;
     return {
-      mode: 'raw',
+      mode: 'flat',
       setMode: () => {},
       config: {
-        mode: 'raw',
+        mode: 'flat',
         label: fallback.label,
         blurPx: fallback.blurPx,
         description: fallback.description,
@@ -159,11 +158,10 @@ export const GlassCard = React.forwardRef<
       ref={ref}
       style={{
         ...config.style,
-        transition: 'backdrop-filter 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
         ...style,
       }}
-      className={`border-2 border-line transition-all duration-300 relative overflow-hidden shadow-rest ${
-        activeHover ? 'hover:border-accent hover:shadow-hover' : ''
+      className={`border border-line-soft transition-colors relative overflow-hidden ${
+        activeHover ? 'hover:border-accent' : ''
       } ${className}`}
       {...props}
     >

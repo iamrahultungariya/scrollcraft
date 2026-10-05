@@ -40,7 +40,23 @@ export const HorizontalScroll: React.FC<HorizontalScrollProps> = ({
     const measure = () => {
       if (isMounted) solver.measure();
     };
-    const unobserveResize = GlobalResizeManager.observe(container, measure);
+    const unobserveContainer = GlobalResizeManager.observe(container, measure);
+    const unobserveTrack = GlobalResizeManager.observe(track, measure);
+
+    if (typeof document !== 'undefined' && 'fonts' in document) {
+      document.fonts.ready.then(() => {
+        if (isMounted) measure();
+      });
+    }
+
+    const images = track.querySelectorAll('img');
+    images.forEach((img) => {
+      if (!img.complete) {
+        img.addEventListener('load', measure, { once: true });
+        img.addEventListener('error', measure, { once: true });
+      }
+    });
+
     const rafId = requestAnimationFrame(() => {
       if (isMounted) measure();
     });
@@ -57,7 +73,12 @@ export const HorizontalScroll: React.FC<HorizontalScrollProps> = ({
     return () => {
       isMounted = false;
       cancelAnimationFrame(rafId);
-      unobserveResize();
+      unobserveContainer();
+      unobserveTrack();
+      images.forEach((img) => {
+        img.removeEventListener('load', measure);
+        img.removeEventListener('error', measure);
+      });
       ticker.remove(taskId);
       solver.destroy();
     };

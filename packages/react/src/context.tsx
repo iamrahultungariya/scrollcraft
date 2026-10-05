@@ -143,7 +143,11 @@ export const ScrollProvider: React.FC<ScrollProviderProps> = ({
     // Handle route changes automatically if enabled
     let cleanupRouteChange: (() => void) | null = null;
     if (autoResetOnRouteChange && typeof window !== 'undefined') {
+      let lastPathname = window.location.pathname;
+
       const handleRouteChange = () => {
+        if (window.location.pathname === lastPathname) return;
+        lastPathname = window.location.pathname;
         engine?.scrollTo(0, { immediate: true });
         window.scrollTo(0, 0);
         requestAnimationFrame(() => {
@@ -163,10 +167,7 @@ export const ScrollProvider: React.FC<ScrollProviderProps> = ({
 
       window.history.replaceState = function (...args) {
         originalReplaceState.apply(this, args);
-        const url = args[2];
-        if (url && typeof url === 'string' && !url.startsWith('#')) {
-          handleRouteChange();
-        }
+        handleRouteChange();
       };
 
       cleanupRouteChange = () => {

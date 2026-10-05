@@ -34,7 +34,7 @@ export function compileTrigger(trigger: string | undefined): CompiledTrigger {
   let elFixedPx: number | null = null;
   if (elAlign === 'center') {
     elOffsetRatio = 0.5;
-  } else if (elAlign === 'bottom') {
+  } else if (elAlign === 'bottom' || elAlign === 'right') {
     elOffsetRatio = 1.0;
   } else if (elAlign.endsWith('%')) {
     elOffsetRatio = parseFloat(elAlign) / 100;
@@ -47,7 +47,7 @@ export function compileTrigger(trigger: string | undefined): CompiledTrigger {
   let vpFixedPx: number | null = null;
   if (vpAlign === 'center') {
     vpOffsetRatio = 0.5;
-  } else if (vpAlign === 'bottom') {
+  } else if (vpAlign === 'bottom' || vpAlign === 'right') {
     vpOffsetRatio = 1.0;
   } else if (vpAlign.endsWith('%')) {
     vpOffsetRatio = parseFloat(vpAlign) / 100;

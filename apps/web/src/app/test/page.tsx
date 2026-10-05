@@ -44,96 +44,98 @@ export default function TestLabHubPage() {
       <TestHeaderHUD title="ScrollCraft Test Lab" badge="25 Verified Units" />
 
       {/* Main Content */}
-      <main className="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 w-full space-y-12 flex-1">
+      <main className="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 w-full space-y-10 flex-1">
         {/* 1. Hero Header */}
-        <section className="space-y-6 pb-8 border-b-2 border-line">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="border-2 border-line bg-bg inline-flex items-center gap-2 px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-accent shadow-rest w-fit">
-              <span className="w-2 h-2 bg-accent inline-block" />
-              <span>[TEST LAB / 01] 25 PRODUCTION HARDENED UNITS</span>
+        <section className="space-y-6 pb-6 border-b border-line-soft">
+          <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+            <div className="inline-flex items-center gap-2 text-accent font-bold uppercase tracking-wider">
+              <span className="w-1.5 h-1.5 bg-accent inline-block" />
+              <span>[TEST LAB] 25 PRODUCTION HARDENED UNITS</span>
             </div>
 
-            <div className="flex items-center gap-2 font-mono text-xs text-muted">
-              <span>ACTIVE TEST BENCH:</span>
-              <span className="px-2 py-0.5 border-2 border-line bg-accent text-black font-bold uppercase text-[10px]">
-                ZERO RE-RENDER LAB
-              </span>
+            <div className="text-muted text-[11px] font-mono uppercase">
+              BENCHMARK: <span className="text-accent font-bold">ZERO VDOM RE-RENDERS</span>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tight text-fg font-display leading-[0.92]">
-              Test Lab &amp; Interactive Catalog
+          <div className="space-y-3">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight text-fg font-display leading-[0.95]">
+              Interactive Test Lab
             </h1>
-            <p className="text-base sm:text-lg text-fg/90 font-body leading-relaxed max-w-3xl">
-              Explore all 25 official primitives, high-performance components, and advanced hooks. Click on any unit to enter its dedicated deep-dive page with live telemetry, zero-rerender audit proof, unconstrained scroll runways, and exact production code.
+            <p className="text-sm sm:text-base text-muted font-body leading-relaxed max-w-3xl">
+              Verified benchmark catalog for all 25 official primitives, high-performance components, and headless hooks. Each unit includes dedicated live telemetry, unconstrained scroll runways, zero-rerender proof, and production code.
             </p>
           </div>
 
-          {/* Telemetry Stat Strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 font-mono">
-            <div className="border-2 border-line bg-bg p-3 shadow-rest">
-              <span className="text-[10px] text-muted block uppercase font-bold">TOTAL UNITS</span>
-              <span className="text-xl sm:text-2xl font-black text-accent font-display">25</span>
+          {/* Specs Strip */}
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 py-3 font-mono text-xs text-muted border-t border-b border-line-soft">
+            <div>
+              <span className="text-muted uppercase">UNITS: </span>
+              <span className="text-accent font-bold">25 HARDENED</span>
             </div>
-            <div className="border-2 border-line bg-bg p-3 shadow-rest">
-              <span className="text-[10px] text-muted block uppercase font-bold">VDOM PASSES</span>
-              <span className="text-xl sm:text-2xl font-black text-fg font-display">0 RE-RENDERS</span>
+            <span className="text-line-soft select-none hidden sm:inline">•</span>
+            <div>
+              <span className="text-muted uppercase">RENDER OVERHEAD: </span>
+              <span className="text-fg font-bold">0 VDOM PASSES</span>
             </div>
-            <div className="border-2 border-line bg-bg p-3 shadow-rest">
-              <span className="text-[10px] text-muted block uppercase font-bold">GPU PIPELINE</span>
-              <span className="text-xl sm:text-2xl font-black text-accent font-display">COMPOSITOR</span>
+            <span className="text-line-soft select-none hidden sm:inline">•</span>
+            <div>
+              <span className="text-muted uppercase">PIPELINE: </span>
+              <span className="text-fg font-bold">GPU COMPOSITOR DRIVEN</span>
             </div>
-            <div className="border-2 border-line bg-bg p-3 shadow-rest">
-              <span className="text-[10px] text-muted block uppercase font-bold">RESILIENCE</span>
-              <span className="text-xl sm:text-2xl font-black text-fg font-display">8 LAYERS</span>
+            <span className="text-line-soft select-none hidden sm:inline">•</span>
+            <div>
+              <span className="text-muted uppercase">ARCHITECTURE: </span>
+              <span className="text-accent font-bold">3-PHASE MICROTASK</span>
             </div>
           </div>
 
-          {/* Featured Robustness Lab Banner */}
-          <div className="pt-2">
+          {/* Featured Robustness Lab Callout */}
+          <div>
             <Link
               href="/test/robust"
-              className="border-2 border-line bg-bg p-5 sm:p-6 shadow-rest hover:shadow-hover hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group cursor-pointer"
+              className="block border border-line-soft hover:border-accent bg-bg/50 hover:bg-bg p-4 sm:p-5 transition-colors group cursor-pointer"
             >
-              <div className="space-y-1.5 font-body">
-                <div className="flex items-center gap-2 font-mono text-xs font-bold text-accent uppercase tracking-wider">
-                  <ShieldCheck className="w-4 h-4 text-accent" />
-                  <span>[STRESS LAB] ADVERSARIAL HARDENING BENCHMARK</span>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1 font-body">
+                  <div className="flex items-center gap-2 font-mono text-[11px] font-bold text-accent uppercase tracking-wider">
+                    <ShieldCheck className="w-3.5 h-3.5 text-accent" />
+                    <span>ADVERSARIAL HARDENING BENCHMARK</span>
+                  </div>
+                  <h3 className="font-mono font-bold text-base sm:text-lg uppercase text-fg group-hover:text-accent transition-colors">
+                    Engine Robustness &amp; Adversarial Stress Laboratory
+                  </h3>
+                  <p className="text-xs text-muted max-w-2xl font-body">
+                    In-browser test suite verifying mathematical fuzzing (500+ vectors), 50ms chaos lifecycle resilience, memory soak, and FrustumShield culling.
+                  </p>
                 </div>
-                <h3 className="font-display font-black text-lg sm:text-xl uppercase text-fg group-hover:text-accent transition-colors">
-                  Engine Robustness &amp; Hardening Laboratory (8 Layers)
-                </h3>
-                <p className="text-xs text-muted max-w-2xl font-body">
-                  Live in-browser test suite verifying mathematical adversarial fuzzing (500+ vectors), 50ms chaos lifecycle resilience, 200-solver memory soak, and FrustumShield culling.
-                </p>
-              </div>
 
-              <div className="h-10 px-4 border-2 border-line bg-accent text-black font-mono font-bold text-xs uppercase shadow-rest inline-flex items-center justify-center gap-2 shrink-0">
-                <span>ENTER ROBUSTNESS LAB</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                <div className="text-xs font-mono font-bold uppercase text-muted group-hover:text-accent transition-colors inline-flex items-center gap-1.5 shrink-0">
+                  <span>ENTER STRESS LAB</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </div>
               </div>
             </Link>
           </div>
         </section>
 
         {/* 2. Controls Bar: Category Filter & Search */}
-        <section className="border-2 border-line bg-bg p-4 sm:p-5 shadow-rest flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 font-mono">
+        <section className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 font-mono pb-2">
           {/* Category Tabs */}
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 md:pb-0">
             {[
-              { id: 'all', label: `ALL [${TEST_REGISTRY.length}]` },
-              { id: 'primitives', label: 'PRIMITIVES [6]' },
-              { id: 'components', label: 'COMPONENTS [7]' },
-              { id: 'hooks', label: 'ADVANCED HOOKS [12]' },
+              { id: 'all', label: `ALL (${TEST_REGISTRY.length})` },
+              { id: 'primitives', label: 'PRIMITIVES (6)' },
+              { id: 'components', label: 'COMPONENTS (7)' },
+              { id: 'hooks', label: 'HOOKS (12)' },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveCategory(tab.id as any)}
-                className={`h-9 px-3.5 border-2 text-xs font-mono font-bold uppercase whitespace-nowrap transition-all cursor-pointer ${
+                className={`h-8 px-3 text-xs font-mono font-bold uppercase whitespace-nowrap transition-colors cursor-pointer border ${
                   activeCategory === tab.id
-                    ? 'bg-accent text-black border-line shadow-rest'
-                    : 'bg-bg text-muted hover:text-fg hover:border-line border-line-soft'
+                    ? 'bg-accent text-black border-accent'
+                    : 'bg-transparent text-muted hover:text-fg border-line-soft hover:border-line'
                 }`}
               >
                 {tab.label}
@@ -142,14 +144,14 @@ export default function TestLabHubPage() {
           </div>
 
           {/* Search Input */}
-          <div className="relative w-full md:w-80">
-            <Search className="w-4 h-4 text-accent absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <div className="relative w-full md:w-72">
+            <Search className="w-3.5 h-3.5 text-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
-              placeholder="SEARCH CATALOG [⌘K]..."
+              placeholder="FILTER TESTS..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-9 pl-9 pr-4 border-2 border-line bg-bg text-fg placeholder:text-muted font-mono uppercase text-xs focus:outline-none focus:border-accent shadow-rest"
+              className="w-full h-8 pl-8 pr-3 border border-line-soft bg-bg text-fg placeholder:text-muted/60 font-mono uppercase text-xs focus:outline-none focus:border-accent transition-colors"
             />
           </div>
         </section>
@@ -157,19 +159,19 @@ export default function TestLabHubPage() {
         {/* 3. Section 1: Primitives (6 Cards) */}
         {(activeCategory === 'all' || activeCategory === 'primitives') && primitives.length > 0 && (
           <section className="space-y-6">
-            <div className="flex items-center justify-between border-b-2 border-line pb-4 font-mono">
-              <div className="flex items-center gap-3">
-                <span className="border border-line bg-bg px-2.5 py-0.5 text-accent font-bold uppercase text-xs">
-                  [PRIMITIVES / 01]
+            <div className="flex items-center justify-between border-b border-line-soft pb-3 font-mono">
+              <div className="flex items-center gap-2.5">
+                <span className="text-accent font-bold uppercase text-xs tracking-wider">
+                  [01]
                 </span>
-                <h2 className="text-xl sm:text-2xl font-black uppercase text-fg font-display">
+                <h2 className="text-lg sm:text-xl font-bold uppercase text-fg font-mono">
                   Declarative Scroll Primitives
                 </h2>
               </div>
-              <span className="text-xs text-muted font-bold uppercase">{primitives.length} UNITS</span>
+              <span className="text-xs text-muted font-mono">{primitives.length} UNITS</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {primitives.map((item, idx) => (
                 <TestItemCard key={item.id} item={item} index={idx} />
               ))}
@@ -180,19 +182,19 @@ export default function TestLabHubPage() {
         {/* 4. Section 2: High-Performance Components (7 Cards) */}
         {(activeCategory === 'all' || activeCategory === 'components') && components.length > 0 && (
           <section className="space-y-6">
-            <div className="flex items-center justify-between border-b-2 border-line pb-4 font-mono">
-              <div className="flex items-center gap-3">
-                <span className="border border-line bg-bg px-2.5 py-0.5 text-fg font-bold uppercase text-xs">
-                  [COMPONENTS / 02]
+            <div className="flex items-center justify-between border-b border-line-soft pb-3 font-mono">
+              <div className="flex items-center gap-2.5">
+                <span className="text-accent font-bold uppercase text-xs tracking-wider">
+                  [02]
                 </span>
-                <h2 className="text-xl sm:text-2xl font-black uppercase text-fg font-display">
+                <h2 className="text-lg sm:text-xl font-bold uppercase text-fg font-mono">
                   High-Performance Components
                 </h2>
               </div>
-              <span className="text-xs text-muted font-bold uppercase">{components.length} UNITS</span>
+              <span className="text-xs text-muted font-mono">{components.length} UNITS</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {components.map((item, idx) => (
                 <TestItemCard key={item.id} item={item} index={idx} />
               ))}
@@ -203,19 +205,19 @@ export default function TestLabHubPage() {
         {/* 5. Section 3: Advanced Hooks (12 Cards) */}
         {(activeCategory === 'all' || activeCategory === 'hooks') && hooks.length > 0 && (
           <section className="space-y-6">
-            <div className="flex items-center justify-between border-b-2 border-line pb-4 font-mono">
-              <div className="flex items-center gap-3">
-                <span className="border border-line bg-bg px-2.5 py-0.5 text-accent font-bold uppercase text-xs">
-                  [HOOKS / 03]
+            <div className="flex items-center justify-between border-b border-line-soft pb-3 font-mono">
+              <div className="flex items-center gap-2.5">
+                <span className="text-accent font-bold uppercase text-xs tracking-wider">
+                  [03]
                 </span>
-                <h2 className="text-xl sm:text-2xl font-black uppercase text-fg font-display">
+                <h2 className="text-lg sm:text-xl font-bold uppercase text-fg font-mono">
                   Headless Reactive Hooks &amp; Solvers
                 </h2>
               </div>
-              <span className="text-xs text-muted font-bold uppercase">{hooks.length} UNITS</span>
+              <span className="text-xs text-muted font-mono">{hooks.length} UNITS</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {hooks.map((item, idx) => (
                 <TestItemCard key={item.id} item={item} index={idx} />
               ))}
@@ -225,20 +227,20 @@ export default function TestLabHubPage() {
 
         {/* 6. Empty State */}
         {filteredItems.length === 0 && (
-          <div className="py-20 text-center space-y-6 font-mono">
+          <div className="py-16 text-center space-y-4 font-mono">
             <p className="text-muted text-xs uppercase font-bold">
               NO STANDARD UNIT TESTS FOUND MATCHING &ldquo;{searchQuery}&rdquo;.
             </p>
-            <div className="inline-block p-6 border-2 border-line bg-bg shadow-rest text-left max-w-lg">
+            <div className="inline-block p-5 border border-line-soft bg-bg/50 text-left max-w-lg">
               <span className="text-xs text-accent uppercase font-bold block mb-2">
                 LOOKING FOR STRESS OR RESILIENCE BENCHMARKS?
               </span>
               <Link
                 href="/test/robust"
-                className="h-10 px-4 border-2 border-line bg-accent text-black font-mono font-bold text-xs uppercase shadow-rest hover:shadow-hover transition-all inline-flex items-center gap-2"
+                className="h-8 px-3 border border-accent bg-accent text-black font-mono font-bold text-xs uppercase hover:opacity-90 transition-opacity inline-flex items-center gap-2"
               >
-                <ShieldCheck className="w-4 h-4" />
-                <span>EXPLORE ENGINE ROBUSTNESS LAB (8 LAYERS) &rarr;</span>
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>EXPLORE ENGINE ROBUSTNESS LAB &rarr;</span>
               </Link>
             </div>
           </div>
@@ -246,11 +248,11 @@ export default function TestLabHubPage() {
       </main>
 
       {/* Global Brutalist Footer */}
-      <footer className="w-full border-t-2 border-line py-8 sm:py-10 bg-bg text-xs font-mono text-muted">
+      <footer className="w-full border-t border-line-soft py-8 sm:py-10 bg-bg text-xs font-mono text-muted">
         <div className="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-fg font-bold uppercase">
             <span>SCROLL CRAFT</span>
-            <span className="w-2 h-2 bg-accent inline-block" />
+            <span className="w-1.5 h-1.5 bg-accent inline-block" />
             <span className="text-muted font-normal text-[11px]">&copy; {new Date().getFullYear()} MIT LICENSED</span>
           </div>
 
@@ -259,7 +261,6 @@ export default function TestLabHubPage() {
             <Link href="/docs" className="hover:text-accent transition-colors">DOCS</Link>
             <Link href="/showcase" className="hover:text-accent transition-colors">SHOWCASE</Link>
             <Link href="/test" className="text-accent underline underline-offset-4">TEST LAB</Link>
-            <Link href="/roadmap" className="hover:text-accent transition-colors">ROADMAP</Link>
             <a
               href="https://github.com/ScrollCraft/scrollcraft"
               target="_blank"

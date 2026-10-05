@@ -30,6 +30,7 @@ export const ScrollTransform = React.forwardRef<HTMLDivElement, ScrollTransformP
       onSnap,
       preset,
       respectReducedMotion,
+      heroAware,
       children,
       ...props
     },
@@ -46,6 +47,7 @@ export const ScrollTransform = React.forwardRef<HTMLDivElement, ScrollTransformP
       onSnap,
       preset,
       respectReducedMotion,
+      heroAware,
     });
     const mergedRef = composeRefs(forwardedRef, internalRef);
 

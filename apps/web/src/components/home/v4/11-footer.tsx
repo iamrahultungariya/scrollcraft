@@ -10,7 +10,6 @@ const NAV_COLS = [
     links: [
       { href: '/docs', label: 'Documentation' },
       { href: '/showcase', label: 'Showcase' },
-      { href: '/roadmap', label: 'Roadmap' },
       { href: '/test', label: 'Test Lab (25 Demos)' },
     ],
   },
@@ -25,7 +24,7 @@ const NAV_COLS = [
   {
     heading: 'Engine Specs',
     links: [
-      { href: '/docs#architecture', label: '4-Phase Game Loop' },
+      { href: '/docs#architecture', label: '3-Phase Microtask Loop' },
       { href: '/docs#hooks', label: 'Reactive Hooks' },
       { href: 'https://github.com/ScrollCraft/scrollcraft/blob/main/LICENSE', label: 'MIT License', external: true },
     ],

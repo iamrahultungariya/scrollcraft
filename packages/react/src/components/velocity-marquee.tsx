@@ -13,6 +13,11 @@ import { useScrollCraft } from '../context';
 export interface VelocityMarqueeProps extends React.HTMLAttributes<HTMLDivElement>, MarqueeOptions {
   children: React.ReactNode;
   className?: string;
+  /**
+   * Explicit number of duplicated track items.
+   * If omitted, dynamically auto-fills based on container and item width to prevent gaps on ultrawide/4K screens (min 6).
+   */
+  copies?: number;
 }
 
 export const VelocityMarquee: React.FC<VelocityMarqueeProps> = ({
@@ -22,11 +27,21 @@ export const VelocityMarquee: React.FC<VelocityMarqueeProps> = ({
   velocityMultiplier,
   direction,
   maxSpeed,
+  reverseOnScrollUp,
+  copies,
   ...domProps
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const { engine, reducedMotion } = useScrollCraft();
+
+  const [repeatCount, setRepeatCount] = React.useState<number>(() => Math.max(copies ?? 6, 6));
+
+  useEffect(() => {
+    if (copies !== undefined) {
+      setRepeatCount(Math.max(copies, 2));
+    }
+  }, [copies]);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -38,15 +53,35 @@ export const VelocityMarquee: React.FC<VelocityMarqueeProps> = ({
       velocityMultiplier,
       direction,
       maxSpeed,
+      reverseOnScrollUp,
     });
 
     const taskId = `marquee-${Math.random().toString(36).slice(2, 8)}`;
 
     let isMounted = true;
     const measure = () => {
-      if (isMounted) solver.measure();
+      if (!isMounted) return;
+      solver.measure();
+
+      // Ultrawide screen auto-expansion: ensure enough copies exist to span viewport + buffer
+      if (copies === undefined && containerRef.current) {
+        const containerWidth = containerRef.current.clientWidth || (typeof window !== 'undefined' ? window.innerWidth : 1920);
+        const firstChild = track.firstElementChild as HTMLElement | null;
+        if (firstChild) {
+          const itemWidth = firstChild.getBoundingClientRect().width;
+          if (itemWidth > 0) {
+            const needed = Math.max(6, Math.ceil(containerWidth / itemWidth) + 2);
+            setRepeatCount((prev) => (needed > prev ? needed : prev));
+          }
+        }
+      }
     };
+
     const unobserveResize = GlobalResizeManager.observe(track, measure);
+    if (containerRef.current) {
+      GlobalResizeManager.observe(containerRef.current, measure);
+    }
+
     if (typeof document !== 'undefined' && 'fonts' in document) {
       document.fonts.ready.then(() => {
         if (isMounted) measure();
@@ -89,7 +124,7 @@ export const VelocityMarquee: React.FC<VelocityMarqueeProps> = ({
       ticker.remove(taskId);
       solver.destroy();
     };
-  }, [baseSpeed, velocityMultiplier, direction, maxSpeed, engine, reducedMotion]);
+  }, [baseSpeed, velocityMultiplier, direction, maxSpeed, reverseOnScrollUp, copies, engine, reducedMotion]);
 
   return (
     <div ref={containerRef} className={`overflow-hidden flex flex-nowrap w-full ${className}`} {...domProps}>
@@ -103,10 +138,15 @@ export const VelocityMarquee: React.FC<VelocityMarqueeProps> = ({
           WebkitBackfaceVisibility: 'hidden',
         }}
       >
-        <div className="shrink-0 flex items-center pr-8">{children}</div>
-        <div className="shrink-0 flex items-center pr-8" aria-hidden="true">{children}</div>
-        <div className="shrink-0 flex items-center pr-8" aria-hidden="true">{children}</div>
-        <div className="shrink-0 flex items-center pr-8" aria-hidden="true">{children}</div>
+        {Array.from({ length: repeatCount }).map((_, i) => (
+          <div
+            key={i}
+            className="shrink-0 flex items-center pr-8"
+            aria-hidden={i > 0 ? true : undefined}
+          >
+            {children}
+          </div>
+        ))}
       </div>
     </div>
   );

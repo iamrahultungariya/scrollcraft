@@ -147,15 +147,15 @@ describe('AdaptiveQualityGovernor (Low-End Dynamic Blur & Layer Throttling)', ()
     });
     solver.measure();
 
-    // High tier: Atmospheric blur written
+    // High tier: Atmospheric blur written during active wave
     adaptiveQualityGovernor.setTier('high');
-    solver.update(0, 1000);
+    solver.update(200, 1000);
     solver.render();
     expect(charEl.style.filter).toContain('blur(');
 
     // Low tier: Atmospheric blur completely suppressed
     adaptiveQualityGovernor.setTier('low');
-    solver.update(0, 1000);
+    solver.update(200, 1000);
     solver.render();
     expect(charEl.style.filter).toBe('');
   });

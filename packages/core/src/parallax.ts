@@ -115,11 +115,18 @@ if (this.options.bleed) {
 
     let offset = 0;
     if (this.options.origin === 'auto') {
-      // Hero anti-jump: anchor displacement at scrollY=0 to 0px
-      const initialDist = (this.viewportSize / 2) - elementCenter;
-      const initialOffset = initialDist * this.options.speed;
-      const dist = viewportCenter - elementCenter;
-      offset = (dist * this.options.speed) - initialOffset;
+      const isAboveTheFold = (this.options.direction === 'vertical' ? this.elementTop : this.elementLeft) < this.viewportSize;
+      if (isAboveTheFold) {
+        // Hero anti-jump: anchor displacement at scrollY=0 to 0px
+        const initialDist = (this.viewportSize / 2) - elementCenter;
+        const initialOffset = initialDist * this.options.speed;
+        const dist = viewportCenter - elementCenter;
+        offset = (dist * this.options.speed) - initialOffset;
+      } else {
+        // Below-the-fold elements center naturally when scrolled into view
+        const distanceFromCenter = viewportCenter - elementCenter;
+        offset = distanceFromCenter * this.options.speed;
+      }
     } else if (this.options.origin === 'top') {
       const dist = scrollOffset - (this.options.direction === 'vertical' ? this.elementTop : this.elementLeft);
       offset = dist * this.options.speed;
@@ -234,10 +241,13 @@ class NativeParallaxDriver implements ScrollDriver {
     let endOffset = -maxDistance * this.options.speed;
 
     if (this.options.origin === 'auto') {
-      const distAt0 = (windowHeight / 2) - (elementTop + elementHeight / 2);
-      const initialOffset = distAt0 * this.options.speed;
-      startOffset -= initialOffset;
-      endOffset -= initialOffset;
+      const isAboveTheFold = elementTop < windowHeight;
+      if (isAboveTheFold) {
+        const distAt0 = (windowHeight / 2) - (elementTop + elementHeight / 2);
+        const initialOffset = distAt0 * this.options.speed;
+        startOffset -= initialOffset;
+        endOffset -= initialOffset;
+      }
     }
 
     startOffset = clamp(startOffset, this.options.min, this.options.max);
@@ -287,7 +297,7 @@ export class ParallaxSolver {
       direction: options?.direction ?? 'vertical',
       min: options?.min ?? -Number.MAX_VALUE,
       max: options?.max ?? Number.MAX_VALUE,
-      origin: options?.origin ?? 'center',
+      origin: options?.origin ?? 'auto',
       bleed: options?.bleed ?? false,
       scale: options?.scale ?? 1,
       rotate: options?.rotate ?? 0,

@@ -24,16 +24,24 @@ export interface StackedCardsOptions {
   minScale?: number;
   /** Travel scroll distance per card in pixels. Default: 400 */
   cardDistance?: number;
+  /** Extra runway distance in pixels after final card stacks before container exits. Default: 120 */
+  exitRunway?: number;
+  /** Opacity falloff per buried card depth to prevent shadow / transparency clutter. Default: 0.15 */
+  opacityStep?: number;
+  /** Minimum opacity bound for deeply buried cards. Default: 0.2 */
+  minOpacity?: number;
 }
 
 interface CardRuntimeState {
   element: HTMLElement;
   initialPointerEvents: string;
+  initialOpacity: string;
   measuredHeight: number;
   pinStartY: number;
   pinEndY: number;
   currentY: number;
   currentScale: number;
+  currentOpacity: number;
   isBuried: boolean;
   isSticky: boolean;
 }
@@ -58,18 +66,23 @@ export class StackedCardsSolver {
       scaleStep: options.scaleStep ?? 0.05,
       minScale: options.minScale ?? 0.8,
       cardDistance: options.cardDistance ?? 400,
+      exitRunway: options.exitRunway ?? 120,
+      opacityStep: options.opacityStep ?? 0.15,
+      minOpacity: options.minOpacity ?? 0.2,
     };
 
     this.cards = cardElements.map((el, index) => {
-el.style.zIndex = String(index + 1);
+      el.style.zIndex = String(index + 1);
       return {
         element: el,
         initialPointerEvents: el.style.pointerEvents || '',
+        initialOpacity: el.style.opacity || '',
         measuredHeight: 0,
         pinStartY: 0,
         pinEndY: 0,
         currentY: 0,
         currentScale: 1,
+        currentOpacity: 1,
         isBuried: false,
         isSticky: false,
       };
@@ -97,6 +110,10 @@ el.style.zIndex = String(index + 1);
 
     let accumulatedDistance = 0;
     const totalCards = this.cards.length;
+    const hasRealLayout =
+      totalCards > 1
+        ? (this.cards[1].element?.offsetTop ?? 0) > 0
+        : (this.cards[0]?.element?.offsetTop ?? 0) > 0;
 
     for (let i = 0; i < totalCards; i++) {
       const card = this.cards[i];
@@ -111,14 +128,12 @@ el.style.zIndex = String(index + 1);
             typeof window.getComputedStyle === 'function' &&
             window.getComputedStyle(card.element)?.position === 'sticky'));
 
-      const offsetTop = card.element.offsetTop;
       const targetStickyTop = this.options.top + i * this.options.offset;
 
-      // When rendered in real DOM with layout, offsetTop reflects the natural document flow
-      if (offsetTop > 0) {
+      if (hasRealLayout) {
+        const offsetTop = card.element?.offsetTop ?? 0;
         card.pinStartY = this.containerTop + offsetTop - targetStickyTop;
       } else {
-        // Fallback for jsdom / unrendered elements / first card
         card.pinStartY = this.containerTop + accumulatedDistance;
       }
 
@@ -140,9 +155,13 @@ el.style.zIndex = String(index + 1);
     const totalCards = this.cards.length;
     // Boundary unpinning: When scroll exceeds container runway, cards stop following scroll
     // and naturally scroll away with the container so they never block subsequent sections!
-    const lastCardHeight = this.cards[totalCards - 1]?.measuredHeight || 300;
-    const maxStackHeight = lastCardHeight + this.options.top;
-    const maxPinY = this.containerTop + Math.max(0, this.containerHeight - maxStackHeight);
+    const lastCard = this.cards[totalCards - 1];
+    const lastCardHeight = lastCard?.measuredHeight || 300;
+    const maxStackHeight =
+      lastCardHeight + this.options.top + (totalCards - 1) * this.options.offset;
+    const maxPinY = lastCard && lastCard.pinStartY > 0
+      ? lastCard.pinStartY + this.options.exitRunway
+      : this.containerTop + Math.max(0, this.containerHeight - maxStackHeight);
     const effectiveScroll = Math.min(scrollY, maxPinY);
 
     // Pre-calculate the pinning and approach state across cards in O(n)
@@ -167,28 +186,65 @@ el.style.zIndex = String(index + 1);
     for (let i = 0; i < totalCards; i++) {
       const card = this.cards[i];
 
-      // Check if scroll has reached this card's pin point
-      if (scrollY < card.pinStartY) {
-        // Before pinning: natural flow position
-        card.currentY = 0;
+      if (card.isSticky) {
+        // Sticky cards are anchored by CSS sticky.
+        // During the exit window (scrollY > maxPinY), apply negative Y transform
+        // to move all cards upward together in unison, preserving the cascade stack!
+        card.currentY = scrollY > maxPinY ? -(scrollY - maxPinY) : 0;
         card.currentScale = 1;
+        card.currentOpacity = 1;
         card.isBuried = false;
+
+        if (scrollY >= card.pinStartY) {
+          const buriedDepth = Math.max(0, fullPinnedCount - 1 - i) + approachFraction;
+          card.isBuried = buriedDepth >= 1;
+          card.currentScale = clamp(
+            1 - (buriedDepth * this.options.scaleStep),
+            this.options.minScale,
+            1
+          );
+          card.currentOpacity = card.isBuried
+            ? clamp(
+                1 - (buriedDepth * this.options.opacityStep),
+                this.options.minOpacity,
+                1
+              )
+            : 1;
+        }
       } else {
-        // Pinned: travel with scroll until container runway finishes
-        const pinnedY = effectiveScroll - card.pinStartY;
-        card.currentY = Math.max(0, pinnedY);
+        // Check if scroll has reached this card's pin point
+        if (scrollY < card.pinStartY) {
+          // Before pinning: natural flow position
+          card.currentY = 0;
+          card.currentScale = 1;
+          card.currentOpacity = 1;
+          card.isBuried = false;
+        } else {
+          // Pinned: travel with scroll until container runway finishes
+          const pinnedY = effectiveScroll - card.pinStartY;
+          card.currentY = Math.max(0, pinnedY);
 
-        // O(1) depth calculation: cards strictly above i that are pinned + approaching card fraction
-        const buriedDepth = Math.max(0, fullPinnedCount - 1 - i) + approachFraction;
+          // O(1) depth calculation: cards strictly above i that are pinned + approaching card fraction
+          const buriedDepth = Math.max(0, fullPinnedCount - 1 - i) + approachFraction;
 
-        card.isBuried = buriedDepth >= 1;
+          card.isBuried = buriedDepth >= 1;
 
-        // Depth scale degradation: cards underneath scale down smoothly
-        card.currentScale = clamp(
-          1 - (buriedDepth * this.options.scaleStep),
-          this.options.minScale,
-          1
-        );
+          // Depth scale degradation: cards underneath scale down smoothly
+          card.currentScale = clamp(
+            1 - (buriedDepth * this.options.scaleStep),
+            this.options.minScale,
+            1
+          );
+
+          // Depth opacity degradation: cards underneath fade smoothly
+          card.currentOpacity = card.isBuried
+            ? clamp(
+                1 - (buriedDepth * this.options.opacityStep),
+                this.options.minOpacity,
+                1
+              )
+            : 1;
+        }
       }
     }
   }
@@ -227,6 +283,7 @@ el.style.zIndex = String(index + 1);
 
       if (isSticky) {
         TransformComposer.setNumeric(card.element, 'stacked-cards', {
+          y: card.currentY !== 0 ? card.currentY : undefined,
           scale: card.currentScale,
         });
       } else {
@@ -243,13 +300,22 @@ el.style.zIndex = String(index + 1);
       if (card.element.style.pointerEvents !== targetPointerEvents) {
         card.element.style.pointerEvents = targetPointerEvents;
       }
+
+      // 3. Dynamic depth opacity falloff:
+      if (card.element.style) {
+        const opacityStr = card.currentOpacity < 1 ? card.currentOpacity.toFixed(3) : '';
+        if (card.element.style.opacity !== opacityStr) {
+          card.element.style.opacity = opacityStr;
+        }
+      }
     }
   }
 
-  public getCardsState(): Array<{ currentY: number; currentScale: number; isBuried: boolean }> {
+  public getCardsState(): Array<{ currentY: number; currentScale: number; currentOpacity: number; isBuried: boolean }> {
     return this.cards.map((c) => ({
       currentY: c.currentY,
       currentScale: c.currentScale,
+      currentOpacity: c.currentOpacity,
       isBuried: c.isBuried,
     }));
   }
@@ -258,8 +324,11 @@ el.style.zIndex = String(index + 1);
     for (const card of this.cards) {
       smartCompositor.destroy(card.element);
       TransformComposer.clear(card.element, 'stacked-cards');
-      card.element.style.pointerEvents = card.initialPointerEvents;
-      card.element.style.zIndex = '';
+      if (card.element.style) {
+        card.element.style.pointerEvents = card.initialPointerEvents;
+        card.element.style.opacity = card.initialOpacity;
+        card.element.style.zIndex = '';
+      }
     }
     this.cards = [];
   }

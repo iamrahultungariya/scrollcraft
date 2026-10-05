@@ -14,6 +14,11 @@ export interface MarqueeOptions {
   velocityMultiplier?: number;
   direction?: 'left' | 'right';
   maxSpeed?: number;
+  /**
+   * Dynamically reverses marquee direction when user scrolls upward (negative velocity).
+   * Default: false
+   */
+  reverseOnScrollUp?: boolean;
 }
 
 export interface MarqueeState extends DriverState {
@@ -36,6 +41,7 @@ export class VelocityMarqueeSolver implements ScrollDriver {
       velocityMultiplier: options?.velocityMultiplier ?? 0.05,
       direction: options?.direction ?? 'left',
       maxSpeed: options?.maxSpeed ?? 50,
+      reverseOnScrollUp: options?.reverseOnScrollUp ?? false,
     };
 
     if (this.element && this.element.style) {
@@ -72,26 +78,29 @@ export class VelocityMarqueeSolver implements ScrollDriver {
   public update(_scrollY: number, velocity: number = 0, deltaTime: number = 1 / 60): MarqueeState {
     if (!this.isVisible || this.elementWidth <= 0) return this.state;
 
-    // The target speed is base + (scroll velocity * multiplier)
-    const rawTargetSpeed = this.options.baseSpeed + (Math.abs(velocity) * this.options.velocityMultiplier);
-    const targetSpeed = clamp(rawTargetSpeed, this.options.baseSpeed, this.options.maxSpeed);
+    let targetSpeed: number;
+    const baseDirMultiplier = this.options.direction === 'left' ? -1 : 1;
+
+    if (this.options.reverseOnScrollUp) {
+      // When scrolling down (velocity > 0), accelerate forward in base direction.
+      // When scrolling up (velocity < 0), velocity opposes base direction and can reverse movement.
+      const scrollSpeed = velocity * this.options.velocityMultiplier;
+      const rawTarget = this.options.baseSpeed + scrollSpeed;
+      targetSpeed = clamp(rawTarget, -this.options.maxSpeed, this.options.maxSpeed);
+    } else {
+      const rawTargetSpeed = this.options.baseSpeed + (Math.abs(velocity) * this.options.velocityMultiplier);
+      targetSpeed = clamp(rawTargetSpeed, this.options.baseSpeed, this.options.maxSpeed);
+    }
 
     // Smooth damp the speed so it decays nicely
     this.currentSpeed = damp(this.currentSpeed, targetSpeed, 8, deltaTime);
 
-    const dirMultiplier = this.options.direction === 'left' ? -1 : 1;
-    
-    this.state.position += this.currentSpeed * dirMultiplier * (deltaTime * 60);
+    this.state.position += this.currentSpeed * baseDirMultiplier * (deltaTime * 60);
 
-    // Seamless infinite loop wrap via modulo arithmetic
+    // Seamless infinite loop wrap via modulo arithmetic in both directions
     let p = this.state.position % this.elementWidth;
-    if (this.options.direction === 'left') {
-      if (p > 0) p -= this.elementWidth;
-      if (p <= -this.elementWidth) p += this.elementWidth;
-    } else {
-      if (p >= 0) p -= this.elementWidth;
-      if (p < -this.elementWidth) p += this.elementWidth;
-    }
+    if (p > 0) p -= this.elementWidth;
+    if (p <= -this.elementWidth) p += this.elementWidth;
     this.state.position = p;
 
     return this.state;

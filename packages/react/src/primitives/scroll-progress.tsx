@@ -22,6 +22,7 @@ export const ScrollProgress = React.memo(
       offset,
       orientation,
       reactive,
+      heroAware,
       progressValue: customProgressValue,
       onProgress,
       ...domProps
@@ -32,6 +33,7 @@ export const ScrollProgress = React.memo(
       offset,
       orientation,
       reactive,
+      heroAware,
       progressValue: customProgressValue,
       onProgress,
     });

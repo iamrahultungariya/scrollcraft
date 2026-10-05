@@ -45,7 +45,7 @@ export function ScrollProgressBar() {
     name: 'useParallax()',
     badge: 'DIRECT COMPOSITOR MUTATION',
     howItWorks:
-      'Computes spatial transformation matrices based on element viewport coordinates and writes translate3d styles directly to the DOM during Phase 4 of the ticker loop, completely bypassing React reconciliation.',
+      'Computes spatial transformation matrices based on element viewport coordinates and writes translate3d styles directly to the DOM during Phase 3 (Render) of the ticker loop, completely bypassing React reconciliation.',
     signature: 'useParallax(ref: RefObject<HTMLElement>, options: { speed?, direction?, easing? }): void',
     returns: 'void (Mutates target DOM style declarations directly on GPU compositor)',
     code: `'use client';

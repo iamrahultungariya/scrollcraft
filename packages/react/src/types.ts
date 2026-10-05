@@ -252,6 +252,8 @@ export interface ScrollProgressOptions {
   reactive?: boolean;
   /** Progress callback */
   onProgress?: (progress: number) => void;
+  /** Automatically anchors starting progress at scrollY=0 to 0.0 when element starts above the fold. Default: true */
+  heroAware?: boolean;
 }
 
 export interface ScrollProgressProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onProgress'>, ScrollProgressOptions {
@@ -272,6 +274,8 @@ export interface ScrollTransformOptions {
   onSnap?: (targetScroll: number) => void;
   markers?: boolean;
   respectReducedMotion?: boolean;
+  /** Automatically anchors starting progress at scrollY=0 to 0.0 when element starts above the fold. Default: true */
+  heroAware?: boolean;
 }
 
 export interface ScrollDrawOptions {
@@ -285,6 +289,8 @@ export interface ScrollDrawOptions {
   markers?: boolean;
   onDrawProgress?: (progress: number) => void;
   respectReducedMotion?: boolean;
+  /** Automatically anchors starting progress at scrollY=0 to 0.0 when element starts above the fold. Default: true */
+  heroAware?: boolean;
 }
 
 export interface MagneticOptions {

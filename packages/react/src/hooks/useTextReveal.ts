@@ -44,6 +44,9 @@ export function useTextReveal<T extends HTMLElement = HTMLParagraphElement>(
     baseOpacity = 0,
     triggerStart,
     triggerEnd,
+    start,
+    end,
+    playOnMount,
     targets,
     respectReducedMotion = true,
   } = options;
@@ -92,7 +95,13 @@ export function useTextReveal<T extends HTMLElement = HTMLParagraphElement>(
       baseOpacity,
       triggerStart,
       triggerEnd,
+      start,
+      end,
+      playOnMount,
     });
+
+    // Synchronously measure layout on mount to eliminate initial race conditions
+    solver.measure();
 
     solverRef.current = solver;
 
@@ -132,6 +141,9 @@ export function useTextReveal<T extends HTMLElement = HTMLParagraphElement>(
     baseOpacity,
     triggerStart,
     triggerEnd,
+    start,
+    end,
+    playOnMount,
     targets,
     reducedMotion,
     respectReducedMotion,

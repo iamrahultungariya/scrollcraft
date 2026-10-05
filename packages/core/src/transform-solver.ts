@@ -34,6 +34,8 @@ export interface TransformSolverOptions {
   scrub?: boolean | number;
   snap?: boolean;
   onSnap?: (targetScroll: number) => void;
+  /** Automatically anchors starting progress at scrollY=0 to 0.0 when element starts above the fold. Default: true */
+  heroAware?: boolean;
 }
 
 export class TransformSolver {
@@ -43,6 +45,8 @@ export class TransformSolver {
   
   public startY: number = 0;
   public endY: number = 0;
+  public viewportStartY: number = 0;
+  public viewportEndY: number = 0;
 
   public getBounds(): { startY: number; endY: number } {
     return { startY: this.startY, endY: this.endY };
@@ -57,6 +61,8 @@ export class TransformSolver {
   
   private isVisible: boolean = false;
   private wasVisible: boolean = false;
+  private heroAware: boolean = true;
+  private effectiveDistance: number = 0;
 
   private snapTimeout: number | null = null;
   private startTriggerCompiled: CompiledTrigger;
@@ -65,10 +71,11 @@ export class TransformSolver {
   constructor(element: HTMLElement, options: TransformSolverOptions) {
     this.element = element;
     this.id = options.id || (`transform-${Math.random().toString(36).slice(2, 8)}`);
+    this.heroAware = options.heroAware !== false;
     this.options = {
       ...options,
       start: options.start ?? 'top bottom',
-      end: options.end ?? 'bottom top',
+      end: options.end ?? ((options as any).preset ? 'center center' : 'bottom top'),
     };
     
     this.startTriggerCompiled = compileTrigger(this.options.start);
@@ -110,9 +117,19 @@ export class TransformSolver {
     
     this.startY = this.startTriggerCompiled.evaluate(rect, wh, scrollTop);
     this.endY = this.endTriggerCompiled.evaluate(rect, wh, scrollTop);
+    this.viewportStartY = rect.top + scrollTop - wh;
+    this.viewportEndY = rect.top + scrollTop + (rect.height || this.element.offsetHeight || 0);
     
     if (this.options.end?.startsWith('+=')) {
         this.endY = this.startY + parseFloat(this.options.end.replace('+=', ''));
+    }
+
+    if (this.heroAware && this.startY < 0) {
+      // Element starts inside the viewport on initial page load:
+      // Anchor remaining distance so at scrollY = 0 progress is strictly 0.0
+      this.effectiveDistance = Math.max(wh * 0.45, this.endY);
+    } else {
+      this.effectiveDistance = this.endY - this.startY;
     }
     
     // Restore transform
@@ -123,7 +140,7 @@ export class TransformSolver {
       type: 'transform',
       element: this.element,
       startTrigger: this.options.start || 'top bottom',
-      endTrigger: this.options.end || 'bottom top',
+      endTrigger: this.options.end || 'center center',
       startY: this.startY,
       endY: this.endY,
       progress: this.progress,
@@ -135,7 +152,12 @@ export class TransformSolver {
     if (this.startY === this.endY) return;
     
     // Calculate raw progress
-    let rawProgress = (scrollY - this.startY) / (this.endY - this.startY);
+    let rawProgress: number;
+    if (this.heroAware && this.startY < 0) {
+      rawProgress = this.effectiveDistance > 0 ? scrollY / this.effectiveDistance : 1;
+    } else {
+      rawProgress = (scrollY - this.startY) / (this.endY - this.startY);
+    }
     rawProgress = clamp(rawProgress, 0, 1);
     
     this.targetProgress = rawProgress;
@@ -220,9 +242,6 @@ export class TransformSolver {
     this.lastRenderedTier = currentTier;
     this.lastRenderedProgress = this.progress;
     Object.assign(this.lastRenderedValues, this.currentValues);
-
-    // Only flush styles if visible or just exited visibility
-    if (!this.isVisible && !this.wasVisible && this.progress === 0) return;
     
     const v = this.currentValues;
     const hasTransformProps =
